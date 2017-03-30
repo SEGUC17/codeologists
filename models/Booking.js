@@ -18,10 +18,7 @@ var schema = mongoose.Schema({
 		type: Date,
 		required: true
 	},
-	status: {
-		type: String,
-		required: true
-	},
+	accepted : Boolean,
 	player_rating: Number,
 	arena_rating: Number
 });
