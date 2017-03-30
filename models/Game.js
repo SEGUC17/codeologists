@@ -4,17 +4,18 @@ var Arena = require('./Arena');
 
 var schema = mongoose.Schema({
 	creator: {
-		type: Player,   //phone
+		type:mongoose.Schema.Types.ObjectId,
+		ref:'Player',
 		required: true
 	},
-	size: number,
+	size: Number,
 	location: {
 		type: String,
 		required: true
 	},
-	suggested_arenas: [Arena],
-	start_date: date,
-	end_date: date
+	suggested_arenas: [{type:mongoose.Schema.Types.ObjectId,ref:'Arena'}],
+	start_date: Date,
+	end_date: Date
 
 });
 
