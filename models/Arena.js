@@ -32,7 +32,6 @@ var schema = mongoose.Schema({
 });
 
 
-
 var Arena = mongoose.model('Arena', schema);
 
 module.exports = Arena;

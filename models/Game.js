@@ -7,14 +7,14 @@ var schema = mongoose.Schema({
 		type: Player,   //phone
 		required: true
 	},
-	size: number,
+	size: Number,
 	location: {
 		type: String,
 		required: true
 	},
 	suggested_arenas: [Arena],
-	start_date: date,
-	end_date: date
+	start_date: Date,
+	end_date: Date
 
 });
 
