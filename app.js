@@ -6,11 +6,11 @@ var cookieParser = require('cookie-parser');
 var mongoose = require('mongoose');
 var nodemon=require('nodemon');
 var path=require('path');
-
+var session = require('express-session');
 
 //database connection url
 var db_url = "mongodb://localhost:27017/db";
-
+mongoose.Promise = Promise;
 
 
 // config app
@@ -20,8 +20,17 @@ mongoose.connect(db_url);
 app.use(express.static(__dirname+ '/public'));
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(cookieParser());
+app.use(session({
+  secret: 'hsfrskdjgnlubhosithdz,gkbvn6359652534we85r596Q5354WER  wizo##keyboard cat',
+  resave: false,
+  saveUninitialized: false,
+
+}));
 app.use(require('./routes/router.js'));
 
+//var P = require('./models/ServiceProvider');
+//var p = new P({name: "hossam" , username:"hosasmfawzy" , password : "123" ,email:"hosasmfawzy96@gmail.com" , phone_number : "01153600443" , location : "rehab" , mode : true });
+//p.save();
 
 
 //start server
