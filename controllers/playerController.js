@@ -1,6 +1,5 @@
 let Game = require('../models/Game');
 let Booking = require('../models/Booking');
-var moment = require('moment-timezone');
 var SpController  = require('./serviceProviderController');
 var viewgames = function(req, res){
         
