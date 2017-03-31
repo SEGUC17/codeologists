@@ -18,10 +18,12 @@ var schema = mongoose.Schema({
 		type: Date,
 		required: true
 	},
-	status: {
-		type: String,
-		required: true
-	},
+	start_index:Number,
+	end_index:Number,
+	bookDay:Number,
+	bookWeek:Number,
+	bookMonth:Number,
+	accepted : Boolean,
 	player_rating: Number,
 	arena_rating: Number
 });
