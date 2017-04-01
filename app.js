@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var mongoose = require('mongoose');
 var nodemon=require('nodemon');
 var path=require('path');
+var passport = require('passport');
 
 
 //database connection url
@@ -20,7 +21,12 @@ mongoose.connect(db_url);
 app.use(express.static(__dirname+ '/public'));
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(cookieParser());
+
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(require('./routes/router.js'));
+
+
 
 
 
