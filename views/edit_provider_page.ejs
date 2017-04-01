@@ -59,7 +59,7 @@
           <label for="old_password">old_password</label><br>
           <input name = "old_password" type="password" id="old_password" placeholder="old password"><br>
 
-          <input class ="btn-primary form-control" type="submit" value="signup">
+          <input class ="btn-primary form-control" type="submit" value="edit">
           <% if(result.profile_pic.data) {%>
             <img src = "data:image/*;base64,<%= result.profile_pic.data.toString('base64')%>"> </img>
             <%}%>

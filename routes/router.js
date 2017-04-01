@@ -5,7 +5,8 @@ var mime = require('mime');
 var fs = require('fs');
 var path = require('path');
 var playerController=require('../controllers/playerController');
-var serviceProviderController = require('../controllers/serviceProviderController')
+var serviceProviderController = require('../controllers/serviceProviderController');
+var visitorController = require('../controllers/visitorController');
 var Player = require('../models/Player');
 
 var router = express.Router();
@@ -38,4 +39,8 @@ router.get('/edit_profile',function(req,res,next){
 router.get('/edit_profile',serviceProviderController.edit_profile_page);
 router.post('/edit_player_profile',upload.array('profile_pic'),playerController.edit_profie_info);
 router.post('/edit_provider_profile',upload.array('profile_pic'),serviceProviderController.edit_profie_info);
+router.post('/search',visitorController.filter);
+
+
+
 module.exports = router;

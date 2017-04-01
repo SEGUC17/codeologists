@@ -28,10 +28,6 @@ app.use(session({
 }));
 app.use(require('./routes/router.js'));
 
-//var P = require('./models/ServiceProvider');
-//var p = new P({name: "hossam" , username:"hosasmfawzy" , password : "123" ,email:"hosasmfawzy96@gmail.com" , phone_number : "01153600443" , location : "rehab" , mode : true });
-//p.save();
-
 
 //start server
 app.listen(8080,function(){
