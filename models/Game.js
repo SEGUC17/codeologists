@@ -8,14 +8,15 @@ var schema = mongoose.Schema({
 		ref:'Player',
 		required: true
 	},
-	size: Number,
+	size: {type: Number,default:5},
 	location: {
 		type: String,
 		required: true
 	},
 	suggested_arenas: [{type:mongoose.Schema.Types.ObjectId,ref:'Arena'}],
-	start_date: Date,
-	end_date: Date
+	start_date: {type:Date,required:true},
+	end_date: {type:Date,required:true},
+	requests:[{playerId:{type:mongoose.Schema.Types.ObjectId,ref:'Player'},comment:String,accepted:Boolean}]
 
 });
 
