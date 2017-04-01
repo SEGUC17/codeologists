@@ -28,16 +28,16 @@ var schema = mongoose.Schema({
 		required: true
 	},
 	location: String,
-	avg_rating: Number,
-	size: Number,
-	type: String,
+	avg_rating: {type:Number,default:0},
+	size: {type:Number,required:true},
+	type: {type:String,default:"Synthatic Green Field"},
 	photos: [{data:Buffer}],
 	price: {
 		type: Number,
 		required: true
 	},
 	comments: [String],
-	ratings_count: Number
+	ratings_count: {type:Number,default:0}
 });
 
 

@@ -11,8 +11,8 @@ var Player = RegisteredUser.discriminator('Player',
       		required: true
       	},
       	notifications : [String],
-      	avg_rating: Number,
-      	ratings_count: Number
+      	avg_rating: {type:Number,default:0},
+      	ratings_count: {type:Number,default:0}
       }));
 
 

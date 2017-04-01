@@ -18,14 +18,13 @@ var schema = mongoose.Schema({
 		type: Date,
 		required: true
 	},
-	start_index:Number,
-	end_index:Number,
-	bookDay:Number,
-	bookWeek:Number,
-	bookMonth:Number,
-	accepted : Boolean,
-	player_rating: Number,
-	arena_rating: Number
+	start_index:{type:Number,required:true},
+	end_index:{type:Number,required:true},
+	bookDay:{type:Number,required:true},
+	bookMonth:{type:Number,required:true},
+	accepted : {type:Boolean,required:true},
+	player_rating: {type:Number,default:0},
+	arena_rating: {type:Number,default:0}
 });
 
 

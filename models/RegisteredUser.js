@@ -18,11 +18,13 @@
  	},
  	email : {
  		type: String,
- 		required: true
+ 		required: true,
+		 unique:true
  	},
  	phone_number : {
  		type: String,
- 		required: true
+ 		required: true,
+		 unique:true
  	},
  	location : {
  		type: String,
