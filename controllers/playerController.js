@@ -4,13 +4,12 @@ let playerController = {
     
     viewgames:function(req, res){
         
-        Game.find(function(err, games){
-            
+        Game.find(function(err, games){ 
             if(err)
                 res.send(err.message);
             else
-                res.render('index', {games});
-        })
+                res.render('games', {games : games});
+        });
     }
 }
 
