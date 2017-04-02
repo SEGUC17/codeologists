@@ -1,9 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title></title>
+	<title>home</title>
 </head>
 <body>
 
+	<a href="/edit_profile">Edit</a><br>
+
+	<form autocomplete="off" class="form"  method="POST" action="/search">
+
+					<label for="n">name</label>
+					<input type="radio" id="n" name="search_type" value="name" class="radio" checked><br>
+					<label for="p">price</label>
+					<input type="radio" id="p" name="search_type" value="price" class="radio"><br>
+					<label for="l">location</label>
+					<input type="radio" id="l" name="search_type" value="location" class="radio"><br>
+					<label for="v">value</label>
+ 				  <input type="text" id="v" name="search_value"><br>
+ 					<input class ="btn-primary form-control" type="submit" value="search">
+					</form>
+<a href="/edit_profile">Edit</a><br>
 </body>
 </html>
