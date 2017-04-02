@@ -39,7 +39,7 @@ var schema = mongoose.Schema({
 	comments: [String],
 	ratings_count: {type:Number,default:0}
 });
-
+//.pre("save") to intiallize the schedule array
 
 
 var Arena = mongoose.model('Arena', schema);

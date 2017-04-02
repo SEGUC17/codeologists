@@ -1,6 +1,7 @@
 let Game = require('../models/Game');
 let Booking = require('../models/Booking');
 var SpController  = require('./serviceProviderController');
+var Arena =  require('../models/Arena');
 var viewgames = function(req, res){
         
         Game.find(function(err, games){
@@ -15,8 +16,12 @@ var viewgames = function(req, res){
 var bookHours=  function(month,day,startIndex,endIndex,timestamp,arenaID,playerID,callback){
    //TODO:handle Last three weeks of the year 
    //create Booking
-   var indicies = SpController.getScheduleIndicies(month,day);
-   if(checkAvailable(indicies.weekIndex,indicies.dayIndex))
+   var indicies = SpController.getScheduleIndicies(month,day)
+  
+  Arena.findById(arenaID,function(err,foundArena){
+
+  if(! err){
+   if(checkAvailable(endIndex,foundArena.schedule [indicies.weekIndex][indicies.dayIndex],startIndex))
   {
     var newBooking = new Booking({
         player:playerID,
@@ -40,23 +45,46 @@ var bookHours=  function(month,day,startIndex,endIndex,timestamp,arenaID,playerI
   {
       callback("Time Unavailable");
   }
-}
-
-function checkAvailable(weekIndex,dayIndex,startIndex,endIndex,schedule){
-    var pointer = 0;
-    for(pointer=startIndex;pointer<=endIndex;pointer++){
-        if(schedule[weekIndex][dayIndex][pointer]!=0)
-            return false;
     }
-    return true;
+    else{
+        callback("No such Arena");
+    }
 
+} )
+}
+
+function checkAvailable(endIndex,schedule,counter){
+        if(counter>endIndex)
+        {
+            return true;
+        }
+        else
+        {
+            if(schedule[counter]!=0)
+            return false;
+            else
+            checkAvailable(endIndex,schedule,counter+1);
+        }
 
 }
 
+var bookWeekly = function(req,res){
+   var indicies = SpController.getScheduleIndicies(month,day);
+   Arena.findById(req.params.arenaId,function(err,foundArena){
+       if(err)
+       {
+           res.send("No such Arena");
 
+       }
+       else
+       {
+           
+       }
+   })
+}
 
 let playerController = {
-    
+    bookWeekly:bookWeekly,
     viewgames:viewgames,
     bookHours:bookHours
 }
