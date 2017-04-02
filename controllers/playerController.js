@@ -12,10 +12,9 @@ day = "0"+day;
 
 let playerController = {
 
-
 edit_profile_page: function(req,res) { // prepar the edit profile page
                                           //retrieve the players's record from DB to be able to fill the fields to be changed
-         Player.findOne({username : req.session.username},function(err,result){
+         Player.findOne({username : req.user.username},function(err,result){
             if(err)
               res.send(err);
             else{
@@ -25,7 +24,7 @@ edit_profile_page: function(req,res) { // prepar the edit profile page
          })
 },
 edit_profie_info : function(req,res){ //accepting new info and update the DB record
-            Player.findOne({username : req.session.username},function(err,result){
+            Player.findOne({username : req.user.username},function(err,result){
                 if(err)
                  res.send(err);
                 else{
@@ -63,8 +62,17 @@ edit_profie_info : function(req,res){ //accepting new info and update the DB rec
                   }
 
                 });
-}
-
+},
+    
+    viewgames:function(req, res){
+        
+        Game.find(function(err, games){ 
+            if(err)
+                res.send(err.message);
+            else
+                res.render('games', {games : games});
+        });
+    }
 }
 
 module.exports = playerController;
