@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>user.name</title>
+</head>
+
+<body>
+
+
+<p>user.name</p>
+
+
+
+<script>
+if(<%=mssgN%>)
+{
+var mssg;
+switch (<%=mssgN%>) {
+    case 0:
+        mssg = "This player is already black listed";
+        break;
+    case 1:
+        mssg = "This player is not black listed";
+        break;
+    case 2:
+        mssg = "This player is already white listed";
+        break;
+    case 3:
+        mssg = "This player is not white listed";
+        break;
+    case 4:
+        mssg = "Successfully added to Blacklist";
+        break;
+    case 5:
+        mssg = "Successfully removed from Blacklist";
+        break;
+    case 6:
+        mssg = "Successfully added to WhiteList";
+        break;
+    case 7:
+        mssg = "Successfully removed from Whitelist";
+        break;
+    case 8:
+        mssg = "No player exists with\n this username";
+        break;
+    default:
+        mssg = "Error in operation.\nTry Again"
+}
+alert(mssg); 
+}
+</script>
+
+</body>
+</html>
