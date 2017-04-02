@@ -14,4 +14,5 @@ router.get('/editdefaultschedule/:arenaname',serviceProviderController.editdefau
 
 router.post('/addarenaimage/:arenaname',upload.any(),serviceProviderController.addimage);
 
+
 module.exports = router;
