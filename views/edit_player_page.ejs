@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+  <style>
+                .alert {
+                    padding: 20px;
+                    background-color: #f44336;
+                    color: white;
+                    opacity: 1;
+                    transition: opacity 0.6s;
+                    margin-bottom: 15px;
+                }
+                .alert.warning {background-color: #ff9800;}
+                .closebtn {
+                    margin-left: 15px;
+                    color: white;
+                    font-weight: bold;
+                    float: right;
+                    font-size: 22px;
+                    line-height: 20px;
+                    cursor: pointer;
+                    transition: 0.3s;
+                }
+                .closebtn:hover {
+                    color: black;
+                }
+                </style>
+</head>
+<body>
+  <form autocomplete="off" class="form" enctype="multipart/form-data" method="POST" action="/edit_player_profile">
+                  <%if(err){%>
+                  <div class="alert">
+                  <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                  <strong><%= err%></strong>
+                  </div>
+                  <%}%>
+                  <label for="name">name</label><br>
+                  <input name = "name" type="text" id="name" value ="<%= result.name %>"><br>
+                  <label for="new_password">new_password</label><br>
+                  <input name = "new_password" type="password"  id="new_password" placeholder="new password"><br>
+                  <label for="email">email</label><br>
+                  <input name = "email" type="text" id="email" value ="<%= result.email %>"><br>
+                  <label for="phone_number">phone_number</label><br>
+                  <input name = "phone_number" type="text"  id="phone_number" value ="<%= result.phone_number %>"><br>
+                  <label for="location">location</label><br>
+                  <input name = "location" type="text" id="location" value = "<%= result.location %>"><br>
+                  <label for="profile_pic">profile_pic</label><br>
+                  <input id ="profile_pic" type="file" class="form-control" name="profile_pic" accept="image/*"><br>
+                  <label for="birthdate">birthdate</label><br>
+                  <input name = "birthdate" required  type="date" id="birthdate"  value = <%=date%> ><br>
+                  <label for="old_password">old_password</label><br>
+                  <input name = "old_password" type="password" id="old_password" placeholder="old password"><br>
+
+                  <input class ="btn-primary form-control" type="submit" value="edit">
+                  <% if(result.profile_pic.data) {%>
+                  <img src = "data:image/*;base64,<%= result.profile_pic.data.toString('base64')%>"> </img>
+                  <%}%>
+          </form>
+
+</body>
+</html>
