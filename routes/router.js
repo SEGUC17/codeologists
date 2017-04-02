@@ -1,13 +1,15 @@
 var express = require('express');
-var multer = require('multer');
-var upload = multer();
-var passport = require('./passportConfig');
-
 var visitorController=require('../controllers/visitorController');
 var playerController=require('../controllers/playerController');
 var serviceProviderController=require('../controllers/serviceProviderController');
+var multer = require('multer');
+var upload = multer();
+var passport = require('./passportConfig');
 var router = express.Router();
 
+router.get('/', function(req, res){
+	res.render('index');
+});
 
 router.get('/register',function(req,res) {
 	res.render('chooseType');
@@ -44,6 +46,10 @@ router.get('/logout', function(req, res){
   req.logout();
   res.redirect('/');
 });
+
+router.post('/arenas', visitorController.view_all);
+
+router.post('/arenaDetails', visitorController.view_details_of_arena);
 
 router.get('/viewgames',playerController.viewgames);
 

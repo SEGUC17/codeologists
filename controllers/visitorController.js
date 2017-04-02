@@ -1,9 +1,11 @@
+
+var Arena = require('../models/Arena');
 var Player = require('../models/Player');
 var ServiceProvider = require('../models/ServiceProvider');
 var hasher = require('password-hash-and-salt');
 
 
-var visitorController = {
+let visitorController = {
 
 	createPlayer:function(req,res) {
 		Player.findOne({username: req.body.username},function(err,user){
@@ -11,11 +13,7 @@ var visitorController = {
 				res.render('newPlayer',{error:'Username already used'});
 			else
 			{
-				
-				
-
-
-
+			
 				hasher(req.body.password).hash(function(error, hash) {
 				    if(error)
 				        throw new Error(error.message);
@@ -48,18 +46,9 @@ var visitorController = {
 				    
 				});
 
-
-
-
-
-
 			}
 		});
 	},
-
-
-
-
 
 	createServiceProvider:function(req,res) {
 		ServiceProvider.findOne({username: req.body.username},function(err,user){
@@ -67,11 +56,7 @@ var visitorController = {
 				res.render('newServiceProvider',{error:'Username already used'});
 			else
 			{
-				
-				
-
-
-
+			
 				hasher(req.body.password).hash(function(error, hash) {
 				    if(error)
 				        throw new Error(error.message);
@@ -102,26 +87,32 @@ var visitorController = {
 				 
 				    
 				});
-
-
-
-
-
-
 			}
 		});
-	}
+	},
+  
+  view_all:function(req, res){
 
+    	Arena.find({location:req.body.location}, function(err, result){
+    		if(err)
+    			res.send(err.message);
+    		else
+    			//When integrating we will change test page to the page we want to redirect to
+    			res.render('test', {result});
+    			//res.send(result);
+    	})
+    },
+   view_details_of_arena:function(req, res){
 
-
-
-
-
-
-
-
+    	Arena.find({name:req.body.name}, function(err, result){
+    		if(err)
+    			res.send(err.message);
+    		else
+    			//When integrating we will change test page to the page we want to redirect to
+    			res.render('test', {result});
+    			//res.send(result);
+    	});
+    }
 };
-
-
 
 module.exports = visitorController;
