@@ -95,6 +95,10 @@ router.get('/editdefaultschedule/:arenaname',serviceProviderController.editdefau
 
 router.post('/addarenaimage/:arenaname',upload.any(),serviceProviderController.addimage);
 
+
+router.post('/createArena', serviceProviderController.createArena);
+router.post('/cancelBooking', serviceProviderController.cancelBooking);
+
 router.post("/sp/arena/:arena_id",function(req,res){
 	if(req.body.flag==1){
 		serviceProviderController.setUnavailable(req,res);
