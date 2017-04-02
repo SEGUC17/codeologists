@@ -5,6 +5,7 @@ var mime = require('mime');
 var fs = require('fs');
 var path = require('path');
 var playerController=require('../controllers/playerController');
+
 var serviceProviderController = require('../controllers/serviceProviderController');
 var visitorController = require('../controllers/visitorController');
 var Player = require('../models/Player');
@@ -93,6 +94,14 @@ router.post('/editarenainfo/:arenaname',serviceProviderController.editarenainfo)
 router.get('/editdefaultschedule/:arenaname',serviceProviderController.editdefaultschedule);
 
 router.post('/addarenaimage/:arenaname',upload.any(),serviceProviderController.addimage);
+
+router.post("/sp/arena/:arena_id",function(req,res){
+	if(req.body.flag==1){
+		serviceProviderController.setUnavailable(req,res);
+	}
+	else
+		serviceProviderController.setavailable(req,res);
+});
 
 
 module.exports = router;
