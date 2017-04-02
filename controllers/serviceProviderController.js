@@ -1,6 +1,6 @@
 let serviceProvider = require('../models/ServiceProvider');
-let booking = require('../models/Booking');
-let game = require('../models/Game');
+let Booking = require('../models/Booking');
+let Game = require('../models/Game');
 let arena = require('../models/Arena');
 
 
@@ -14,6 +14,10 @@ let serviceProviderController =
 			if(!err)
 			{
 				user.mode = true;
+				user.save(function(err){
+					if(err)
+						console.log(err);
+				});
 			}
 		});
 	},
@@ -26,6 +30,10 @@ let serviceProviderController =
 			if(!err)
 			{
 				user.mode = false;
+				user.save(function(err){
+					if(err)
+						console.log(err);
+				});
 			}
 		});
 	},
@@ -41,7 +49,7 @@ let serviceProviderController =
 			var start = booking.start_index;
 			var end =  booking.end_index;
 			var ok = true;
-			for(var i=start_index;i<=end_index;i++)
+			for(var i=start;i<=end;i++)
 			{
 				if(schedule[weekIndex][dayIndex][i] != 0)
 				{
@@ -57,7 +65,7 @@ let serviceProviderController =
 			else
 			{
 				//find all bookings in the same arena , same day and same month
-				booking.find({arena : arenaa._id , bookDay : booking.bookDay , bookMonth : booking.bookMonth }
+				Booking.find({arena : arenaa._id , bookDay : booking.bookDay , bookMonth : booking.bookMonth }
 					, function(err , allBookings){
 					if(err)
 						console.log("Error !!");
@@ -74,12 +82,13 @@ let serviceProviderController =
 									arena.findOne( {_id : allBookings[i].arena}, function(err ,arenaa){
 										//send a notification that his booking was rejected
 										var notification = 'Unfortunately,your booking for ' + (arenaa.name) + ' from ' 
-										+ start1 + ' to ' + end1 + ' has been rejected';
+										+ getTimeFromIndex(start1) + ' to ' + getTimeFromIndex(end1) 
+										+ ' has been rejected';
 										player.findOne({ _id  : allBookings[i].player} , function(err , playerr){
 											playerr.notifications.push(notification);
 											playerr.save();
 											//removes this booking
-											booking.remove({_id : allBookings[i]._id} , function(err , result){
+											Booking.remove({_id : allBookings[i]._id} , function(err , result){
 												if(err)
 													console.log(err);
 												else
@@ -91,19 +100,28 @@ let serviceProviderController =
 								}
 							}
 					}
+					for(var i=start ; i<=end;i++)
+					{
+						arenaa.schedule[weekIndex][dayIndex][i] = booking._id;
+					}
+					arenaa.save(function(err){
+						if(err)
+							console.log(err);
+					})
 				})
 			}
 
 		})
 	},
 
-	handleBooking:function(id)
+	handleBooking:function(req,res)
 	{
-		booking.findOne({_id : id} , function(err , booking){
+		var id = req.body.id;
+		Booking.findOne({_id : id} , function(err , booking2){
 			if(err)
 				console.log('ERROR in handleBooking');
 			else
-				arena.findOne({_id : booking.arena} , function(err , arena){
+				arena.findOne({_id : booking2.arena} , function(err , arena){
 					if(err)
 						console.log('ERROR in handleBooking 2');
 					else
@@ -113,7 +131,7 @@ let serviceProviderController =
 							else
 							{
 								if(serviceProvider.mode == true)
-									acceptBooking(booking);
+									acceptBooking(booking2);
 							}
 						})
 				});
@@ -130,7 +148,73 @@ let serviceProviderController =
 		var firstDayInWeek = new Date(date - (weekDay*1000*60*60*24));
 		var difInWeeks = Math.floor((curDate - firstDayInWeek)/1000/60/60/24/7);
 		return { weekIndex : difInWeeks , dayIndex : (curDate.getDay()+1)%7 };
+	},
+	//the indices are 0-based
+	getTimeFromIndex:function(index){
+		var hour = Math.floor(index/2);
+		var minute = '00';
+		if(index%2==1)
+			minute ='30';
+		return hour+':'+minute;
+	},
+
+
+	rejectBooking:function(req,res){
+		var bookingID = req.body.booking;
+		arena.findOne({_id : booking.arena},function(err , arenaa){
+			var arenaName = arenaa.name;
+			Booking.findOne({_id:bookingID} , function(err , curBooking){
+				if(err)
+					console.log(err);
+				else
+				{
+					var notification = 'Unfortunately,your booking for ' + (arenaName) + ' from ' 
+						+ getTimeFromIndex(curBooking.start_index) + ' to ' + end1 + ' has been rejected';
+					player.findOne({ _id  : curBooking.player} , function(err , playerr){
+						playerr.notifications.push(notification);
+						playerr.save();
+						//removes this booking
+						Booking.remove({_id : curBooking._id} , function(err , result){
+						if(err)
+							console.log(err);
+						else
+							console.log(result);
+						});
+					});
+				}
+			});
+		});
+	},
+
+
+	createGame:function(req,res){
+		//to get from the session
+		var creator2 = 'Mina';
+		var size2 = req.body.size;
+		var location2 = req.body.location;
+		var arenas2 = req.body.arenas;
+		var start_date2 = req.body.start_date;
+		var end_date2 = req.body.end_date;
+		let added = new Game
+		{
+			creator: creator,
+			size: size2,
+			location: location2,
+			suggested_arenas: arenas2,
+			start_date: start_date2,
+			end_date: end_date2
+		}
+		added.save(function(err , added){
+			if(err)
+				console.log(err);
+		})
+
 	}
+
+
+
+
+
 
 }
 
