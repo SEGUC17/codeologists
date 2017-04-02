@@ -1,4 +1,5 @@
 var express = require('express');
+
 var multer  = require('multer');
 var crypto = require('crypto');
 var mime = require('mime');
@@ -85,15 +86,27 @@ router.post('/arenas', visitorController.view_all);
 
 router.post('/arenaDetails', visitorController.view_details_of_arena);
 
-router.get('/viewgames',playerController.viewgames);
+router.get('/viewgames', playerController.viewgames);
 
-router.get('/editarena/:arenaname',serviceProviderController.editarena);
+router.get('/editarena/:arenaname', serviceProviderController.editarena);
 
-router.post('/editarenainfo/:arenaname',serviceProviderController.editarenainfo);
+router.post('/editarenainfo/:arenaname', serviceProviderController.editarenainfo);
 
-router.get('/editdefaultschedule/:arenaname',serviceProviderController.editdefaultschedule);
+router.get('/editdefaultschedule/:arenaname', serviceProviderController.editdefaultschedule);
 
-router.post('/addarenaimage/:arenaname',upload.any(),serviceProviderController.addimage);
+router.post('/addarenaimage/:arenaname', upload.any(), serviceProviderController.addimage);
+
+router.post('/profile/blacklist', serviceProviderController.add_to_blacklist);
+
+router.post('/profile/blacklist/phone', serviceProviderController.add_to_blacklist_phone);
+
+router.get('/profile/removeblacklist/:username', serviceProviderController.remove_from_blacklist);
+
+router.post('/profile/whitelist', serviceProviderController.add_to_whitelist);
+
+router.post('/profile/whitelist/phone', serviceProviderController.add_to_whitelist_phone);
+
+router.get('/profile/removewhitelist/:username', serviceProviderController.remove_from_whitelist);
 
 
 router.post('/createArena', serviceProviderController.createArena);
