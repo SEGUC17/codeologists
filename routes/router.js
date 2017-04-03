@@ -120,5 +120,9 @@ router.post("/sp/arena/:arena_id",function(req,res){
 		serviceProviderController.setavailable(req,res);
 });
 
+app.post('/RequestGame',requestgame);
+app.post('/AcceptRequest',acceptrequest);
+app.post('/RejectRequest',rejectrequest);
+
 
 module.exports = router;
