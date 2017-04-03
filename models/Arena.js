@@ -36,7 +36,7 @@ var schema = mongoose.Schema({
 		type: Number,
 		required: true
 	},
-	comments: [String],
+	comments: [{Content: String, time_stamp: Date, player: String}],
 	ratings_count: Number
 });
 

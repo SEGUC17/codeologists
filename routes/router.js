@@ -25,6 +25,13 @@ var storage = multer.diskStorage({  // for profile Pictures
 });
 var upload = multer({ storage: storage }); // for profilePictures
 
+router.use(function(req, res, next) {
+  res.locals.currentUser = req.user;
+  res.locals.errors = req.flash("error");
+  res.locals.infos = req.flash("info");
+  next();
+});
+
 router.get('/', function(req,res){
   // setting username and type for testing
   res.render('index');
@@ -111,6 +118,38 @@ router.get('/profile/removewhitelist/:username', serviceProviderController.remov
 
 router.post('/createArena', serviceProviderController.createArena);
 router.post('/cancelBooking', serviceProviderController.cancelBooking);
+
+
+router.post('/comment', ensureAuthenticated, function(req, res){
+  var player = req.body.username;
+  var content = req.body.comment;
+  req.arena.comments.push({Content: content, time_stamp: new Date(), player: player});
+  res.redirect('/');
+});
+
+router.post('/ProviderRatesBooking', ensureAuthenticated, function(req, res){
+  var player = req.body.booking.player;
+  var rating = req.body.rating;
+  req.booking.player.avg_rating += rating;
+  req.booking.player.avg_rating ++;
+
+});
+
+// router.post('/comment', ensureAuthenticated, function(req, res){
+//   var player = req.body.username;
+//   var content = req.body.comment;
+//   req.arena.comments.push({Content: content, time_stamp: time_stamp, player: player});
+// }
+
+
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    req.flash("error", "You must be logged in to see this page.");
+    //res.redirect("/login");
+  }
+}
 
 router.post("/sp/arena/:arena_id",function(req,res){
 	if(req.body.flag==1){
