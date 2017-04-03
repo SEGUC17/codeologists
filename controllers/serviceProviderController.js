@@ -1,11 +1,9 @@
-//var serviceProvider = require('./ServiceProvider');
 var multer = require('multer');
 var fs = require('fs');
 var path = require('path');
 var Booking = require('../models/Booking');
 var Arena = require('../models/Arena');
 var serviceProvider = require('../models/serviceProvider');
-var fs = require('fs');
 var path = require('path');
 let Game = require('../models/Game');
 
@@ -217,14 +215,14 @@ let serviceProviderController =
 		var start_date2 = req.body.start_date;
 		var end_date2 = req.body.end_date;
 		let added = new Game
-		{
+		({
 			creator: creator2,
 			size: size2,
 			location: location2,
 			suggested_arenas: arenas2,
 			start_date: start_date2,
 			end_date: end_date2
-		}
+		});
 		added.save(function(err , added){
 			if(err)
 				console.log(err);
