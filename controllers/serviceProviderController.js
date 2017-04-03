@@ -3,7 +3,7 @@ var fs = require('fs');
 var path = require('path');
 var Booking = require('../models/Booking');
 var Arena = require('../models/Arena');
-var serviceProvider = require('../models/serviceProvider');
+var ServiceProvider = require('../models/ServiceProvider');
 var path = require('path');
 let Game = require('../models/Game');
 
@@ -706,7 +706,7 @@ let serviceProviderController =
     })
     // el service provider kda s7?
     var newArena = new Arena({
-      service_provider: servProv;
+      service_provider: servProv,
       rules_and_regulations: rules,
       name: name,
       address: address,
