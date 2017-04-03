@@ -31,6 +31,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(require('./routes/router.js'));
 
+schedule.scheduleJob({hour:00,minute:00,dayOfWeek:5},systemController.updateSchedule);
+
 //start server
 app.listen(8080,function(){
   console.log("app listening on port 8080");
