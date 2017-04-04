@@ -56,7 +56,7 @@ let serviceProviderController =
 			}
 		});
 	},
-	
+
 	acceptBooking:function(booking)
 	{
 		//find the arena of this booking
@@ -100,8 +100,8 @@ let serviceProviderController =
 								{
 									arena.findOne( {_id : allBookings[i].arena}, function(err ,arenaa){
 										//send a notification that his booking was rejected
-										var notification = 'Unfortunately,your booking for ' + (arenaa.name) + ' from ' 
-										+ getTimeFromIndex(start1) + ' to ' + getTimeFromIndex(end1) 
+										var notification = 'Unfortunately,your booking for ' + (arenaa.name) + ' from '
+										+ getTimeFromIndex(start1) + ' to ' + getTimeFromIndex(end1)
 										+ ' has been rejected';
 										player.findOne({ _id  : allBookings[i].player} , function(err , playerr){
 											playerr.notifications.push(notification);
@@ -187,7 +187,7 @@ let serviceProviderController =
 					console.log(err);
 				else
 				{
-					var notification = 'Unfortunately,your booking for ' + (arenaName) + ' from ' 
+					var notification = 'Unfortunately,your booking for ' + (arenaName) + ' from '
 						+ getTimeFromIndex(curBooking.start_index) + ' to ' + end1 + ' has been rejected';
 					player.findOne({ _id  : curBooking.player} , function(err , playerr){
 						playerr.notifications.push(notification);
@@ -443,7 +443,7 @@ let serviceProviderController =
             });
         });
     },
-  
+
   edit_profile_page: function(req,res) { // prepar the edit profile page
                                             //retrieve the players's record from DB to be able to fill the fields to be changed
            serviceProvider.findOne({username : req.session.username},function(err,result){
@@ -523,7 +523,7 @@ let serviceProviderController =
             for (var i = 0; i < 48; i++) {
      		      schedule[weekIndex][dayIndex][i] = before_edit[i] ;
      	};
-     	res.send("error, You can not set booked slots to be unavailable");  
+     	res.send("error, You can not set booked slots to be unavailable");
      	}
      	else{
      		arena.schedule = schedule;
@@ -551,9 +551,9 @@ let serviceProviderController =
      arenaModel.findById(req.paramas.arena_id,function(err,arena){
      	var schedule = arena.schedule;
      	for (var i = startIndex; i <= endIndex ; i++) {
-     	schedule[weekIndex][dayIndex][i] = 0;	
+     	schedule[weekIndex][dayIndex][i] = 0;
      	};
-     
+
      arena.schedule = schedule;
      		arena.save(function(err){
      			if(err){
@@ -772,6 +772,42 @@ let serviceProviderController =
        time_stamp: time_stamp}, function(err){
          if(err){console.log(err);}
        })
+  },
+  
+  providerRateBooking:function(req,res)
+  {
+    Booking.findOne({_id: req.params.id}, function (err, booking) {
+      if (err) {
+        next(err);
+        return;
+      }
+      booking.player_rating = req.body.rating;
+      booking.save(function(err) {
+        if (err) {
+          next(err);
+          return;
+        }
+        res.redirect('/');
+      });
+
+      // find player
+      Player.findOne({ _id: booking.player }, function(err, player) {
+        var rating = req.body.rating;
+        if (err) { return next(err); }
+        if (!player) { return next(404); }
+        // update rating
+        player.avg_rating = (player.avg_rating*player.ratings_count+rating)/(player.ratings_count+1);
+        player.ratings_count ++;
+        // save rating at player
+        player.save(function(err) {
+          if (err) {
+            next(err);
+            return;
+          }
+          res.redirect('/');
+        });
+      });
+    }
   }
 }
 
