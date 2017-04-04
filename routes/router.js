@@ -174,5 +174,9 @@ router.post('/arena/:arenaId?bookHours', function (req, res) {
 })
 
 
+app.post('/RequestGame',requestgame);
+app.post('/AcceptRequest',acceptrequest);
+app.post('/RejectRequest',rejectrequest);
+
 
 module.exports = router;
