@@ -108,6 +108,12 @@ router.post('/profile/whitelist/phone', serviceProviderController.add_to_whiteli
 
 router.get('/profile/removewhitelist/:username', serviceProviderController.remove_from_whitelist);
 
+router.post('/arena/:id/comment', ensureAuthenticated,  playerController.commentOnArena);
+
+router.post('ProviderRatesBooking/:id', ensureAuthenticated, serviceProviderController.providerRateBooking);
+
+router.post('/PlayerRatesBooking/:id', ensureAuthenticated,  playerController.playerRateBooking);
+
 
 router.post('/createArena', serviceProviderController.createArena);
 router.post('/cancelBooking', serviceProviderController.cancelBooking);
@@ -134,7 +140,7 @@ router.get('/arena/:arenaId?viewBookings', function (req, res) {
                     Booking.find({accepted:false,arena:foundArena._id}).$where('(new Date(new Date().getFullYear(),this.bookMonth,this.bookDay))>(new Date())').exec(function (err, bookingArr) {
                             //TODO: render a view (will be done in Sprint 2 ISA)
                             if(err)
-                            {   
+                            {
                                 res.json("Error finding pending requests");
                             }
                             else
