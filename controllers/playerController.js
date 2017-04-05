@@ -133,7 +133,7 @@ let playerController = {
       if (err)
         res.send(err.message);
       else
-        res.render('games', { games: games });
+        res.render('viewgames', { games: games });
     });
   },
 

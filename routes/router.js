@@ -102,15 +102,15 @@ router.post('/arenas', visitorController.view_all);
 
 router.post('/arenaDetails', visitorController.view_details_of_arena);
 
-router.get('/viewgames', playerController.viewgames);
+router.get('/viewgames', ensureAuthenticated, playerController.viewgames);
 
-router.get('/editarena/:arenaname', serviceProviderController.editarena);
+router.get('/editarena/:arenaname', ensureAuthenticated, serviceProviderController.editarena);
 
-router.post('/editarenainfo/:arenaname', serviceProviderController.editarenainfo);
+router.post('/editarenainfo/:arenaname', ensureAuthenticated, serviceProviderController.editarenainfo);
 
-router.get('/editdefaultschedule/:arenaname', serviceProviderController.editdefaultschedule);
+router.get('/editdefaultschedule/:arenaname', ensureAuthenticated, serviceProviderController.editdefaultschedule);
 
-router.post('/addarenaimage/:arenaname', upload.any(), serviceProviderController.addimage);
+router.post('/addarenaimage/:arenaname', ensureAuthenticated, upload.any(), serviceProviderController.addimage);
 
 router.post('/profile/blacklist', serviceProviderController.add_to_blacklist);
 

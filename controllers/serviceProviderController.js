@@ -216,45 +216,90 @@ let serviceProviderController =
         editarena: function (req, res) {
             var arenaname = req.params.arenaname;
             Arena.findOne({ name: arenaname }, function (err, arena) {
-                if (err) { res.redirect('/'); } //handle error
-                if (!arena) { res.redirect('/'); } //handle error
-                if (req.user && arena.service_provider != req.user._id) { res.redirect('/'); } //handle error
-                res.render('editarena', { arena: arena });
+                if (err) {
+                    req.flash('error', 'this page is not available');
+                    res.redirect('/');
+                }
+                if (!arena) {
+                    req.flash('error', 'this page is not available');
+                    res.redirect('/');
+                }
+                if (req.user && arena.service_provider == req.user._id) {
+                    res.render('editarena', { arena: arena });
+                }
+                req.flash('error', 'this page is not available');
+                res.redirect('/');
             });
         },
         editarenainfo: function (req, res) {
             var arenaname = req.params.arenaname;
             Arena.findOne({ name: arenaname }, function (err, arena) {
-                if (err) { res.redirect('/'); } //handle error
-                if (!arena) { res.redirect('/'); } //handle error
-                if (req.user && arena.service_provider != req.user._id) { res.redirect('/'); } //handle error
-                arena.rules_and_regulations = req.body.rules_and_regulations;
-                arena.address = req.body.address;
-                arena.location = req.body.location;
-                arena.size = req.body.size;
-                arena.type = req.body.type;
-                arena.price = req.body.price;
-                arena.save(function (err) {
-                    if (err) {
-                        res.redirect('/'); //handle error
-                        // nxt(err);
-                        // return;
-                    }
-                    res.redirect('/arenas/' + arena.name);
-                });
+                if (err) {
+                    req.flash('error', 'this page is not available');
+                    res.redirect('/');
+                }
+                if (!arena) {
+                    req.flash('error', 'this page is not available');
+                    res.redirect('/');
+                }
+                if (req.user && arena.service_provider == req.user._id) {
+                    arena.rules_and_regulations = req.body.rules_and_regulations;
+                    arena.address = req.body.address;
+                    arena.location = req.body.location;
+                    arena.size = req.body.size;
+                    arena.type = req.body.type;
+                    arena.price = req.body.price;
+                    arena.save(function (err) {
+                        if (err) {
+                            console.log(err);
+                            nxt(err);
+                        }
+                        req.flash('info', 'your arena info is updated successfully');
+                        res.redirect('/viewarena/' + arenaname);
+                    });
+                }
+                req.flash('error', 'this page is not available');
+                res.redirect('/');
             });
         },
-        editdefaultschedule: function (req, res) {
+        editdefaultschedule: function (req, res, nxt) {
             var arenaname = req.params.arenaname;
             Arena.findOne({ name: arenaname }, function (err, arena) {
-                if (err) { res.redirect('/'); } //handle error
-                if (!arena) { res.redirect('/'); } //handle error
-                if (req.user && arena.service_provider != req.user._id) { res.redirect('/'); } //handle error
-                for (var i = 0; i < 7; i++) {
-                    for (var j = 0; j < 48; j++) {
-                        arena.default_weekly_schedule[i][j] = req.body.schedule[i][j].checked ? -1 : 0; //may be changed
-                    }
+                if (err) {
+                    req.flash('error', 'this page is not available');
+                    res.redirect('/');
                 }
+                if (!arena) {
+                    req.flash('error', 'this page is not available');
+                    res.redirect('/');
+                }
+                if (req.user && arena.service_provider == req.user._id) {
+                    if (req.defaultschedule) {
+                        var ds = req.default_schedule;
+                        for (var i = 0; i < 7; i++) {
+                            for (var j = 0; j < 48; j++) {
+                                arena.default_weekly_schedule[i][j] = 0;
+                            }
+                        }
+
+                        for (var i = 0; i < ds.length; i++) {
+                            var sa = ds[i].split(",");
+                            var x = parseInt(ds[i][0]);
+                            var y = parseInt(ds[i][1]);
+                            arena.default_weekly_schedule[x][y] = -1;
+                        }
+                    }
+                    arena.save(function (err) {
+                        if (err) {
+                            console.log(err);
+                            nxt(err);
+                        }
+                    });
+                    req.flash('info', 'your default schedule is updated successfully');
+                    res.redirect('/viewarena/' + arenaname);
+                }
+                req.flash('error', 'this page is not available');
+                res.redirect('/');
             });
         },
         addimage: function (req, res, nxt) {
@@ -262,11 +307,27 @@ let serviceProviderController =
             var newimage = { data: fs.readFileSync(img_path) };
             var arenaname = req.params.arenaname;
             Arena.findOne({ name: arenaname }, function (err, arena) {
-                if (err) { res.redirect('/'); } //handle error
-                if (!arena) { res.redirect('/'); } //handle error
-                if (req.user && arena.service_provider != req.user._id) { res.redirect('/'); } //handle error
-                arena.photos.push(newimage);
-                arena.save(nxt);
+                if (err) {
+                    req.flash('error', 'this page is not available');
+                    res.redirect('/');
+                }
+                if (!arena) {
+                    req.flash('error', 'this page is not available');
+                    res.redirect('/');
+                }
+                if (req.user && arena.service_provider == req.user._id) {
+                    arena.photos.push(newimage);
+                    arena.save(function (err) {
+                        if (err) {
+                            console.log(err);
+                            nxt(err);
+                        }
+                    });
+                    req.flash('info', 'your new arena image is uploaded successfully');
+                    res.redirect('/viewarena/' + arenaname);
+                }
+                req.flash('error', 'this page is not available');
+                res.redirect('/');
             });
         },
 
