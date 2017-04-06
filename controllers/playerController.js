@@ -6,6 +6,7 @@ var serviceProviderController = require('./serviceProviderController');
 var Arena = require('../models/Arena');
 var Booking = require('../models/Booking');
 var ServiceProvider = require('../models/ServiceProvider');
+var Game = require('../models/Game');
 function date_calc(year, month, day) {
   if (month < 10)  //if month is one digit pad it with zero
     month = "0" + month;
@@ -141,7 +142,7 @@ let playerController = {
       res.send("You are not authorized to view this page");
       return;
     }
-    var player = req.user.id;
+    var player = req.user._id;
     var arena = req.body.arenaID;
     var bookingID = req.params.bookingID;
     var status;
@@ -200,7 +201,7 @@ let playerController = {
   createGame: function (req, res) {
 
     if (!(req.body.size) || !(req.body.location) || !(req.body.arenas) || !(req.body.start_date) ||
-      !(req.body.end_date) || !(req.user.player))
+      !(req.body.end_date) || !(req.user._id))
       res.send('Missing fields');
 
     var creator2 = req.user.player;

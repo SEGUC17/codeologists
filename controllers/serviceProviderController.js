@@ -196,7 +196,7 @@ let serviceProviderController =
                 else {
                     var booking = bookingObj;
                     Arena.findOne({ _id: booking.arena }, function (err, arenaa) {
-                        if (!arenaa.service_provider.equals(req.user.id)) {
+                        if (!arenaa.service_provider.equals(req.user._id)) {
                             res.send('You are not authorized to do this');
                             return;
                         }

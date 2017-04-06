@@ -159,7 +159,7 @@ router.post('/arena/:arenaId/bookHours', ensureAuthenticated, playerController.c
 
 router.post('/RequestGame', ensureAuthenticated, playerController.requestgame);
 router.post('/AcceptRequest', ensureAuthenticated, playerController.acceptrequest);
-router.post('/RejectRequest', ensureAuthenticated, playerController.rejectrequest);
+router.post('/RejectRequest/:id', ensureAuthenticated, playerController.rejectrequest);
 
 
 module.exports = router;
