@@ -52,7 +52,6 @@ var createBooking = function (req, res) {
 
 
 var bookHours = function (month, day, startIndex, endIndex, timestamp, arenaID, playerID, callback) {
-  //TODO:handle Last three weeks of the year 
   //create Booking
   var indices = serviceProviderController.getScheduleIndices(month, day);
 

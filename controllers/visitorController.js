@@ -154,12 +154,9 @@ let visitorController = {
 
 										var blacklist = service[j].blacklist;
 
-										//The Following line is used for testing
-										//var id2 = require('mongodb').ObjectID('58e63e7f6c2c75071f0f6f72');
-
 										for (var k = 0; k < blacklist.length; k++) {//loop searching in blacklist of service provider
 
-											if (req.user._id.equals(blacklist[k])) {//use id2 instead of req.user._id while testing
+											if (req.user._id == blacklist[k]) {
 												result.splice(i, 1);
 												break;
 											}
@@ -169,11 +166,12 @@ let visitorController = {
 							}
 						}
 
-						if (result.length == 0)
+						if (result.length == 0) {
 							res.render('index', { result: "", error: "No Arenas Found in That Location." });
+							return;
+						}
 
-						//When integrating we will change test page to the page we want to redirect to
-						res.render('test', { result, error: "" });
+						res.send(result);
 
 					})
 				}
@@ -188,7 +186,7 @@ let visitorController = {
 
 		var blacklisted = 0;
 
-		Arena.find({ name: req.body.location }, function (err, result) {
+		Arena.find({ name: req.body.name }, function (err, result) {
 			if (err)
 				res.send(err.message);
 			else {
@@ -199,21 +197,18 @@ let visitorController = {
 					ServiceProvider.findById(id, function (err, service) {
 						var blacklist = service.blacklist;
 
-						//The following line is used for testing
-						///var id2 = require('mongodb').ObjectID('58e63e7f6c2c75071f0f6f72');
 
 						for (var i = 0; i < blacklist.length; i++) {
 
-							if (req.user._id.equals(blacklist[i])) {//use id2 instead of req.user._id while testing
+							if (req.user._id == blacklist[i]) {
 								blacklisted = 1;
 							}
 						}
 
 						if (blacklisted == 0)
-							//When integrating we will change test page to the page we want to redirect to
-							res.render('test', { result, error: "" });
+							res.send(result);
 						else
-							res.render('error');
+							res.send("No Arenas");
 					})
 
 				}
