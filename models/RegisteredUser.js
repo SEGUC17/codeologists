@@ -22,7 +22,8 @@ var schema = mongoose.Schema({
 	},
 	phone_number: {
 		type: String,
-		required: true
+		required: true,
+		unique: true
 	},
 	location: {
 		type: String,

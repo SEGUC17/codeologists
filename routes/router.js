@@ -13,17 +13,8 @@ var Player = require('../models/Player');
 
 var passport = require('./passportConfig');
 var router = express.Router();
-var storage = multer.diskStorage({  // for profile Pictures
-    destination: function (req, file, cb) {
-        cb(null, './views')
-    },
-    filename: function (req, file, cb) {
-        crypto.pseudoRandomBytes(16, function (err, raw) {
-            cb(null, raw.toString('hex') + Date.now() + '.' + mime.extension(file.mimetype));
-        });
-    }
-});
-var upload = multer({ storage: storage }); // for profilePictures
+
+var upload = multer(); // for profilePictures
 
 router.use(function (req, res, nxt) {
     res.locals.currentUser = req.user;
@@ -47,15 +38,15 @@ router.get('/', function (req, res) {
 });
 
 
-router.get('/edit_profile', function (req, res, next) {
+router.get('/edit_profile', ensureAuthenticated, function (req, res, next) {
     if (req.user.type == "Player")
         next();
     else
         next('route');
 }, playerController.edit_profile_page);
-router.get('/edit_profile', serviceProviderController.edit_profile_page);
-router.post('/edit_player_profile', upload.array('profile_pic'), playerController.edit_profie_info);
-router.post('/edit_provider_profile', upload.array('profile_pic'), serviceProviderController.edit_profie_info);
+router.get('/edit_profile', ensureAuthenticated, serviceProviderController.edit_profile_page);
+router.post('/edit_player_profile', ensureAuthenticated, upload.array('profile_pic'), playerController.edit_profile_info);
+router.post('/edit_provider_profile', ensureAuthenticated, upload.array('profile_pic'), serviceProviderController.edit_profile_info);
 router.post('/search', visitorController.filter);
 
 router.get('/', function (req, res) {
@@ -70,7 +61,7 @@ router.post('/register', function (req, res) {
     if (req.body.player)
         res.redirect('/newPlayer');
     else
-        res.redirect('/newService');
+        res.redirect('/newServiceProvider');
 });
 
 router.get('/newPlayer', function (req, res) {
@@ -89,8 +80,16 @@ router.post('/newServiceProvider', upload.any(), function (req, res) {
     visitorController.createServiceProvider(req, res);
 });
 
-router.post('/login', passport.authenticate('local'), function (req, res) {
-    res.send(req.user);
+router.get('/login', function (req, res) {
+    res.render('login');
+});
+
+router.post('/login', passport.authenticate('local', {
+    failureRedirect: '/login',
+    failureFlash: true
+}), function (req, res) {
+    req.flash('info', 'You have logged in successfully');
+    res.redirect('/');
 });
 
 router.get('/logout', function (req, res) {
@@ -100,103 +99,67 @@ router.get('/logout', function (req, res) {
 
 router.post('/arenas', visitorController.view_all);
 
-router.post('/arenaDetails', visitorController.view_details_of_arena);
+router.post('/arenaDetails', ensureAuthenticated, visitorController.view_details_of_arena);
 
 router.get('/viewgames', ensureAuthenticated, playerController.viewgames);
 
-router.get('/editarena/:arenaname', ensureAuthenticated, serviceProviderController.editarena);
+router.get('/editarena/:arenaid', ensureAuthenticated, serviceProviderController.editarena);
 
-router.post('/editarenainfo/:arenaname', ensureAuthenticated, serviceProviderController.editarenainfo);
+router.post('/editarenainfo/:arenaid', ensureAuthenticated, serviceProviderController.editarenainfo);
 
-router.get('/editdefaultschedule/:arenaname', ensureAuthenticated, serviceProviderController.editdefaultschedule);
+router.post('/editdefaultschedule/:arenaid', ensureAuthenticated, serviceProviderController.editdefaultschedule);
 
-router.post('/addarenaimage/:arenaname', ensureAuthenticated, upload.any(), serviceProviderController.addimage);
+router.post('/addarenaimage/:arenaid', ensureAuthenticated, upload.any(), serviceProviderController.addimage);
 
-router.post('/profile/blacklist', serviceProviderController.add_to_blacklist);
+router.post('/profile/blacklist', ensureAuthenticated, serviceProviderController.add_to_blacklist);
 
-router.post('/profile/blacklist/phone', serviceProviderController.add_to_blacklist_phone);
+router.post('/profile/blacklist/phone', ensureAuthenticated, serviceProviderController.add_to_blacklist_phone);
 
-router.get('/profile/removeblacklist/:username', serviceProviderController.remove_from_blacklist);
+router.post('/profile/removeblacklist', ensureAuthenticated, serviceProviderController.remove_from_blacklist);
 
-router.post('/profile/whitelist', serviceProviderController.add_to_whitelist);
+router.post('/profile/whitelist', ensureAuthenticated, serviceProviderController.add_to_whitelist);
 
-router.post('/profile/whitelist/phone', serviceProviderController.add_to_whitelist_phone);
+router.post('/profile/whitelist/phone', ensureAuthenticated, serviceProviderController.add_to_whitelist_phone);
 
-router.get('/profile/removewhitelist/:username', serviceProviderController.remove_from_whitelist);
+router.post('/profile/removewhitelist', ensureAuthenticated, serviceProviderController.remove_from_whitelist);
 
 router.post('/arena/:id/comment', ensureAuthenticated, playerController.commentOnArena);
 
-router.post('ProviderRatesBooking/:id', ensureAuthenticated, serviceProviderController.providerRateBooking);
+router.post('/ProviderRatesBooking/:id', ensureAuthenticated, serviceProviderController.providerRateBooking);
 
 router.post('/PlayerRatesBooking/:id', ensureAuthenticated, playerController.playerRateBooking);
 
+router.get('/createArena', ensureAuthenticated, function (req, res) {
+    res.render('createarena');
+});
+router.post('/createArena', ensureAuthenticated, upload.any(), serviceProviderController.createArena);
+router.post('/cancelBooking/:bookingID', ensureAuthenticated, playerController.cancelBooking);
 
-router.post('/createArena', serviceProviderController.createArena);
-router.post('/cancelBooking', serviceProviderController.cancelBooking);
+router.post('/turnAcceptModeOn', ensureAuthenticated, serviceProviderController.turnAutoAcceptModeOn);
+router.post('/turnAcceptModeOff', ensureAuthenticated, serviceProviderController.turnAutoAcceptModeOff);
+router.post('/acceptBooking', ensureAuthenticated, serviceProviderController.acceptBooking2);
+router.post('/rejectBooking', ensureAuthenticated, serviceProviderController.rejectBooking);
+router.post('/createGame', ensureAuthenticated, playerController.createGame);
 
-router.post("/sp/arena/:arena_id", function (req, res) {
+router.post("/sp/arena/:arena_id", ensureAuthenticated, function (req, res) {
     if (req.body.flag == 1) {
         serviceProviderController.setUnavailable(req, res);
     }
     else
-        serviceProviderController.setavailable(req, res);
+        serviceProviderController.setAvailable(req, res);
 });
-router.get('/arena/:arenaId?viewBookings', function (req, res) {
-    Arena.findById(req.params.arenaId, function (err, foundArena) {
-        if (err) {
-            res.send("Sorry Broken Link, this arena may have been deleted, removed or is no longer existant");
-        }
-        else {
-            ServiceProvider.findById(foundArena.service_provider, function (err, serviceProvider) {
-                if (err) {
-                    res.send("Internal server Error, Sorry for the inconvenience !");
-                }
-                else if (serviceProvider.username == req.user.username) {
-                    //find all pending requests where the request time is greater than today, the arena is the current arena  and have not been accepted
-                    Booking.find({ accepted: false, arena: foundArena._id }).$where('(new Date(new Date().getFullYear(),this.bookMonth,this.bookDay))>(new Date())').exec(function (err, bookingArr) {
-                        //TODO: render a view (will be done in Sprint 2 ISA)
-                        if (err) {
-                            res.json("Error finding pending requests");
-                        }
-                        else {
-                            res.json(bookingArr);
-                        }
-
-                    });
-                }
-            })
-
-        }
-    })
-})
+router.get('/arena/:arenaId/viewBookings', ensureAuthenticated, serviceProviderController.viewBookings)
 //
-router.post('/arena/:arenaId?bookWeekly', playerController.bookWeekly);
+router.post('/arena/:arenaId/bookWeekly', ensureAuthenticated, playerController.bookWeekly);
 
 
 //book free hours
-router.post('/arena/:arenaId?bookHours', function (req, res) {
-
-    Player.findOne({ username: req.cookies.username }, function (err, player) {
-
-        playerController.bookHours(req.body.month, req.body.day, req.body.startIndex, req.body.endIndex, new Date(), req.params.arenaId, player._id, function (err) {
-            if (err) {
-                console.log(err);
-                res.send(err);
-            }
-            else {
-                res.redirect('/arena/:arenaId');
-            }
-        })
-
-    })
+router.post('/arena/:arenaId/bookHours', ensureAuthenticated, playerController.createBooking);
 
 
-})
-
-
-router.post('/RequestGame', playerController.requestgame);
-router.post('/AcceptRequest', playerController.acceptrequest);
-router.post('/RejectRequest', playerController.rejectrequest);
+router.post('/RequestGame', ensureAuthenticated, playerController.requestgame);
+router.post('/AcceptRequest', ensureAuthenticated, playerController.acceptrequest);
+router.post('/RejectRequest', ensureAuthenticated, playerController.rejectrequest);
 
 
 module.exports = router;

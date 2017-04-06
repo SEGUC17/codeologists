@@ -17,11 +17,11 @@ var localStrategy = new LocalStrategy(
 			}
 			hasher(password).verifyAgainst(user.password, function (error, verified) {
 				if (error)
-					res.send(error);
+					done(error);
 				else if (!verified)
 					return done(null, false, { message: 'Incorrect username or password' });
 				else
-					return done(null, { username: user.username, type: user.type });
+					return done(null, user);
 			});
 
 		});
@@ -34,11 +34,11 @@ var localStrategy = new LocalStrategy(
 passport.use(localStrategy);
 
 passport.serializeUser(function (user, done) {
-	done(null, user);
+	done(null, {username:user.username,type:user.type,_id:user._id});
 });
 
 passport.deserializeUser(function (user, done) {
-	done(null, user);
+	done(null, {username:user.username,type:user.type,_id:user._id});
 });
 
 

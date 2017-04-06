@@ -16,7 +16,7 @@ var schema = mongoose.Schema({
 	suggested_arenas: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Arena' }],
 	start_date: { type: Date, required: true },
 	end_date: { type: Date, required: true },
-	requests: [{ playerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Player' }, comment: String, accepted: Boolean }]
+	requests: [{ playerUsername: { type: String, required: true }, comment: String, accepted: { type: Boolean, required: true } }]
 
 });
 

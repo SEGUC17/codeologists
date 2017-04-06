@@ -6,133 +6,285 @@ var Arena = require('../models/Arena');
 var ServiceProvider = require('../models/ServiceProvider');
 var path = require('path');
 let Game = require('../models/Game');
+var Player = require('../models/Player');
+var hasher = require('password-hash-and-salt');
+var async = require('async');
+
+var upload = multer();
+
+function validateEmail(email) {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+}
 
 
-var storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'public/');
-    },
-    filename: function (req, file, cb) {
-        cb(null, req.body.name + Date.now());
-    }
-});
+var acceptBooking = function (booking) {
+    Arena.findOne({ _id: booking.arena }, function (err, arenaa) {
+        var schedule = arenaa.schedule;
+        var indices = getScheduleIndices(booking.bookMonth, booking.bookDay);
+        var dayIndex = indices.dayIndex;
+        var weekIndex = indices.weekIndex;
+        var start = booking.start_index;
+        var end = booking.end_index;
+        var ok = true;
+        for (var i = start; i <= end; i++) {
+            if (schedule[weekIndex][dayIndex][i] != 0) {
+                ok = false;
+                break;
+            }
+        }
+        if (ok) {
+            Booking.find({ arena: arenaa._id, bookDay: booking.bookDay, bookMonth: booking.bookMonth }
+                , function (err, allBookings) {
+                    if (!err) {
+                        async.each(allBookings, function (currentBooking, callback) {
+                            if (!(currentBooking.accepted) && !(currentBooking._id.equals(booking._id))) {
+                                var start1 = currentBooking.start_index;
+                                var end1 = currentBooking.end_index;
+                                if ((start1 >= start && start1 <= end) || (end1 >= start && end1 <= end)) {
+                                    Arena.findOne({ _id: currentBooking.arena }, function (err, arenaa) {
+                                        var notification = 'Unfortunately,your booking on day ' + (currentBooking.bookDay) + ' on month ' +
+                                            (currentBooking.bookMonth) + ' for ' + (arenaa.name) + ' from '
+                                            + getTimeFromIndex(start1) + ' to ' + getTimeFromIndex(end1) + ' has been rejected';
+                                        Player.findOne({ _id: currentBooking.player }, function (err, playerr) {
+                                            playerr.notifications.push(notification);
+                                            playerr.save();
+                                            Booking.remove({ _id: currentBooking._id }, function (err, result) {
 
-var upload = multer({
-    storage: storage
-});
+                                            });
 
+                                        });
+                                    });
+                                }
+                            }
+                        }, function (err) {
+                        })
+                    }
+                    for (var i = start; i <= end; i++) {
+                        arenaa.schedule[weekIndex][dayIndex][i] = booking._id;
+                    }
+                    arenaa.accepted = true;
+                    arenaa.markModified('schedule');
+                    arenaa.save(function (err) {
+
+                    })
+                });
+        }
+    })
+}
+
+var getScheduleIndices = function (month1, day1) {
+    var date = new Date();
+    date.setHours(0, 0, 0, 0);
+    var year = date.getFullYear();
+    var weekDay = (date.getDay() + 1) % 7;
+    var curDate = new Date(year, month1, day1);
+    var firstDayInWeek = new Date(date - (weekDay * 1000 * 60 * 60 * 24));
+    var difInWeeks = Math.floor((curDate - firstDayInWeek) / 1000 / 60 / 60 / 24 / 7);
+    return { weekIndex: difInWeeks, dayIndex: (curDate.getDay() + 1) % 7 };
+}
+
+var getTimeFromIndex = function (index) {
+    var hour = Math.floor(index / 2);
+    var minute = '00';
+    if (index % 2 == 1)
+        minute = '30';
+    return hour + ':' + minute;
+}
+
+function viewBookings(req, res) {
+    Arena.findById(req.params.arenaId, function (err, foundArena) {
+        if (err || !foundArena) {
+            if (err)
+                throw (err);
+            res.send("Sorry Broken Link, this arena may have been deleted, removed or is no longer existant");
+
+        }
+        else {
+            ServiceProvider.findById(foundArena.service_provider, function (errSp, serviceProvider) {
+                if (errSp) {
+                    res.send("Internal server Error, Sorry for the inconvenience !");
+                }
+                else if (serviceProvider) {
+
+                    if (serviceProvider.username == req.user.username) {
+                        //find all pending requests where the request time is greater than today, the arena is the current arena  and have not been accepted
+                        Booking.find({ accepted: false, arena: foundArena._id }).$where('(new Date(new Date().getFullYear(),this.bookMonth,this.bookDay))>(new Date())').exec(function (err, bookingArr) {
+                            //TODO: render a view (will be done in Sprint 2 ISA)
+                            if (err) {
+                                res.json("Error finding pending requests");
+                            }
+                            else {
+
+                                res.json(bookingArr);
+                            }
+
+                        })
+                    }
+                }
+                else {
+                    res.send("Internal Server Error sorry :'(");
+                };
+            })
+
+        }
+    })
+        ;
+
+}
 
 
 let serviceProviderController =
     {
+        acceptBooking: acceptBooking,
+        getScheduleIndices: getScheduleIndices,
+        getTimeFromIndex: getTimeFromIndex,
         turnAutoAcceptModeOn: function (req, res) {
-            //get the data from session??
-            var username = 'Mina';
-            serviceProvider.findOne({ username: username }, function (err, user) {
-                if (!err) {
-                    user.mode = true;
-                    user.save(function (err) {
-                        if (err)
-                            console.log(err);
-                    });
+            if (req.user.type != 'ServiceProvider') {
+                res.send('You are not authorized to do this action');
+                return;
+            }
+            var username = req.user.username;
+            ServiceProvider.findOne({ username: username }, function (err, user) {
+                if (!user) {
+                    res.send('Try again after logging in');
+
+                }
+                else {
+                    if (!err) {
+                        user.mode = true;
+                        user.save(function (err) {
+                            if (err)
+                                res.send(err);
+                        });
+                    }
                 }
             });
         },
 
         turnAutoAcceptModeOff: function (req, res) {
-            //get the data from session??
-            var username = 'Mina';
-            serviceProvider.findOne({ username: username }, function (err, user) {
-                if (!err) {
-                    user.mode = false;
-                    user.save(function (err) {
-                        if (err)
-                            console.log(err);
-                    });
+            if (req.user.type != 'ServiceProvider') {
+                res.send('You are not authorized to do this action');
+                return;
+            }
+            var username = req.user.username;
+            ServiceProvider.findOne({ username: username }, function (err, user) {
+                if (!user) {
+                    res.send('Try again after logging in');
+
+                }
+                else {
+                    if (!err) {
+                        user.mode = false;
+                        user.save(function (err) {
+                            if (err)
+                                res.send(err);
+                        });
+                    }
                 }
             });
         },
 
-        acceptBooking: function (booking) {
-            //find the arena of this booking
-            arena.findOne({ _id: booking.arena }, function (err, arenaa) {
-                var schedule = arenaa.schedule;
-                var indices = getScheduleIndices(booking.bookMonth, booking.bookDay);
-                var dayIndex = indices.dayIndex;
-                var weekIndex = indices.weekIndex;
-                var start = booking.start_index;
-                var end = booking.end_index;
-                var ok = true;
-                for (var i = start; i <= end; i++) {
-                    if (schedule[weekIndex][dayIndex][i] != 0) {
-                        ok = false;
-                        break;
-                    }
-                }
-                if (!ok) {
-                    //do something in the front end
-                    console.log('This is not a free time');
-                }
+        acceptBooking2: function (req, res) {
+            if (req.user.type != 'ServiceProvider') {
+                res.send('You are not authorized to do this');
+                return;
+            }
+            Booking.findById(req.body.bookingId, function (err, bookingObj) {
+                if (err || !bookingObj)
+                    res.send("no such booking or bad request");
                 else {
-                    //find all bookings in the same arena , same day and same month
-                    Booking.find({ arena: arenaa._id, bookDay: booking.bookDay, bookMonth: booking.bookMonth }
-                        , function (err, allBookings) {
-                            if (err)
-                                console.log("Error !!");
-                            else {
-                                for (var i = 0; i < allBookings.length; i++)
-                                    if (!(allBookings[i].accepted)) {
-                                        var start1 = allBookings[i].start_index;
-                                        var end1 = allBookings[i].end;
-                                        //check whether this booking is intersecting with the booked one
-                                        if ((start1 >= start && start1 <= end) || (end1 >= start && end1 <= end)) {
-                                            arena.findOne({ _id: allBookings[i].arena }, function (err, arenaa) {
-                                                //send a notification that his booking was rejected
-                                                var notification = 'Unfortunately,your booking for ' + (arenaa.name) + ' from '
-                                                    + getTimeFromIndex(start1) + ' to ' + getTimeFromIndex(end1)
-                                                    + ' has been rejected';
-                                                player.findOne({ _id: allBookings[i].player }, function (err, playerr) {
-                                                    playerr.notifications.push(notification);
-                                                    playerr.save();
-                                                    //removes this booking
-                                                    Booking.remove({ _id: allBookings[i]._id }, function (err, result) {
-                                                        if (err)
-                                                            console.log(err);
-                                                        else
-                                                            console.log(result);
+                    var booking = bookingObj;
+                    Arena.findOne({ _id: booking.arena }, function (err, arenaa) {
+                        if (!arenaa.service_provider.equals(req.user.id)) {
+                            res.send('You are not authorized to do this');
+                            return;
+                        }
+                        var schedule = arenaa.schedule;
+                        var indices = getScheduleIndices(booking.bookMonth, booking.bookDay);
+                        var dayIndex = indices.dayIndex;
+                        var weekIndex = indices.weekIndex;
+                        var start = booking.start_index;
+                        var end = booking.end_index;
+                        var ok = true;
+                        for (var i = start; i <= end; i++) {
+                            if (schedule[weekIndex][dayIndex][i] != 0) {
+                                ok = false;
+                                break;
+                            }
+                        }
+                        if (!ok) {
+                            res.send('This is not a free time');
+                        }
+                        else {
+                            Booking.find({ arena: arenaa._id, bookDay: booking.bookDay, bookMonth: booking.bookMonth }
+                                , function (err, allBookings) {
+                                    if (!err && allBookings) {
+                                        async.each(allBookings, function (currentBooking, callback) {
+                                            if (!(currentBooking.accepted) && !(currentBooking._id.equals(booking._id))) {
+                                                var start1 = currentBooking.start_index;
+                                                var end1 = currentBooking.end_index;
+                                                if ((start1 >= start && start1 <= end) || (end1 >= start && end1 <= end)) {
+                                                    Arena.findOne({ _id: currentBooking.arena }, function (err, arenaa) {
+                                                        if (!err && arenaa) {
+                                                            var notification = 'Unfortunately,your booking on day ' + (currentBooking.bookDay) + ' on month ' +
+                                                                (currentBooking.bookMonth) + ' for ' + (arenaa.name) + ' from '
+                                                                + getTimeFromIndex(start1) + ' to ' + getTimeFromIndex(end1) + ' has been rejected';
+                                                            Player.findOne({ _id: currentBooking.player }, function (err, playerr) {
+                                                                if (!err && playerr) {
+                                                                    playerr.notifications.push(notification);
+                                                                    playerr.save();
+                                                                    Booking.remove({ _id: currentBooking._id }, function (err, result) {
+
+                                                                    });
+                                                                }
+                                                            });
+                                                        }
                                                     });
-
-                                                });
-                                            });
-                                        }
+                                                }
+                                            }
+                                        }, function (err) {
+                                            res.send('there are conflicting bookings');
+                                        })
                                     }
-                            }
-                            for (var i = start; i <= end; i++) {
-                                arenaa.schedule[weekIndex][dayIndex][i] = booking._id;
-                            }
-                            arenaa.save(function (err) {
-                                if (err)
-                                    console.log(err);
-                            })
-                        })
-                }
+                                    for (var i = start; i <= end; i++) {
+                                        arenaa.schedule[weekIndex][dayIndex][i] = booking._id;
+                                    }
 
+                                    bookingObj.accepted = true;
+                                    bookingObj.save(function (err) {
+                                        if (err)
+                                            res.send(err);
+                                    })
+
+                                    arenaa.markModified('schedule');
+                                    arenaa.save(function (err) {
+                                        if (err)
+                                            res.send('error while saving');
+                                        else
+                                            res.send('done');
+                                    })
+                                });
+                        }
+                    })
+                }
             })
         },
 
-        handleBooking: function (req, res) {
-            var id = req.body.id;
+
+
+        handleBooking: function (id) {
             Booking.findOne({ _id: id }, function (err, booking2) {
-                if (err)
-                    console.log('ERROR in handleBooking');
+                if (err || !booking2)
+                    res.send('There is no such booking');
                 else
-                    arena.findOne({ _id: booking2.arena }, function (err, arena) {
-                        if (err)
-                            console.log('ERROR in handleBooking 2');
+                    Arena.findOne({ _id: booking2.arena }, function (err, arena) {
+                        if (err || !arena)
+                            res.send('Not a valid booking');
                         else
-                            arena.findOne({ _id: arena.service_provider }, function (err, serviceProvider) {
-                                if (err)
-                                    console.log('ERROR in handleBooking 3');
+                            ServiceProvider.findOne({ _id: arena.service_provider }, function (err, serviceProvider) {
+                                if (err || !serviceProvider)
+                                    res.send('Not a valid booking');
                                 else {
                                     if (serviceProvider.mode == true)
                                         acceptBooking(booking2);
@@ -141,106 +293,81 @@ let serviceProviderController =
                     });
             });
         },
-        //month1 is given as 0-index while day is not (javascript convention)
-        getScheduleIndices: function (month1, day1) {
-            var date = new Date();
-            date.setHours(0, 0, 0, 0);
-            var year = date.getFullYear();
-            var weekDay = (date.getDay() + 1) % 7;
-            //we assumed that it is the same year, lw e7na fi a5er elsana --> to be handled ba3deen
-            var curDate = new Date(year, month1, day1);
-            var firstDayInWeek = new Date(date - (weekDay * 1000 * 60 * 60 * 24));
-            var difInWeeks = Math.floor((curDate - firstDayInWeek) / 1000 / 60 / 60 / 24 / 7);
-            return { weekIndex: difInWeeks, dayIndex: (curDate.getDay() + 1) % 7 };
-        },
-        //the indices are 0-based
-        getTimeFromIndex: function (index) {
-            var hour = Math.floor(index / 2);
-            var minute = '00';
-            if (index % 2 == 1)
-                minute = '30';
-            return hour + ':' + minute;
-        },
-
-
         rejectBooking: function (req, res) {
-            var bookingID = req.body.booking;
-            arena.findOne({ _id: booking.arena }, function (err, arenaa) {
-                var arenaName = arenaa.name;
-                Booking.findOne({ _id: bookingID }, function (err, curBooking) {
-                    if (err)
-                        console.log(err);
+            if (!(req.body.bookingId))
+                res.send('Missing field');
+            if (req.user.type != 'ServiceProvider') {
+                res.send('You are not authorized to do this');
+                return;
+            }
+            var bookingID = req.body.bookingId;
+            Booking.findOne({ _id: bookingID }, function (err, curBooking) {
+                if (err || !curBooking) {
+                    res.send('Not a valid Booking');
+                    return;
+                }
+                Arena.findOne({ _id: curBooking.arena }, function (err, arenaa) {
+
+                    var arenaName = arenaa.name;
+                    if (err || !arenaa) {
+                        res.send('Not a valid Booking');
+                    }
                     else {
-                        var notification = 'Unfortunately,your booking for ' + (arenaName) + ' from '
-                            + getTimeFromIndex(curBooking.start_index) + ' to ' + end1 + ' has been rejected';
-                        player.findOne({ _id: curBooking.player }, function (err, playerr) {
+                        var indices = getScheduleIndices(curBooking.bookMonth, curBooking.bookDay);
+                        var dayIndex = indices.dayIndex;
+                        var weekIndex = indices.weekIndex;
+                        var start = curBooking.start_index;
+                        var end = curBooking.end_index;
+                        var notification = 'Unfortunately,your booking on day ' + (curBooking.bookDay) + ' on month ' +
+                            (curBooking.bookMonth) + ' for ' + (arenaa.name) + ' from '
+                            + getTimeFromIndex(start) + ' to ' + getTimeFromIndex(end) + ' has been rejected';
+
+                        Player.findOne({ _id: curBooking.player }, function (err, playerr) {
                             playerr.notifications.push(notification);
                             playerr.save();
-                            //removes this booking
                             Booking.remove({ _id: curBooking._id }, function (err, result) {
                                 if (err)
-                                    console.log(err);
-                                else
-                                    console.log(result);
+                                    res.send(err);
                             });
                         });
                     }
                 });
             });
         },
-
-
-        createGame: function (req, res) {
-            //to get from the session
-            var creator2 = 'Mina';
-            var size2 = req.body.size;
-            var location2 = req.body.location;
-            var arenas2 = req.body.arenas;
-            var start_date2 = req.body.start_date;
-            var end_date2 = req.body.end_date;
-            let added = new Game
-                ({
-                    creator: creator2,
-                    size: size2,
-                    location: location2,
-                    suggested_arenas: arenas2,
-                    start_date: start_date2,
-                    end_date: end_date2
-                });
-            added.save(function (err, added) {
-                if (err)
-                    console.log(err);
-            })
-
-        },
-        editarena: function (req, res) {
-            var arenaname = req.params.arenaname;
-            Arena.findOne({ name: arenaname }, function (err, arena) {
-                if (err) {
-                    req.flash('error', 'this page is not available');
-                    res.redirect('/');
-                }
-                if (!arena) {
-                    req.flash('error', 'this page is not available');
-                    res.redirect('/');
-                }
-                if (req.user && arena.service_provider == req.user._id) {
-                    res.render('editarena', { arena: arena });
-                }
-                req.flash('error', 'this page is not available');
-                res.redirect('/');
+        viewarena: function (req, res) {
+            Arena.findOne({ _id: req.params.arenaid }, function (err, arena) {
+                res.render('arena', { arena: arena });
             });
         },
-        editarenainfo: function (req, res) {
-            var arenaname = req.params.arenaname;
-            Arena.findOne({ name: arenaname }, function (err, arena) {
+        editarena: function (req, res) {
+            var arenaid = req.params.arenaid;
+            Arena.findOne({ _id: arenaid }, function (err, arena) {
                 if (err) {
                     req.flash('error', 'this page is not available');
-                    res.redirect('/');
+                    return res.redirect('/');
                 }
                 if (!arena) {
                     req.flash('error', 'this page is not available');
-                    res.redirect('/');
+                    return res.redirect('/');
+                }
+                if (req.user && arena.service_provider == req.user._id) {
+                    return res.render('editarena', { arena: arena });
+                } else {
+                    req.flash('error', 'this page is not available');
+                    return res.redirect('/');
+                }
+            });
+        },
+        editarenainfo: function (req, res, nxt) {
+            var arenaid = req.params.arenaid;
+            Arena.findOne({ _id: arenaid }, function (err, arena) {
+                if (err) {
+                    req.flash('error', 'this page is not available');
+                    return res.redirect('/');
+                }
+                if (!arena) {
+                    req.flash('error', 'this page is not available');
+                    return res.redirect('/');
                 }
                 if (req.user && arena.service_provider == req.user._id) {
                     arena.rules_and_regulations = req.body.rules_and_regulations;
@@ -252,246 +379,282 @@ let serviceProviderController =
                     arena.save(function (err) {
                         if (err) {
                             console.log(err);
-                            nxt(err);
+                            return nxt(err);
                         }
                         req.flash('info', 'your arena info is updated successfully');
-                        res.redirect('/viewarena/' + arenaname);
+                        return res.redirect('/viewarena/' + arenaid);
                     });
+                } else {
+                    req.flash('error', 'this page is not available');
+                    return res.redirect('/');
                 }
-                req.flash('error', 'this page is not available');
-                res.redirect('/');
             });
         },
         editdefaultschedule: function (req, res, nxt) {
-            var arenaname = req.params.arenaname;
-            Arena.findOne({ name: arenaname }, function (err, arena) {
+            var arenaid = req.params.arenaid;
+            Arena.findOne({ _id: arenaid }, function (err, arena) {
                 if (err) {
                     req.flash('error', 'this page is not available');
-                    res.redirect('/');
+                    return res.redirect('/');
                 }
                 if (!arena) {
                     req.flash('error', 'this page is not available');
-                    res.redirect('/');
+                    return res.redirect('/');
                 }
                 if (req.user && arena.service_provider == req.user._id) {
-                    if (req.defaultschedule) {
-                        var ds = req.default_schedule;
-                        for (var i = 0; i < 7; i++) {
-                            for (var j = 0; j < 48; j++) {
-                                arena.default_weekly_schedule[i][j] = 0;
-                            }
-                        }
+                    var new_sch = new Array(7).fill(new Array(48).fill(0));
+                    if (req.body.schedule) {
+                        var ds = req.body.schedule;
 
                         for (var i = 0; i < ds.length; i++) {
                             var sa = ds[i].split(",");
-                            var x = parseInt(ds[i][0]);
-                            var y = parseInt(ds[i][1]);
-                            arena.default_weekly_schedule[x][y] = -1;
+                            var x = parseInt(sa[0]);
+                            var y = parseInt(sa[1]);
+                            new_sch[x][y] = -1;
                         }
                     }
+                    arena.default_weekly_schedule = new_sch;
                     arena.save(function (err) {
                         if (err) {
                             console.log(err);
-                            nxt(err);
+                            return nxt(err);
                         }
                     });
                     req.flash('info', 'your default schedule is updated successfully');
-                    res.redirect('/viewarena/' + arenaname);
+                    return res.redirect('/viewarena/' + arenaid);
+                } else {
+                    req.flash('error', 'this page is not available');
+                    return res.redirect('/');
                 }
-                req.flash('error', 'this page is not available');
-                res.redirect('/');
             });
         },
         addimage: function (req, res, nxt) {
-            var img_path = req.files[0].path;
-            var newimage = { data: fs.readFileSync(img_path) };
-            var arenaname = req.params.arenaname;
-            Arena.findOne({ name: arenaname }, function (err, arena) {
+            var newimage = { data: req.files[0].buffer };
+            var arenaid = req.params.arenaid;
+            Arena.findOne({ _id: arenaid }, function (err, arena) {
                 if (err) {
                     req.flash('error', 'this page is not available');
-                    res.redirect('/');
+                    return res.redirect('/');
                 }
                 if (!arena) {
                     req.flash('error', 'this page is not available');
-                    res.redirect('/');
+                    return res.redirect('/');
                 }
                 if (req.user && arena.service_provider == req.user._id) {
                     arena.photos.push(newimage);
                     arena.save(function (err) {
                         if (err) {
                             console.log(err);
-                            nxt(err);
+                            return nxt(err);
                         }
                     });
                     req.flash('info', 'your new arena image is uploaded successfully');
-                    res.redirect('/viewarena/' + arenaname);
+                    return res.redirect('/viewarena/' + arenaid);
+                } else {
+                    req.flash('error', 'this page is not available');
+                    res.redirect('/');
                 }
-                req.flash('error', 'this page is not available');
-                res.redirect('/');
             });
         },
 
+        /**
+     * adds a player to the black list using username.
+     */
         add_to_blacklist: function (req, res) {
 
-            var serviceProviderID = req.cookies.ID;
-            var playerUsername = req.body.Bplayerusername;
+            var playerUsername = req.body.Pusername;
+            var serviceProviderUsername = req.user.username;
 
-            serviceProvider.findById(serviceProviderID, function (err, serviceProvider) {
-                if (err)
-                    console.log(err);
+            ServiceProvider.findOne({ username: serviceProviderUsername }, function (err, serviceProvider) {
+                if (err || (serviceProvider == null)) {
+                    return res.send("Error in operation.\nTry Again");
+                }
+                Player.findOne({ username: playerUsername }, function (err2, player) {
+                    console.log(playerUsername);
 
-                player.findOne({ username: playerUsername }, function (err2, player) {
-                    if (err2) {
-                        res.render('SPprofile', { user: serviceProvider, mssgN: 8 });
-                    } else {
-                        if (serviceProvider.blacklist.include(player))
-                            res.render('SPprofile', { user: serviceProvider, mssgN: "0" });
-                        else {
-                            serviceProvider.blacklist.push(player);
-                            serviceProvider.save(function (err) {
-                                console.log('Success!');
-                            });
-                            res.render('SPprofile', { user: serviceProvider, mssgN: "4" });
+                    if (err2 || (player == null)) {
+                        return res.send("Error in operation.\nTry Again");
+                    }
+
+                    for (var i = 0; i < serviceProvider.blacklist.length; i++) {
+                        if (serviceProvider.blacklist[i].equals(player._id)) {
+                            return res.send("This player is already black listed");
                         }
                     }
+                    serviceProvider.blacklist.push(player);
+                    serviceProvider.save(function (err) { });
+                    res.send("Successfully added to Blacklist");
+
                 });
             });
         },
 
+        /**
+         * adds a player to the black list using phone number.
+         */
         add_to_blacklist_phone: function (req, res) {
 
-            var serviceProviderID = req.cookies.ID;
-            var playerNumber = req.body.BplayerNumber;
+            var serviceProviderUsername = req.user.username;
+            var playerNumber = req.body.phoneNumber;
 
-            serviceProvider.findById(serviceProviderID, function (err, serviceProvider) {
-                if (err)
-                    console.log(err);
+            ServiceProvider.findOne({ username: serviceProviderUsername }, function (err, serviceProvider) {
 
-                player.findOne({ phone_number: playerNumber }, function (err2, player) {
-                    if (err2) {
-                        res.render('SPprofile', { user: serviceProvider, mssgN: 8 });
-                    } else {
-                        if (serviceProvider.blacklist.include(player))
-                            res.render('SPprofile', { user: serviceProvider, mssgN: "0" });
-                        else {
-                            serviceProvider.blacklist.push(player);
-                            serviceProvider.save(function (err) {
-                                console.log('Success!');
-                            });
-                            res.render('SPprofile', { user: serviceProvider, mssgN: "4" });
+                if (err || (serviceProvider == null)) {
+                    return res.send("Error in operation.\nTry Again");
+                }
+                Player.findOne({ phone_number: playerNumber }, function (err2, player) {
+
+                    if (err2 || (player == null)) {
+                        return res.send("Error in operation.\nTry Again");
+                    }
+
+                    for (var i = 0; i < serviceProvider.blacklist.length; i++) {
+                        if (serviceProvider.blacklist[i].equals(player._id)) {
+                            return res.send("This player is already black listed");
                         }
                     }
+                    serviceProvider.blacklist.push(player);
+                    serviceProvider.save(function (err) { });
+                    res.send("Successfully added to Blacklist");
                 });
             });
         },
 
+        /**
+         * removes a player from the white list using username.
+         */
         remove_from_blacklist: function (req, res) {
 
-            var serviceProviderID = req.cookies.ID;
-            var playerUsername = req.prams.username;
+            var serviceProviderUsername = req.user.username;
+            var playerUsername = req.body.Pusername;
 
-            serviceProvider.findById(serviceProviderID, function (err, serviceProvider) {
+            ServiceProvider.findOne({ username: serviceProviderUsername }, function (err, serviceProvider) {
 
-                player.findOne({ username: playerUsername }, function (err2, player) {
-                    if (err2)
-                        res.render('SPprofile', { user: serviceProvider, mssgN: "8" });
-                    else {
-                        if (serviceProvider.blacklist.include(player)) {
-                            var pos = serviceProvider.blacklist.indexOf(player);
-                            serviceProvider.blacklist.splice(pos, 1);
-                            serviceProvider.save(function (err) {
-                                console.log('Success!');
-                            });
-                            res.render('SPprofile', { user: serviceProvider, mssgN: "5" });
+                if (err || (serviceProvider == null)) {
+                    return res.send("Error in operation.\nTry Again");
+                }
+                Player.findOne({ username: playerUsername }, function (err2, player) {
 
-                        } else
-                            res.render('SPprofile', { user: serviceProvider, mssgN: "1" });
+                    if (err2 || (player == null)) {
+                        return res.send("Error in operation.\nTry Again");
                     }
+
+                    for (var i = 0; i < serviceProvider.blacklist.length; i++) {
+
+                        if (serviceProvider.blacklist[i].equals(player._id)) {
+
+                            var pos = serviceProvider.blacklist.indexOf(player._id);
+                            serviceProvider.blacklist.splice(pos, 1);
+                            serviceProvider.save(function (err) { });
+                            return res.send("Successfully removed from Blacklist");
+                        }
+                    }
+                    res.send("This player is not black listed");
                 });
             });
         },
 
+        /**
+         * adds a player to the black list using username.
+         */
         add_to_whitelist: function (req, res) {
 
-            var serviceProviderID = req.cookies.ID;
-            var playerUsername = req.body.Wplayerusername;
+            var serviceProviderUsername = req.user.username;
+            var playerUsername = req.body.Pusername;
 
-            serviceProvider.findById(serviceProviderID, function (err, serviceProvider) {
+            ServiceProvider.findOne({ username: serviceProviderUsername }, function (err, serviceProvider) {
 
-                player.findOne({ username: playerUsername }, function (err2, player) {
-                    if (err2)
-                        res.render('SPprofile', { user: serviceProvider, mssgN: "8" });
-                    else {
-                        if (serviceProvider.whitelist.include(player))
-                            res.render('SPprofile', { user: serviceProvider, mssgN: "2" });
-                        else {
-                            serviceProvider.whitelist.push(player);
-                            serviceProvider.save(function (err) {
-                                console.log('Success!');
-                            });
-                            res.render('SPprofile', { user: serviceProvider, mssgN: "6" });
+                if (err || (serviceProvider == null)) {
+                    return res.send("Error in operation.\nTry Again");
+                }
+
+                Player.findOne({ username: playerUsername }, function (err2, player) {
+
+                    if (err2 || (player == null)) {
+                        return res.send("Error in operation.\nTry Again");
+                    }
+
+                    for (var i = 0; i < serviceProvider.whitelist.length; i++) {
+                        if (serviceProvider.whitelist[i].equals(player._id)) {
+                            return res.send("This player is already white listed");
                         }
                     }
+                    serviceProvider.whitelist.push(player);
+                    serviceProvider.save(function (err) { });
+                    res.send("Successfully added to WhiteList");
                 });
             });
         },
 
+        /**
+         * adds a player to the white list using phone number.
+         */
         add_to_whitelist_phone: function (req, res) {
 
-            var serviceProviderID = req.cookies.ID;
-            var playerNumber = req.body.WplayerNumber;
+            var serviceProviderUsername = req.user.username;
+            var playerNumber = req.body.phoneNumber;
 
-            serviceProvider.findById(serviceProviderID, function (err, serviceProvider) {
-                if (err)
-                    console.log(err);
+            ServiceProvider.findOne({ username: serviceProviderUsername }, function (err, serviceProvider) {
 
-                player.findOne({ phone_number: playerNumber }, function (err2, player) {
-                    if (err2) {
-                        res.render('SPprofile', { user: serviceProvider, mssgN: 8 });
-                    } else {
-                        if (serviceProvider.whitelist.include(player))
-                            res.render('SPprofile', { user: serviceProvider, mssgN: "0" });
-                        else {
-                            serviceProvider.whitelist.push(player);
-                            serviceProvider.save(function (err) {
-                                console.log('Success!');
-                            });
-                            res.render('SPprofile', { user: serviceProvider, mssgN: "4" });
+                if (err || (serviceProvider == null)) {
+                    return res.send("Error in operation.\nTry Again");
+                }
+
+                Player.findOne({ phone_number: playerNumber }, function (err2, player) {
+
+                    if (err2 || (player == null)) {
+                        return res.send("Error in operation.\nTry Again");
+                    }
+
+                    for (var i = 0; i < serviceProvider.whitelist.length; i++) {
+                        if (serviceProvider.whitelist[i].equals(player._id)) {
+                            return res.send("This player is already white listed");
                         }
                     }
+                    serviceProvider.whitelist.push(player);
+                    serviceProvider.save(function (err) { });
+                    res.send("Successfully added to WhiteList");
+
                 });
             });
         },
 
+        /**
+         * removes a player from the white list using username.
+         */
         remove_from_whitelist: function (req, res) {
 
-            var serviceProviderID = req.cookies.ID;
-            var playerUsername = req.prams.username;
+            var serviceProviderUsername = req.user.username;
+            var playerUsername = req.body.Pusername;
 
-            serviceProvider.findById(serviceProviderID, function (err, serviceProvider) {
+            ServiceProvider.findOne({ username: serviceProviderUsername }, function (err, serviceProvider) {
 
-                player.findOne({ username: playerUsername }, function (err2, player) {
-                    if (err2)
-                        res.render('SPprofile', { user: serviceProvider, mssgN: "8" });
-                    else {
-                        if (serviceProvider.whitelist.include(player)) {
-                            var pos = serviceProvider.whitelist.indexOf(player);
-                            serviceProvider.whitelist.splice(pos, 1);
-                            serviceProvider.save(function (err) {
-                                console.log('Success!');
-                            });
-                            res.render('SPprofile', { user: serviceProvider, mssgN: "7" });
+                if (err || (serviceProvider == null)) {
+                    return res.send("Error in operation.\nTry Again");
+                }
 
-                        } else
-                            res.render('SPprofile', { user: serviceProvider, mssgN: "3" });
+                Player.findOne({ username: playerUsername }, function (err2, player) {
+
+                    if (err2 || (player == null)) {
+                        return res.send("Error in operation.\nTry Again");
                     }
+                    for (var i = 0; i < serviceProvider.whitelist.length; i++) {
+                        if (serviceProvider.whitelist[i].equals(player._id)) {
+                            var pos = serviceProvider.whitelist.indexOf(player._id);
+                            serviceProvider.whitelist.splice(pos, 1);
+                            serviceProvider.save(function (err) { });
+                            return res.send("Successfully removed from Whitelist");
+                        }
+                    }
+                    res.send("This player is not white listed");
+
                 });
             });
         },
 
         edit_profile_page: function (req, res) { // prepar the edit profile page
             //retrieve the players's record from DB to be able to fill the fields to be changed
-            serviceProvider.findOne({ username: req.session.username }, function (err, result) {
+            ServiceProvider.findOne({ username: req.user.username }, function (err, result) {
                 if (err)
                     res.send(err);
                 else {
@@ -500,8 +663,8 @@ let serviceProviderController =
                 }
             })
         },
-        edit_profie_info: function (req, res) { //accepting new info and update the DB record
-            serviceProvider.findOne({ username: req.session.username }, function (err, result) {
+        edit_profile_info: function (req, res) { //accepting new info and update the DB record
+            ServiceProvider.findOne({ username: req.user.username }, function (err, result) {
                 if (err)
                     res.send(err);
                 else {
@@ -517,100 +680,227 @@ let serviceProviderController =
                     } if (!req.body.old_password) {
                         res.render('edit_provider_page', { err: "your password is required to confirm changes", result });
                         return;
-                    } if (result.password != req.body.old_password) {
-                        res.render('edit_provider_page', { err: "wrong password !", result });
-                        return;
-                    } result.name = req.body.name;
-                    if (req.body.new_password)
-                        result.password = req.body.new_password;
-                    result.email = req.body.email;
-                    result.phone_number = req.body.phone_number;
-                    if (req.files[0]) {
-                        result.profile_pic.data = fs.readFileSync(req.files[0].path);
-                        fs.unlinkSync(req.files[0].path);
                     }
-                    if (req.body.mode == "on")
-                        result.mode = true;
-                    else
-                        result.mode = false;
-                    result.save();
-                    res.render('edit_provider_page', { err: "information updated successfully", result });
+
+                    hasher(req.body.old_password).verifyAgainst(result.password, function (err, verified) {
+                        if (err) {
+                            console.log("error 1");
+                            res.send(err);
+                            return;
+                        }
+                        else {
+                            if (!verified) {
+                                res.send({ err: " wrong pass" });
+                                return;
+                            } else {
+                                result.name = req.body.name;
+                                if (req.body.new_password) {
+                                    hasher(req.body.new_password).hash(function (err, hash) {
+                                        result.password = hash;
+                                        if (!validateEmail(req.body.email)) {
+                                            res.send("wrong email format");
+                                            return;
+                                        }
+                                        result.email = req.body.email;
+                                        result.phone_number = req.body.phone_number;
+                                        if (req.files[0]) {
+                                            result.profile_pic.data = req.files[0].buffer;
+                                        }
+                                        if (req.body.mode == "on")
+                                            result.mode = true;
+                                        else
+                                            result.mode = false;
+                                        result.save(function (err) {
+                                            if (err) {
+                                                res.send(err);
+                                                return;
+                                            } else {
+                                                res.render('edit_provider_page', { err: "information updated successfully", result });
+                                                return;
+                                            }
+                                        });
+
+                                    });
+                                }
+                                else {
+                                    if (!validateEmail(req.body.email)) {
+                                        res.send("wrong email format");
+                                        return;
+                                    }
+                                    result.email = req.body.email;
+                                    result.phone_number = req.body.phone_number;
+                                    if (req.files[0]) {
+                                        result.profile_pic.data = req.files[0].buffer;
+                                    }
+                                    if (req.body.mode == "on")
+                                        result.mode = true;
+                                    else
+                                        result.mode = false;
+                                    result.save(function (err) {
+                                        if (err) {
+                                            res.send(err);
+                                            return;
+                                        } else {
+                                            res.render('edit_provider_page', { err: "information updated successfully", result });
+                                            return;
+                                        }
+                                    });
+                                }
+                            }
+
+                        }
+                    });
                 }
 
             });
         },
-        setUnavailable: function (req, res) {
-            var startIndex = req.body.startIndex;
-            var endIndex = req.body.endIndex;
-            var day = req.body.day;
-            var month = req.body.month;
-            var Indices = getScheduleIndices(month, day);
-            var weekIndex = Indices.weekIndex;
-            var dayIndex = Indices.dayIndex;
-            var flag = 0;
+        setUnavailable: function (req, res, next) {
+            if (req.user && (req.user.type == "ServiceProvider")) {
+                ServiceProvider.findOne({ username: req.user.username }, function (err, sp) {
+                    Arena.findOne({ _id: req.params.arena_id }, function (err2, arena) {
 
-            arenaModel.findById(req.paramas.arena_id, function (err, arena) {
-                var schedule = arena.schedule;
-                var before_edit = [];
-                for (var i = 0; i < 48; i++) {
-                    before_edit[i] = schedule[weekIndex][dayIndex][i];
-                };
-                for (var i = startIndex; i <= endIndex; i++) {
-                    if (schedule[weekIndex][dayIndex][i] == 0 || schedule[weekIndex][dayIndex][i] == -1)
-                        schedule[weekIndex][dayIndex][i] = -1;
-                    else {
-                        flag = 1;
-                        break;
-                    }
+                        //checking if this arena belongs to that user(service provider)
+                        if (arena && arena.service_provider.equals(sp._id)) {
 
-                };
-                if (flag) {
-                    for (var i = 0; i < 48; i++) {
-                        schedule[weekIndex][dayIndex][i] = before_edit[i];
-                    };
-                    res.send("error, You can not set booked slots to be unavailable");
-                }
-                else {
-                    arena.schedule = schedule;
-                    arena.save(function (err) {
-                        if (err) {
-                            res.send("error in arena DB");
+                            var startIndex = req.body.startIndex;
+                            var endIndex = req.body.endIndex;
+                            var day = req.body.day;
+                            var month = req.body.month;
+
+                            //checking if all required fields are delivered
+                            if (month && day && endIndex && startIndex) {
+
+                                var Indices = getScheduleIndices(month, day);
+                                var weekIndex = Indices.weekIndex;
+                                var dayIndex = Indices.dayIndex;
+                                var flag = 0;
+
+                                Arena.findById(req.params.arena_id, function (err, arena) {
+                                    if (arena) {
+
+                                        //saving the day which will be modifed to restore it to the schedule later if there's an error 
+                                        var before_edit = [];
+                                        for (var i = 0; i < 48; i++) {
+                                            before_edit[i] = arena.schedule[weekIndex][dayIndex][i];
+                                        };
+
+                                        //setting only available slots to be unavailable. if a booked slot encountered an error statement will be sent to the user (service provider). 
+                                        for (var i = startIndex; i <= endIndex; i++) {
+                                            if (arena.schedule[weekIndex][dayIndex][i] == 0 || arena.schedule[weekIndex][dayIndex][i] == -1)
+                                                (arena.schedule)[weekIndex][dayIndex][i] = -1;
+
+                                            else {
+                                                flag = 1;
+                                                break;
+                                            }
+
+                                        };
+                                        //checking if the user(servvice provider) tries to set a booked slot to be unavailable.
+                                        if (flag) {
+                                            for (var i = 0; i < 48; i++) {
+                                                arena.schedule[weekIndex][dayIndex][i] = before_edit[i];
+                                            };
+                                            res.send("error, You can not set booked slots to be unavailable");
+                                        }
+                                        else {
+                                            arena.markModified("schedule");
+                                            arena.save(function (err, arr) {
+                                                if (err) {
+                                                    res.send("error in arena DB");
+                                                }
+                                            });
+                                            res.send(arena.schedule);
+                                        }
+
+                                    }
+                                    else { res.send("error, wrong arena id") };
+                                });
+
+                            }
+                            else {
+                                //if one of the fields in req.body isn't delivered 
+                                res.send("incorrect data");
+                            }
+                        }
+                        else {
+                            //if the arena does not belong to this service provider or there's no such arena 
+                            res.send("You are not allowed to view this page or there's no such arena");
                         }
                     });
-                    res.redirect("/sp/arena/" + req.paramas.arena_id);
-                }
+                });
+            }
+            else {
+                //if the user(visitor) isn't logged in or he is logged in but he is not a service provider
+                res.send("You are not allowed to view this page");
+            }
 
-            });
         },
 
 
         setAvailable: function (req, res) {
-            var startIndex = req.body.startIndex;
-            var endIndex = req.body.endIndex;
-            var day = req.body.day;
-            var month = req.body.month;
-            var Indices = getScheduleIndices(month, day);
-            var weekIndex = Indices.weekIndex;
-            var dayIndex = Indices.dayIndex;
+            if (req.user && (req.user.type.equals("ServiceProvider"))) {
+                ServiceProvider.findOne({ username: req.user.username }, function (err, sp) {
+                    Arena.findOne({ _id: req.params.arena_id }, function (err2, arena) {
 
-            arenaModel.findById(req.paramas.arena_id, function (err, arena) {
-                var schedule = arena.schedule;
-                for (var i = startIndex; i <= endIndex; i++) {
-                    schedule[weekIndex][dayIndex][i] = 0;
-                };
+                        //checking if this arena belongs to that user(service provider)
+                        if (arena && arena.service_provider.equals(sp._id)) {
 
-                arena.schedule = schedule;
-                arena.save(function (err) {
-                    if (err) {
-                        res.send("error in arena DB");
-                    }
+                            var startIndex = req.body.startIndex;
+                            var endIndex = req.body.endIndex;
+                            var day = req.body.day;
+                            var month = req.body.month;
+
+                            //checking if all required fields are delivered
+                            if (month && day && endIndex && startIndex) {
+
+                                var Indices = getScheduleIndices(month, day);
+                                var weekIndex = Indices.weekIndex;
+                                var dayIndex = Indices.dayIndex;
+
+                                Arena.findById(req.params.arena_id, function (err, arena) {
+                                    var schedule = arena.schedule;
+
+                                    //making the slots between the startIndex and the endIndex (inclusive) available 
+                                    for (var i = startIndex; i <= endIndex; i++) {
+                                        schedule[weekIndex][dayIndex][i] = 0;
+                                    };
+
+                                    arena.schedule = schedule;
+                                    arena.markModified("schedule");
+                                    arena.save(function (err) {
+                                        if (err) {
+                                            res.send("error in arena DB");
+                                        }
+                                    });
+                                    res.redirect("/sp/arena/" + req.params.arena_id);
+                                });
+
+                            }
+                            else {
+                                //if one of the fields in req.body isn't delivered 
+                                res.send("incorrect data");
+                            }
+                        }
+                        else {
+                            //if the arena does not belong to this service provider or there's no such arena
+                            res.send("You are not allowed to view this page or there's no such arena");
+                        }
+                    });
                 });
-                res.redirect("/sp/arena/" + req.paramas.arena_id);
-            });
+            }
+            else {
+                //if the user(visitor) isn't logged in or he is logged in but he is not a service provider   
+                res.send("You are not allowed to view this page");
+            }
         },
         createArena: function (req, res) {
+            if (req.user && (req.user.type != "ServiceProvider")) {
+                res.send("Not authenticated");
+                return;
+            }
+
+
             // initializing the arena
-            // ageeeb el service provider id mneen?
             var rules = req.body.rules_and_regulations;
             var name = req.body.name;
             var address = req.body.address;
@@ -618,95 +908,61 @@ let serviceProviderController =
             var size = req.body.size;
             var type = req.body.type;
             var price = req.body.price;
-
-
-            // storing photos
-            var photos;
-            for (var i = 0; req.files && req.files[i]; i++) {
-                var pth = req.files[i].path;
-                var data = fs.readFileSync(pth);
-                //var type = 'image/'+path.extname(req.files[i].originalname);
-
-                photos.push({ data })
-            }
             var ratings_count = 0;
             var avg_rating = 0;
 
+            if (!name || !address || !location || !size || !type || !price) {
+                res.send("missing input");
+                return;
+            }
 
-            // testing
-            var saturday = [true, false, false];
+            // storing photos
+            var photos = [];
+            for (var i = 0; req.files && req.files[i]; i++) {
+                photos.push(req.files[i].buffer);
+            }
             // creating default schedule
             var default_schedule = [];
-            //var day = req.body.saturday;
-            var day = saturday;
-            var sat = [];
-            for (var i = 0; i < day.length; i++) {
-                if (day[i] == true)
-                    sat.push(0);
-                else {
-                    sat.push(-1);
-                }
+            var day = req.body.saturday;
+            var sat = new Array(48).fill(0);
+            for (var i = 0; day && i < day.length; i++) {
+                sat[day[i]] = -1;
             }
 
-            //day = req.body.sunday;
-            day = [true, false, true];
-            var sun = [];
-            for (var i = 0; i < day.length; i++) {
-                if (day[i] == true)
-                    sun.push(0);
-                else {
-                    sun.push(-1);
-                }
+            day = req.body.sunday;
+            var sun = new Array(48).fill(0);
+            for (var i = 0; day && i < day.length; i++) {
+                sun[day[i]] = -1;
             }
 
-            //day = req.body.monday;
-            var mon = [];
-            for (var i = 0; i < day.length; i++) {
-                if (day[i] == true)
-                    mon.push(0);
-                else {
-                    mon.push(-1);
-                }
+            day = req.body.monday;
+            var mon = new Array(48).fill(0);
+            for (var i = 0; day && i < day.length; i++) {
+                mon[day[i]] = -1;
             }
 
-            //day = req.body.tuesday;
-            var tues = [];
-            for (var i = 0; i < day.length; i++) {
-                if (day[i] == true)
-                    tues.push(0);
-                else {
-                    tues.push(-1);
-                }
+            day = req.body.tuesday;
+            var tues = new Array(48).fill(0);
+            for (var i = 0; day && i < day.length; i++) {
+                tues[day[i]] = -1;
             }
 
-            //day = req.body.wednesday;
-            var wed = [];
-            for (var i = 0; i < day.length; i++) {
-                if (day[i] == true)
-                    wed.push(0);
-                else {
-                    wed.push(-1);
-                }
+            day = req.body.wednesday;
+            var wed = new Array(48).fill(0);
+            for (var i = 0; day && i < day.length; i++) {
+                wed[day[i]] = -1;
             }
 
-            //day = req.body.thursday;
-            var thurs = [];
-            for (var i = 0; i < day.length; i++) {
-                if (day[i] == true)
-                    thurs.push(0);
-                else {
-                    thurs.push(-1);
-                }
+            day = req.body.thursday;
+            var thurs = new Array(48).fill(0);
+            for (var i = 0; day && i < day.length; i++) {
+                thurs[day[i]] = -1;
             }
 
-            //day = req.body.friday;
-            var fri = [];
-            for (var i = 0; i < day.length; i++) {
-                if (day[i] == true)
-                    fri.push(0);
-                else {
-                    fri.push(-1);
-                }
+            day = req.body.friday;
+            var fri = new Array(48).fill(0);
+            for (var i = 0; day && i < day.length; i++) {
+                fri[day[i]] = -1;
             }
 
             default_schedule.push(sat);
@@ -720,7 +976,7 @@ let serviceProviderController =
             var normal_schedule = [];
             var weekNo = 4;
             var daysNo = 7;
-            var slotsNo = 3;
+            var slotsNo = 48;
             for (var i = 0; i < weekNo; i++) {
                 var oneWeek = [];
                 for (var j = 0; j < daysNo; j++) {
@@ -735,120 +991,90 @@ let serviceProviderController =
 
             var user = req.user.username;
             var servProv;
-            ServiceProvider.findOne({ username: username }, function (err, doc) {
+            ServiceProvider.findOne({ username: user }, function (err, doc) {
                 if (err) {
-                    console.log(err);
+                    res.send(err);
                 }
                 else {
                     servProv = doc._id;
+
+                    var newArena = new Arena({
+                        service_provider: servProv,
+                        rules_and_regulations: rules,
+                        name: name,
+                        address: address,
+                        location: location,
+                        avg_rating: avg_rating,
+                        size: size,
+                        type: type,
+                        price: price,
+                        photos: photos,
+                        ratings_count: ratings_count,
+                        default_weekly_schedule: default_schedule,
+                        schedule: normal_schedule
+                    });
+
+
+                    newArena.save(function (err) {
+                        if (err)
+                            res.send(err);
+                        return;
+                    });
+                    res.redirect('/'); // to be changed 
                 }
-            })
-            // el service provider kda s7?
-            var newArena = new Arena({
-                service_provider: servProv,
-                rules_and_regulations: rules,
-                name: name,
-                address: address,
-                location: location,
-                avg_rating: avg_rating,
-                size: size,
-                type: type,
-                price: price,
-                photos: photos,
-                ratings_count: ratings_count,
-                default_weekly_schedule: default_schedule,
-                schedule: normal_schedule
-            });
-
-            // m7tag at2aked eno unique somehow?
-            // akeed msh unique 3shan f mal3abeen f nafs el mkan
-            newArena.save(function (err) {
-                if (err)
-                    console.log(err);
-            });
-        },
-
-        cancelBooking: function (req, res) {
-            var player = req.body.player;
-            var arena = req.body.arena;
-            var time_stamp = req.body.time_stamp;
-            var status;
-            var day, week, start, end;
-            var id;
-
-            Booking.findOne({
-                player: player,
-                arena: arena,
-                time_stamp: time_stamp
-            }, function (err, book) {
-                if (err)
-                    console.log(err);
-                else {
-                    status = book.accepted;
-                    var obj = getScheduleIndices(book.bookMonth, book.bookDay);
-                    day = obj.dayIndex;
-                    week = obj.weekIndex;
-                    start = book.start_index;
-                    end = book.end_index;
-                    id = book._id;
-                }
-            });
-
-            // I need the index of day in the week
-            // week means week 1 2 3 4 in the month or 1 .. 52 in the year?
-            if (accepted) {
-                Arena.findOne({ _id: arena }, function (err, doc) {
-                    for (var i = 0; i < 48; i++) {
-                        var currDay = doc.schedule[week][day];
-                        if (i >= start && i <= end && currDay[i] == id)
-                            doc.schedule[week][day][i] = 0;
-                    }
-                });
-            }
-
-            Booking.remove({
-                player: player,
-                arena: arena,
-                time_stamp: time_stamp
-            }, function (err) {
-                if (err) { console.log(err); }
             })
         },
 
         providerRateBooking: function (req, res) {
             Booking.findOne({ _id: req.params.id }, function (err, booking) {
                 if (err) {
-                    next(err);
+                    res.send(err);
                     return;
                 }
-                booking.player_rating = req.body.rating;
+                if (!booking)
+                    res.send(404);
+
+                booking.player_rating = parseInt(req.body.rating);
                 booking.save(function (err) {
                     if (err) {
-                        next(err);
+                        res.send(err);
                         return;
                     }
-                    res.redirect('/');
                 });
-
+                res.send(booking);
                 // find player
                 Player.findOne({ _id: booking.player }, function (err, player) {
-                    var rating = req.body.rating;
-                    if (err) { return next(err); }
-                    if (!player) { return next(404); }
+                    var rating = parseInt(req.body.rating);
+                    if (err) {
+                        res.send(err);
+                        return;
+                    }
+                    if (!player) {
+                        res.send(404);
+                        return;
+                    }
                     // update rating
-                    player.avg_rating = (player.avg_rating * player.ratings_count + rating) / (player.ratings_count + 1);
+                    if (!player.ratings_count)
+                        player.ratings_count = 0;
+
+                    if (!player.avg_rating)
+                        player.avg_rating = 0;
+
+                    player.avg_rating = ((player.avg_rating * player.ratings_count) + rating) / (player.ratings_count + 1);
+
                     player.ratings_count++;
                     // save rating at player
                     player.save(function (err) {
                         if (err) {
-                            next(err);
+                            res.send(err);
                             return;
                         }
-                        res.redirect('/');
                     });
                 });
+
             });
-        }
+        },
+        viewBookings: viewBookings
     }
 
 module.exports = serviceProviderController;

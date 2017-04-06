@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>test views</title>
+</head>
+<body>
+<a href="/">home</a>
+<%if(currentUser){%>
+<a href="/logout">logout</a>
+<a href="/profile"> <%=currentUser.username%> </a>
+<%}else{%>
+<a href="/login">login</a>
+<a href="/register">register</a>
+<%}%>
+
+
