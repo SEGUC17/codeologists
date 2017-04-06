@@ -157,8 +157,8 @@ router.post('/arena/:arenaId/bookWeekly', ensureAuthenticated, playerController.
 router.post('/arena/:arenaId/bookHours', ensureAuthenticated, playerController.createBooking);
 
 
-router.post('/RequestGame', ensureAuthenticated, playerController.requestgame);
-router.post('/AcceptRequest', ensureAuthenticated, playerController.acceptrequest);
+router.post('/RequestGame/:id', ensureAuthenticated, playerController.requestgame);
+router.post('/AcceptRequest/:id', ensureAuthenticated, playerController.acceptrequest);
 router.post('/RejectRequest/:id', ensureAuthenticated, playerController.rejectrequest);
 
 
