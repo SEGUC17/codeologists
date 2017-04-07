@@ -202,7 +202,10 @@ let playerController = {
 
     if (!(req.body.size) || !(req.body.location) || !(req.body.arenas) || !(req.body.start_date) ||
       !(req.body.end_date) || !(req.user._id))
-      res.send('Missing fields');
+      {
+         res.send('Missing fields');
+         return;
+      }
 
     var creator2 = req.user.player;
     var size2 = req.body.size;
