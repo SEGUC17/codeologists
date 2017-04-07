@@ -22,7 +22,7 @@ var createBooking = function (req, res) {
   if (req.user) {
     Player.findOne({ username: req.user.username }, function (err, player) {
       if (req.body.month && req.body.month && req.body.startIndex && req.body.endIndex) {
-        if (err) {
+        if (err || !player) {
           console.log(err);
           res.send(err);
         }
