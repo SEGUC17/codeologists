@@ -6,6 +6,7 @@ var mime = require('mime');
 var fs = require('fs');
 var path = require('path');
 var playerController = require('../controllers/playerController');
+var bookingController = require('../controllers/bookingController');
 
 var serviceProviderController = require('../controllers/serviceProviderController');
 var visitorController = require('../controllers/visitorController');
@@ -148,13 +149,13 @@ router.post("/sp/arena/:arena_id", ensureAuthenticated, function (req, res) {
     else
         serviceProviderController.setAvailable(req, res);
 });
-router.get('/arena/:arenaId/viewBookings', ensureAuthenticated, serviceProviderController.viewBookings)
-//
-router.post('/arena/:arenaId/bookWeekly', ensureAuthenticated, playerController.bookWeekly);
+router.get('/arena/:arenaName/viewBookings', ensureAuthenticated, serviceProviderController.viewBookings)
+
+router.post('/arena/:arenaName/bookWeekly', ensureAuthenticated, playerController.bookWeekly);
 
 
 //book free hours
-router.post('/arena/:arenaId/bookHours', ensureAuthenticated, playerController.createBooking);
+router.post('/arena/:arenaName/bookHours', ensureAuthenticated, bookingController.createBooking);
 
 
 router.post('/RequestGame/:id', ensureAuthenticated, playerController.requestgame);

@@ -10,8 +10,7 @@ var schema = mongoose.Schema({
 		required: true
 	},
 	arena: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: 'Arena',
+		type: String,
 		required: true
 	},
 	time_stamp: {

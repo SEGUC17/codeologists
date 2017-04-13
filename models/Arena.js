@@ -21,7 +21,9 @@ var schema = mongoose.Schema({
 	rules_and_regulations: String,
 	name: {
 		type: String,
-		required: true
+		required: true,
+		unique : true,
+		index:true
 	},
 	address: {
 		type: String,
