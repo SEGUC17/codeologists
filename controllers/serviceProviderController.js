@@ -838,7 +838,7 @@ let serviceProviderController =
 
 
         setAvailable: function (req, res) {
-            if (req.user && (req.user.type.equals("ServiceProvider"))) {
+            if (req.user && (req.user.type== "ServiceProvider")) {
                 ServiceProvider.findOne({ username: req.user.username }, function (err, sp) {
                     Arena.findOne({ _id: req.params.arena_id }, function (err2, arena) {
 
@@ -1018,7 +1018,7 @@ let serviceProviderController =
                     newArena.save(function (err) {
                         if (err)
                             res.send(err);
-                        return;
+                        return ;
                     });
                     res.redirect('/'); // to be changed 
                 }

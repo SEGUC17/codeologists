@@ -96,13 +96,13 @@ var bookHours = function (month, day, startIndex, endIndex, timestamp, arenaID, 
           callback("Time Unavailable");
         }
       } else {
+        if (err)
+          callback(err);
+        else if (!(indices.dayIndex >= 0 && indices.weekIndex >= 0 && indices.dayIndex <= 6 && indices.weekIndex <= 3))
+          callback("Day and month ot of bound");
+        else
+          callback("no such booking");
       }
-      if (err)
-        callback(err);
-      else if (!(indices.dayIndex >= 0 && indices.weekIndex >= 0 && indices.dayIndex <= 6 && indices.weekIndex <= 3))
-        callback("Day and month ot of bound");
-      else
-        callback("no such booking");
     }
 
   })
@@ -200,17 +200,16 @@ let playerController = {
 
   createGame: function (req, res) {
 
-    if (!(req.body.size) || !(req.body.location) || !(req.body.arenas) || !(req.body.start_date) ||
-      !(req.body.end_date) || !(req.user._id))
-      {
-         res.send('Missing fields');
-         return;
-      }
+    if (!(req.body.size) || !(req.body.location) || !(req.body.start_date) ||
+      !(req.body.end_date) || !(req.user._id)) {
+      res.send('Missing fields');
+      return;
+    }
 
-    var creator2 = req.user.player;
+    var creator2 = req.user._id;
     var size2 = req.body.size;
     var location2 = req.body.location;
-    var arenas2 = req.body.arenas;
+    //var arenas2 = req.body.arenas;
     var start_date2 = req.body.start_date;
     var end_date2 = req.body.end_date;
     let added = new Game
@@ -218,7 +217,7 @@ let playerController = {
         creator: creator2,
         size: size2,
         location: location2,
-        suggested_arenas: arenas2,
+        //suggested_arenas: arenas2,
         start_date: start_date2,
         end_date: end_date2
       });
@@ -344,7 +343,7 @@ let playerController = {
       if (err)
         res.send(err.message);
       else
-        res.render('viewgames', { games: games });
+        res.send(games);
     });
   },
 
@@ -438,6 +437,7 @@ let playerController = {
           var n = game.requests[i].playerUsername.localeCompare(NewReq.playerUsername);
           if (n == 0) {
             res.send("You have already sent the same request before");
+            return;
           }
         }
         game.requests.push(NewReq);
@@ -510,7 +510,8 @@ let playerController = {
         for (var i = 0; i < arrayLength; i++) {
           var n = game.requests[i].playerUsername.localeCompare(playerUsername);
           if (n == 0) {
-            delete game.requests[i];
+            //delete game.requests[i];
+            game.requests.splice(i);
             game.save(nxt);
 
             Player.findOne({ username: playerUsername }, function (err, player) {

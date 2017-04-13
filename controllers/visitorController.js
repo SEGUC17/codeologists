@@ -53,7 +53,7 @@ let visitorController = {
 					player.email = req.body.email;
 					player.phone_number = req.body.phone_number;
 					player.location = req.body.location;
-					if (req.files)
+					if (req.files[0])
 						player.profile_pic.data = req.files[0].buffer;
 					player.birthdate = req.body.birthdate;
 					player.ratings_count = 0;
@@ -104,7 +104,7 @@ let visitorController = {
 					service.email = req.body.email;
 					service.phone_number = req.body.phone_number;
 					service.location = req.body.location;
-					if (req.files)
+					if (req.files[0])
 						service.profile_pic.data = req.files[0].buffer;
 					service.mode = req.body.mode ? true : false;
 
