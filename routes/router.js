@@ -7,7 +7,7 @@ var fs = require('fs');
 var path = require('path');
 var playerController = require('../controllers/playerController');
 var bookingController = require('../controllers/bookingController');
-
+var arenaController = require('../controllers/arenaController');
 var serviceProviderController = require('../controllers/serviceProviderController');
 var visitorController = require('../controllers/visitorController');
 var Player = require('../models/Player');
@@ -124,11 +124,11 @@ router.post('/profile/whitelist/phone', ensureAuthenticated, serviceProviderCont
 
 router.post('/profile/removewhitelist', ensureAuthenticated, serviceProviderController.remove_from_whitelist);
 
-router.post('/arena/:id/comment', ensureAuthenticated, playerController.commentOnArena);
+router.post('/arena/:id/comment', ensureAuthenticated, arenaController.commentOnArena);
 
-router.post('/ProviderRatesBooking/:id', ensureAuthenticated, serviceProviderController.providerRateBooking);
+router.post('/ProviderRatesBooking/:id', ensureAuthenticated, bookingController.providerRateBooking);
 
-router.post('/PlayerRatesBooking/:id', ensureAuthenticated, playerController.playerRateBooking);
+router.post('/PlayerRatesBooking/:id', ensureAuthenticated, bookingController.playerRateBooking);
 
 router.get('/createArena', ensureAuthenticated, function (req, res) {
     res.render('createarena');

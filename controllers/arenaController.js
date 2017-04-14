@@ -73,26 +73,29 @@ function checkAvailable(endIndex, schedule, startIndex) {
 
 function commentOnArena(req, res) {
 
-    if (req.body.type == 'Player') {
+    if(!req.body.comment)
+      res.json({err: 400});
+
+    if (req.user.type == 'Player') {
         Arena.findOne({ _id: req.params.id }, function (err, arena) {
             if (err) {
-                res.send(err);
+                res.json({err: err});
                 return;
             }
             var content = req.body.comment;
-            arena.comments.push({ Content: content, time_stamp: new Date(), player: req.body.username });
+            arena.comments.push({ Content: content, time_stamp: new Date(), player: req.user.username });
             arena.save(function (err) {
                 if (err) {
-                    res.send(err);
+                    res.json({err: err});
                     return;
                 }
-                res.send("Your comment was posted");
+                res.json(arena);
             });
 
         });
     }
     else {
-        res.send("not allowed to comment");
+        res.json({err: "not allowed to comment"});
     }
 };
 function viewarena(req, res) {
@@ -241,13 +244,13 @@ function addimage(req, res, nxt) {
                         Arena.findById(req.params.arena_id, function (err, arena) {
                             if (arena) {
 
-                                //saving the day which will be modifed to restore it to the schedule later if there's an error 
+                                //saving the day which will be modifed to restore it to the schedule later if there's an error
                                 var before_edit = [];
                                 for (var i = 0; i < 48; i++) {
                                     before_edit[i] = arena.schedule[weekIndex][dayIndex][i];
                                 };
 
-                                //setting only available slots to be unavailable. if a booked slot encountered an error statement will be sent to the user (service provider). 
+                                //setting only available slots to be unavailable. if a booked slot encountered an error statement will be sent to the user (service provider).
                                 for (var i = startIndex; i <= endIndex; i++) {
                                     if (arena.schedule[weekIndex][dayIndex][i] == 0 || arena.schedule[weekIndex][dayIndex][i] == -1)
                                         (arena.schedule)[weekIndex][dayIndex][i] = -1;
@@ -280,12 +283,12 @@ function addimage(req, res, nxt) {
                         });
                     }
                     else {
-                        //if one of the fields in req.body isn't delivered 
+                        //if one of the fields in req.body isn't delivered
                         res.send("incorrect data");
                     }
                 }
                 else {
-                    //if the arena does not belong to this service provider or there's no such arena 
+                    //if the arena does not belong to this service provider or there's no such arena
                     res.send("You are not allowed to view this page or there's no such arena");
                 }
             });
@@ -321,7 +324,7 @@ function addimage(req, res, nxt) {
                                 Arena.findById(req.params.arena_id, function (err, arena) {
                                     var schedule = arena.schedule;
 
-                                    //making the slots between the startIndex and the endIndex (inclusive) available 
+                                    //making the slots between the startIndex and the endIndex (inclusive) available
                                     for (var i = startIndex; i <= endIndex; i++) {
                                         schedule[weekIndex][dayIndex][i] = 0;
                                     };
@@ -338,7 +341,7 @@ function addimage(req, res, nxt) {
 
                             }
                             else {
-                                //if one of the fields in req.body isn't delivered 
+                                //if one of the fields in req.body isn't delivered
                                 res.send("incorrect data");
                             }
                         }
@@ -350,7 +353,7 @@ function addimage(req, res, nxt) {
                 });
             }
             else {
-                //if the user(visitor) isn't logged in or he is logged in but he is not a service provider   
+                //if the user(visitor) isn't logged in or he is logged in but he is not a service provider
                 res.send("You are not allowed to view this page");
             }
         }
@@ -481,7 +484,7 @@ function addimage(req, res, nxt) {
                             res.send(err);
                         return;
                     });
-                    res.redirect('/'); // to be changed 
+                    res.redirect('/'); // to be changed
                 }
             })
         }
