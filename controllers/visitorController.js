@@ -134,16 +134,16 @@ let visitorController = {
 	view_all: function (req, res) {
 
 		if (req.body.location.length == 0) {
-			res.render('index', { result: "", error: "Please Choose Your Location to View Arenas In." });
+			res.json({error: "Please Choose Your Location to View Arenas In."});
 		} else {
 
 			Arena.find({ location: req.body.location }, function (err, result) {
 				if (err)
-					res.send(err.message);
+					res.json({error: err.message});
 				else {
 					ServiceProvider.find(function (err, service) {
 						if (err)
-							res.send(err.message);
+							res.json({error: err});
 						else {
 							for (var i = 0; i < result.length; i++) { //loop searching in list of arenas
 								var id = require('mongodb').ObjectID(result[i].service_provider);
@@ -167,12 +167,11 @@ let visitorController = {
 						}
 
 						if (result.length == 0) {
-							res.render('index', { result: "", error: "No Arenas Found in That Location." });
+							res.json(result);
 							return;
 						}
 
-						res.send(result);
-
+						res.json(result);
 					})
 				}
 			})
@@ -188,10 +187,10 @@ let visitorController = {
 
 		Arena.find({ name: req.body.name }, function (err, result) {
 			if (err)
-				res.send(err.message);
+				res.json({error: err.message});
 			else {
 				if (result.length == 0)
-					res.render('index', { result: "", error: "No Arenas Found in That Location." });
+					res.json({error: "No Arenas Found in That Location."});
 				else {
 					var id = require('mongodb').ObjectID(result[0].service_provider);
 					ServiceProvider.findById(id, function (err, service) {
@@ -206,9 +205,9 @@ let visitorController = {
 						}
 
 						if (blacklisted == 0)
-							res.send(result);
+							res.json(result);
 						else
-							res.send("No Arenas");
+							res.json({error: "No Arenas"});
 					})
 
 				}
