@@ -17,7 +17,7 @@ var localStrategy = new LocalStrategy(
 			}
 			hasher(password).verifyAgainst(user.password, function (error, verified) {
 				if (error)
-					done(error);
+					return done(error);
 				else if (!verified)
 					return done(null, false, { message: 'Incorrect username or password' });
 				else
