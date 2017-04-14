@@ -139,7 +139,7 @@ let visitorController = {
 
 			Arena.find({ location: req.body.location }, function (err, result) {
 				if (err)
-					res.json({error: err.message});
+					res.json({error: err});
 				else {
 					ServiceProvider.find(function (err, service) {
 						if (err)
@@ -187,7 +187,7 @@ let visitorController = {
 
 		Arena.find({ name: req.body.name }, function (err, result) {
 			if (err)
-				res.json({error: err.message});
+				res.json({error: err});
 			else {
 				if (result.length == 0)
 					res.json({error: "No Arenas Found in That Location."});
