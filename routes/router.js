@@ -7,7 +7,7 @@ var fs = require('fs');
 var path = require('path');
 var playerController = require('../controllers/playerController');
 var bookingController = require('../controllers/bookingController');
-
+var arenaController = require('../controllers/arenaController');
 var serviceProviderController = require('../controllers/serviceProviderController');
 var visitorController = require('../controllers/visitorController');
 var Player = require('../models/Player');
@@ -142,12 +142,12 @@ router.post('/acceptBooking', ensureAuthenticated, serviceProviderController.acc
 router.post('/rejectBooking', ensureAuthenticated, serviceProviderController.rejectBooking);
 router.post('/createGame', ensureAuthenticated, playerController.createGame);
 
-router.post("/sp/arena/:arena_id", ensureAuthenticated, function (req, res) {
+router.post("/sp/arena/:arena_id",ensureAuthenticated, function (req, res) {
     if (req.body.flag == 1) {
-        serviceProviderController.setUnavailable(req, res);
+        arenaController.setUnavailable(req, res);
     }
     else
-        serviceProviderController.setAvailable(req, res);
+        arenaController.setAvailable(req, res);
 });
 router.get('/arena/:arenaName/viewBookings', ensureAuthenticated, serviceProviderController.viewBookings)
 
