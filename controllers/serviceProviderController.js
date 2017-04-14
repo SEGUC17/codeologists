@@ -167,7 +167,7 @@ let serviceProviderController = {
 
                 for (var i = 0; i < serviceProvider.blacklist.length; i++) {
                     if (serviceProvider.blacklist[i].equals(player._id)) {
-                        return res.send(400, "This player is already black listed");
+                        return res.json(400, { error: "This player is already black listed" });
                     }
                 }
                 serviceProvider.blacklist.push(player);
@@ -207,7 +207,7 @@ let serviceProviderController = {
 
                 for (var i = 0; i < serviceProvider.blacklist.length; i++) {
                     if (serviceProvider.blacklist[i].equals(player._id)) {
-                        return res.send(400, "This player is already black listed");
+                        return res.json(400, { error: "This player is already black listed" });
                     }
                 }
                 serviceProvider.blacklist.push(player);
