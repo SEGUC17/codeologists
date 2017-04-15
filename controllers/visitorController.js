@@ -35,19 +35,19 @@ let visitorController = {
 	createPlayer: function (req, res) {
 		Player.findOne({ username: req.body.username }, function (err, user) {
 			if (user)
-				res.render('newPlayer', { error: 'Username already used' });
+				res.status(400).json({ error: 'Username already used' });
 			else {
 
 				hasher(req.body.password).hash(function (error, hash) {
 					if (error)
-						throw new Error(error.message);
+						res.status(400).json({ error: error.message });
 
 
 					var player = new Player();
 					player.name = req.body.name;
 					player.username = req.body.username;
 					if (!validateEmail(req.body.email)) {
-						res.send("Email not in correct format");
+						res.status(400).json({ error: "Email not in correct format" });
 						return;
 					}
 					player.email = req.body.email;
@@ -62,17 +62,17 @@ let visitorController = {
 					player.password = hash;
 
 					if (!req.body.email || !req.body.name || !req.body.location || !req.body.phone_number || !req.body.username || !req.body.birthdate || !req.body.password) {
-						res.send("Missing data");
+						res.status(400).json({ error: "Missing data" });
 						return;
 					}
 
 
 					player.save(function (err, player) {
 						if (err)
-							res.send(err);
+							res.status(500).json({ error: err });
 						else {
 
-							res.redirect('/');
+							res.json({ success: "New player created" });
 						}
 					});
 
@@ -86,19 +86,19 @@ let visitorController = {
 	createServiceProvider: function (req, res) {
 		ServiceProvider.findOne({ username: req.body.username }, function (err, user) {
 			if (user)
-				res.render('newServiceProvider', { error: 'Username already used' });
+				res.status(400).json({ error: 'Username already used' });
 			else {
 
 				hasher(req.body.password).hash(function (error, hash) {
 					if (error)
-						throw new Error(error.message);
+						res.status(400).json({ error: error.message });
 
 
 					var service = new ServiceProvider();
 					service.name = req.body.name;
 					service.username = req.body.username;
 					if (!validateEmail(req.body.email)) {
-						res.send("Email not in correct format");
+						res.status(400).json({ error: "Email not in correct format" });
 						return;
 					}
 					service.email = req.body.email;
@@ -112,16 +112,16 @@ let visitorController = {
 					service.password = hash;
 
 					if (!req.body.email || !req.body.name || !req.body.location || !req.body.phone_number || !req.body.username || !req.body.mode || !req.body.password) {
-						res.send("Missing data");
+						res.status(400).json({ error: "Missing data" });
 						return;
 					}
 
 					service.save(function (err, service) {
 						if (err)
-							res.send(err);
+							res.status(500).json({ error: err });
 						else {
 
-							res.redirect('/');
+							res.json({ success: "New service provider created" });
 						}
 					});
 
@@ -134,16 +134,16 @@ let visitorController = {
 	view_all: function (req, res) {
 
 		if (req.body.location.length == 0) {
-			res.render('index', { result: "", error: "Please Choose Your Location to View Arenas In." });
+			res.json({ error: "Please Choose Your Location to View Arenas In." });
 		} else {
 
 			Arena.find({ location: req.body.location }, function (err, result) {
 				if (err)
-					res.send(err.message);
+					res.json({ error: err });
 				else {
 					ServiceProvider.find(function (err, service) {
 						if (err)
-							res.send(err.message);
+							res.json({ error: err });
 						else {
 							for (var i = 0; i < result.length; i++) { //loop searching in list of arenas
 								var id = require('mongodb').ObjectID(result[i].service_provider);
@@ -167,12 +167,11 @@ let visitorController = {
 						}
 
 						if (result.length == 0) {
-							res.render('index', { result: "", error: "No Arenas Found in That Location." });
+							res.json(result);
 							return;
 						}
 
-						res.send(result);
-
+						res.json(result);
 					})
 				}
 			})
@@ -188,10 +187,10 @@ let visitorController = {
 
 		Arena.find({ name: req.body.name }, function (err, result) {
 			if (err)
-				res.send(err.message);
+				res.json({ error: err });
 			else {
 				if (result.length == 0)
-					res.render('index', { result: "", error: "No Arenas Found in That Location." });
+					res.json({ error: "No Arenas Found in That Location." });
 				else {
 					var id = require('mongodb').ObjectID(result[0].service_provider);
 					ServiceProvider.findById(id, function (err, service) {
@@ -206,9 +205,9 @@ let visitorController = {
 						}
 
 						if (blacklisted == 0)
-							res.send(result);
+							res.json(result);
 						else
-							res.send("No Arenas");
+							res.json({ error: "No Arenas" });
 					})
 
 				}
@@ -217,6 +216,7 @@ let visitorController = {
 			}
 		})
 	},
+
 	filter: function (req, res) {
 		var search_type = req.body.search_type;
 		var search_value = req.body.search_value;

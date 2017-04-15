@@ -18,7 +18,7 @@ function validateEmail(email) {
 }
 
 //most probably should be moved to bookingController
-   function acceptBooking (booking) {
+function acceptBooking(booking) {
     Arena.findOne({ _id: booking.arena }, function (err, arenaa) {
         var schedule = arenaa.schedule;
         var indices = getScheduleIndices(booking.bookMonth, booking.bookDay);
@@ -145,33 +145,41 @@ let serviceProviderController =
             });
         },
         /**
-     * adds a player to the black list using username.
-     */
+      * adds a player to the black list using username.
+      */
         add_to_blacklist: function (req, res) {
 
             var playerUsername = req.body.Pusername;
             var serviceProviderUsername = req.user.username;
 
             ServiceProvider.findOne({ username: serviceProviderUsername }, function (err, serviceProvider) {
-                if (err || (serviceProvider == null)) {
-                    return res.send("Error in operation.\nTry Again");
-                }
-                Player.findOne({ username: playerUsername }, function (err2, player) {
-                    console.log(playerUsername);
 
-                    if (err2 || (player == null)) {
-                        return res.send("Error in operation.\nTry Again");
+                if (err) {
+                    return res.json(500, { error: err });
+                }
+                if (serviceProvider == null) {
+                    return res.json(403, { error: "Please log in as a Service Provider" });
+                }
+
+                Player.findOne({ username: playerUsername }, function (err2, player) {
+
+                    if (err2) {
+                        return res.json(500, { error: err2 });
+                    }
+                    if (player == null) {
+                        return res.json(400, { error: "Unregistered player" });
                     }
 
                     for (var i = 0; i < serviceProvider.blacklist.length; i++) {
                         if (serviceProvider.blacklist[i].equals(player._id)) {
-                            return res.send("This player is already black listed");
+                            return res.json(400, { error: "This player is already black listed" });
                         }
                     }
                     serviceProvider.blacklist.push(player);
-                    serviceProvider.save(function (err) { });
-                    res.send("Successfully added to Blacklist");
-
+                    serviceProvider.save(function (err) {
+                        return res.json(500, { error: "Error in operation. Try again" });
+                    });
+                    res.json({ message: "Successfully added to blacklist" });
                 });
             });
         },
@@ -186,23 +194,32 @@ let serviceProviderController =
 
             ServiceProvider.findOne({ username: serviceProviderUsername }, function (err, serviceProvider) {
 
-                if (err || (serviceProvider == null)) {
-                    return res.send("Error in operation.\nTry Again");
+                if (err) {
+                    return res.json(500, { error: err });
                 }
+                if (serviceProvider == null) {
+                    return res.json(403, { error: "Please log in as a Service Provider" });
+                }
+
                 Player.findOne({ phone_number: playerNumber }, function (err2, player) {
 
-                    if (err2 || (player == null)) {
-                        return res.send("Error in operation.\nTry Again");
+                    if (err2) {
+                        return res.json(500, { error: err2 });
+                    }
+                    if (player == null) {
+                        return res.json(400, { error: "Unregistered player" });
                     }
 
                     for (var i = 0; i < serviceProvider.blacklist.length; i++) {
                         if (serviceProvider.blacklist[i].equals(player._id)) {
-                            return res.send("This player is already black listed");
+                            return res.json(400, { error: "This player is already black listed" });
                         }
                     }
                     serviceProvider.blacklist.push(player);
-                    serviceProvider.save(function (err) { });
-                    res.send("Successfully added to Blacklist");
+                    serviceProvider.save(function (err) {
+                        return res.json(500, { error: "Error in operation. Try again" });
+                    });
+                    res.json({ message: "Successfully added to Blacklist" });
                 });
             });
         },
@@ -217,13 +234,20 @@ let serviceProviderController =
 
             ServiceProvider.findOne({ username: serviceProviderUsername }, function (err, serviceProvider) {
 
-                if (err || (serviceProvider == null)) {
-                    return res.send("Error in operation.\nTry Again");
+                if (err) {
+                    return res.json(500, { error: err });
                 }
+                if (serviceProvider == null) {
+                    return res.json(403, { error: "Please log in as a Service Provider" });
+                }
+
                 Player.findOne({ username: playerUsername }, function (err2, player) {
 
-                    if (err2 || (player == null)) {
-                        return res.send("Error in operation.\nTry Again");
+                    if (err2) {
+                        return res.json(500, { error: err2 });
+                    }
+                    if (player == null) {
+                        return res.json(400, { error: "Unregistered player" });
                     }
 
                     for (var i = 0; i < serviceProvider.blacklist.length; i++) {
@@ -232,11 +256,13 @@ let serviceProviderController =
 
                             var pos = serviceProvider.blacklist.indexOf(player._id);
                             serviceProvider.blacklist.splice(pos, 1);
-                            serviceProvider.save(function (err) { });
-                            return res.send("Successfully removed from Blacklist");
+                            serviceProvider.save(function (err) {
+                                return res.json(500, { error: "Error in operation. Try again" });
+                            });
+                            return res.json({ message: "Successfully removed from Blacklist" });
                         }
                     }
-                    res.send("This player is not black listed");
+                    res.json(400, { error: "This player is not black listed" });
                 });
             });
         },
@@ -251,24 +277,32 @@ let serviceProviderController =
 
             ServiceProvider.findOne({ username: serviceProviderUsername }, function (err, serviceProvider) {
 
-                if (err || (serviceProvider == null)) {
-                    return res.send("Error in operation.\nTry Again");
+                if (err) {
+                    return res.json(500, { error: err });
+                }
+                if (serviceProvider == null) {
+                    return res.json(403, { error: "Please log in as a Service Provider" });
                 }
 
                 Player.findOne({ username: playerUsername }, function (err2, player) {
 
-                    if (err2 || (player == null)) {
-                        return res.send("Error in operation.\nTry Again");
+                    if (err2) {
+                        return res.json(500, { error: err2 });
+                    }
+                    if (player == null) {
+                        return res.json(400, { error: "Unregistered player" });
                     }
 
                     for (var i = 0; i < serviceProvider.whitelist.length; i++) {
                         if (serviceProvider.whitelist[i].equals(player._id)) {
-                            return res.send("This player is already white listed");
+                            return res.json(400, { error: "This player is already Whitelisted" });
                         }
                     }
                     serviceProvider.whitelist.push(player);
-                    serviceProvider.save(function (err) { });
-                    res.send("Successfully added to WhiteList");
+                    serviceProvider.save(function (err) {
+                        return res.json(500, { error: "Error in operation. Try again" });
+                    });
+                    res.json({ message: "Successfully added to Whitelist" });
                 });
             });
         },
@@ -283,24 +317,32 @@ let serviceProviderController =
 
             ServiceProvider.findOne({ username: serviceProviderUsername }, function (err, serviceProvider) {
 
-                if (err || (serviceProvider == null)) {
-                    return res.send("Error in operation.\nTry Again");
+                if (err) {
+                    return res.json(500, { error: err });
+                }
+                if (serviceProvider == null) {
+                    return res.json(403, { error: "Please log in as a Service Provider" });
                 }
 
                 Player.findOne({ phone_number: playerNumber }, function (err2, player) {
 
-                    if (err2 || (player == null)) {
-                        return res.send("Error in operation.\nTry Again");
+                    if (err2) {
+                        return res.json(500, { error: err2 });
+                    }
+                    if (player == null) {
+                        return res.json(400, { error: "Unregistered player" });
                     }
 
                     for (var i = 0; i < serviceProvider.whitelist.length; i++) {
                         if (serviceProvider.whitelist[i].equals(player._id)) {
-                            return res.send("This player is already white listed");
+                            return res.json(400, { error: "This player is already white listed" });
                         }
                     }
                     serviceProvider.whitelist.push(player);
-                    serviceProvider.save(function (err) { });
-                    res.send("Successfully added to WhiteList");
+                    serviceProvider.save(function (err) {
+                        return res.json(500, { error: "Error in operation. Try again" });
+                    });
+                    res.json({ message: "Successfully added to Whitelist" });
 
                 });
             });
@@ -316,24 +358,33 @@ let serviceProviderController =
 
             ServiceProvider.findOne({ username: serviceProviderUsername }, function (err, serviceProvider) {
 
-                if (err || (serviceProvider == null)) {
-                    return res.send("Error in operation.\nTry Again");
+                if (err) {
+                    return res.json(500, { error: err });
+                }
+                if (serviceProvider == null) {
+                    return res.json(403, { error: "Please log in as a Service Provider" });
                 }
 
                 Player.findOne({ username: playerUsername }, function (err2, player) {
 
-                    if (err2 || (player == null)) {
-                        return res.send("Error in operation.\nTry Again");
+                    if (err2) {
+                        return res.json(500, { error: err2 });
                     }
+                    if (player == null) {
+                        return res.json(400, { error: "Unregistered player" });
+                    }
+
                     for (var i = 0; i < serviceProvider.whitelist.length; i++) {
                         if (serviceProvider.whitelist[i].equals(player._id)) {
                             var pos = serviceProvider.whitelist.indexOf(player._id);
                             serviceProvider.whitelist.splice(pos, 1);
-                            serviceProvider.save(function (err) { });
-                            return res.send("Successfully removed from Whitelist");
+                            serviceProvider.save(function (err) {
+                                return res.json(500, { error: "Error in operation. Try again" });
+                            });
+                            return res.json({ message: "Successfully removed from Whitelist" });
                         }
                     }
-                    res.send("This player is not white listed");
+                    res.json(400, { error: "This player is not White listed" });
 
                 });
             });

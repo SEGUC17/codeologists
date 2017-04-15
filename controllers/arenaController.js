@@ -220,7 +220,7 @@ function addimage(req, res, nxt) {
         }
     });
 }
- function setUnavailable (req, res, next) {
+ function setUnavailable (req, res) {
     if (req.user && (req.user.type == "ServiceProvider")) {
         ServiceProvider.findOne({ username: req.user.username }, function (err, sp) {
             Arena.findOne({ _id: req.params.arena_id }, function (err2, arena) {
@@ -236,7 +236,7 @@ function addimage(req, res, nxt) {
                     //checking if all required fields are delivered
                     if (month && day && endIndex && startIndex) {
 
-                        var Indices = getScheduleIndices(month, day);
+                        var Indices = serviceProviderController.getScheduleIndices(month, day);
                         var weekIndex = Indices.weekIndex;
                         var dayIndex = Indices.dayIndex;
                         var flag = 0;
@@ -266,37 +266,40 @@ function addimage(req, res, nxt) {
                                     for (var i = 0; i < 48; i++) {
                                         arena.schedule[weekIndex][dayIndex][i] = before_edit[i];
                                     };
-                                    res.send("error, You can not set booked slots to be unavailable");
+                                    res.json({error:"You can not set booked slots to be unavailable"});
                                 }
                                 else {
                                     arena.markModified("schedule");
                                     arena.save(function (err, arr) {
                                         if (err) {
-                                            res.send("error in arena DB");
+                                            res.json({error : "error in arena DB"});
                                         }
                                     });
-                                    res.send(arena.schedule);
+                                    res.status(200).json({schedule : arena.schedule});
                                 }
 
                             }
-                            else { res.send("error, wrong arena id") };
+                            else {
+                                res.status(404).json({error:"error, wrong arena id"}); 
+                              };
                         });
                     }
                     else {
-                        //if one of the fields in req.body isn't delivered
-                        res.send("incorrect data");
+                        //if one of the fields in req.body isn't delivered 
+                     res.json({error:"Missing data"});
                     }
                 }
                 else {
-                    //if the arena does not belong to this service provider or there's no such arena
-                    res.send("You are not allowed to view this page or there's no such arena");
-                }
+                    //if the arena does not belong to this service provider or there's no such arena 
+                    res.status(404).json({error:"You are not allowed to view this page or there's no such arena"});
+                     }
             });
         });
     }
     else {
         //if the user(visitor) isn't logged in or he is logged in but he is not a service provider
-        res.send("You are not allowed to view this page");
+        res.status(403).json({error:"You are not allowed to view this page"}); 
+        
     }
 
 }
@@ -317,7 +320,7 @@ function addimage(req, res, nxt) {
                             //checking if all required fields are delivered
                             if (month && day && endIndex && startIndex) {
 
-                                var Indices = getScheduleIndices(month, day);
+                                var Indices = serviceProviderController.getScheduleIndices(month, day);
                                 var weekIndex = Indices.weekIndex;
                                 var dayIndex = Indices.dayIndex;
 
@@ -333,31 +336,31 @@ function addimage(req, res, nxt) {
                                     arena.markModified("schedule");
                                     arena.save(function (err) {
                                         if (err) {
-                                            res.send("error in arena DB");
+                                            res.json({error:"error in arena DB"});
                                         }
                                     });
-                                    res.redirect("/sp/arena/" + req.params.arena_id);
+                                    res.status(200).json({schedule : arena.schedule});
                                 });
 
                             }
                             else {
-                                //if one of the fields in req.body isn't delivered
-                                res.send("incorrect data");
+                                //if one of the fields in req.body isn't delivered 
+                               res.json({error:"Missing data"});
                             }
                         }
                         else {
                             //if the arena does not belong to this service provider or there's no such arena
-                            res.send("You are not allowed to view this page or there's no such arena");
+                            res.status(404).json({error:"You are not allowed to view this page or there's no such arena"});
                         }
                     });
                 });
             }
             else {
-                //if the user(visitor) isn't logged in or he is logged in but he is not a service provider
-                res.send("You are not allowed to view this page");
+                //if the user(visitor) isn't logged in or he is logged in but he is not a service provider   
+                res.status(403).json({error:"You are not allowed to view this page"});
             }
-        }
- function createArena (req, res) {
+        } 
+        function createArena (req, res) {
             if (req.user && (req.user.type != "ServiceProvider")) {
                 res.send("Not authenticated");
                 return;

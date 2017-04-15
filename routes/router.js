@@ -55,18 +55,18 @@ router.get('/', function (req, res) {
 });
 
 router.get('/register', function (req, res) {
-    res.render('chooseType');
+    res.json({success:"choose type"});
 });
 
 router.post('/register', function (req, res) {
     if (req.body.player)
-        res.redirect('/newPlayer');
+        res.json({success:"player"});
     else
-        res.redirect('/newServiceProvider');
+        res.json({success:"service provider"});
 });
 
 router.get('/newPlayer', function (req, res) {
-    res.render('newPlayer');
+    res.json({success:"player"});
 });
 
 router.post('/newPlayer', upload.any(), function (req, res) {
@@ -74,7 +74,7 @@ router.post('/newPlayer', upload.any(), function (req, res) {
 });
 
 router.get('/newServiceProvider', function (req, res) {
-    res.render('newServiceProvider');
+   res.json({success:"service provider"});
 });
 
 router.post('/newServiceProvider', upload.any(), function (req, res) {
@@ -82,20 +82,21 @@ router.post('/newServiceProvider', upload.any(), function (req, res) {
 });
 
 router.get('/login', function (req, res) {
-    res.render('login');
+    res.json({success:"login"});
 });
 
-router.post('/login', passport.authenticate('local', {
-    failureRedirect: '/login',
-    failureFlash: true
-}), function (req, res) {
-    req.flash('info', 'You have logged in successfully');
-    res.redirect('/');
+router.post('/login', passport.authenticate('local'), function (req, res) {
+    res.json({success:"User authenticated successfully"});
 });
 
 router.get('/logout', function (req, res) {
-    req.logout();
-    res.redirect('/');
+    if(req.user)
+    {
+        req.logout();
+        res.redirect('/');
+    }
+    else
+        res.status(400).json({error:"Cannot logout if you are not logged in"});
 });
 
 router.post('/arenas', visitorController.view_all);
@@ -142,12 +143,12 @@ router.post('/acceptBooking', ensureAuthenticated, serviceProviderController.acc
 router.post('/rejectBooking', ensureAuthenticated, serviceProviderController.rejectBooking);
 router.post('/createGame', ensureAuthenticated, playerController.createGame);
 
-router.post("/sp/arena/:arena_id", ensureAuthenticated, function (req, res) {
+router.post("/sp/arena/:arena_id",ensureAuthenticated, function (req, res) {
     if (req.body.flag == 1) {
-        serviceProviderController.setUnavailable(req, res);
+        arenaController.setUnavailable(req, res);
     }
     else
-        serviceProviderController.setAvailable(req, res);
+        arenaController.setAvailable(req, res);
 });
 router.get('/arena/:arenaName/viewBookings', ensureAuthenticated, serviceProviderController.viewBookings)
 
