@@ -11,6 +11,9 @@ var session = require('express-session');
 var systemController = require('./controllers/systemController');
 var passport = require('passport');
 var flash = require('connect-flash');
+var Booking = require('./models/Booking');
+var Arena = require('./models/Arena');
+
 
 schedule.scheduleJob({ hour: 00, minute: 00, dayOfWeek: 5 }, systemController.updateSchedule);
 schedule.scheduleJob({ hour: 07, minute: 00, dayOfWeek: 5 }, systemController.collectGarbage);

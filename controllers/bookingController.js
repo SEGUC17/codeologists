@@ -133,23 +133,31 @@ var cancelBooking = function (req, res) {
 
 };
 function playerRateBooking(req, res) {
+
+          if(!req.body.rating || parseInt(req.body.rating) > 5 || parseInt(req.body.rating) < 1)
+          {
+            res.status(400).json({error: "bad request, enter a proper rating!"});
+            return;
+          }
+
     Booking.findOne({ _id: req.params.id }, function (err, booking) {
         booking.arena_rating = parseInt(req.body.rating);
+
         //save arena rating at booking
         booking.save(function (err) {
             if (err) {
-                res.send(err);
+                res.json({error: err.message});
                 return;
             }
         });
         Arena.findOne({ _id: booking.arena }, function (err, arena) {
             var rating = parseInt(req.body.rating);
             if (err) {
-                res.send(err);
+                res.json({error: err.message});
                 return;
             }
             if (!arena) {
-                res.send(404);
+                res.status(404).json({error: "arena not found!"});
                 return;
             }
 
@@ -166,11 +174,11 @@ function playerRateBooking(req, res) {
             // save rating at arena
             arena.save(function (err) {
                 if (err) {
-                    res.send(err);
+                    res.json({error: err.message});
                     return;
                 }
             });
-            res.send(arena);
+            res.json(arena);
         });
     });
 
@@ -322,31 +330,37 @@ function rejectBooking(req, res) {
     });
 }
  function providerRateBooking (req, res) {
+   if(!req.body.rating || parseInt(req.body.rating) > 5 || parseInt(req.body.rating) < 1)
+   {
+     res.status(400).json({error: "bad request, enter a proper rating!"});
+     return;
+    }
+
             Booking.findOne({ _id: req.params.id }, function (err, booking) {
                 if (err) {
-                    res.send(err);
+                    res.json({error: err.message});
                     return;
                 }
                 if (!booking)
-                    res.send(404);
+                    res.status(404).json({error: "booking not found"});
 
                 booking.player_rating = parseInt(req.body.rating);
                 booking.save(function (err) {
                     if (err) {
-                        res.send(err);
+                        res.json({error: err.message});
                         return;
                     }
                 });
-                res.send(booking);
+                res.json(booking);
                 // find player
                 Player.findOne({ _id: booking.player }, function (err, player) {
                     var rating = parseInt(req.body.rating);
                     if (err) {
-                        res.send(err);
+                        res.json({error: err.message});
                         return;
                     }
                     if (!player) {
-                        res.send(404);
+                        res.status(404).json({error: "player not found!"});
                         return;
                     }
                     // update rating
@@ -362,7 +376,7 @@ function rejectBooking(req, res) {
                     // save rating at player
                     player.save(function (err) {
                         if (err) {
-                            res.send(err);
+                            res.json({error: err.message});
                             return;
                         }
                     });
