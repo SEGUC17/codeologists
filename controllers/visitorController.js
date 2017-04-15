@@ -72,7 +72,7 @@ let visitorController = {
 							res.status(500).json({error:err});
 						else {
 
-							res.status(200).json({success:"New player created"});
+							res.json({success:"New player created"});
 						}
 					});
 
@@ -121,7 +121,7 @@ let visitorController = {
 							res.status(500).json({error:err});
 						else {
 
-							res.status(200).json({success:"New service provider created"});
+							res.json({success:"New service provider created"});
 						}
 					});
 

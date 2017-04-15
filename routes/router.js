@@ -55,18 +55,18 @@ router.get('/', function (req, res) {
 });
 
 router.get('/register', function (req, res) {
-    res.status(200).json({success:"choose type"});
+    res.json({success:"choose type"});
 });
 
 router.post('/register', function (req, res) {
     if (req.body.player)
-        res.status(200).json({success:"player"});
+        res.json({success:"player"});
     else
-        res.status(200).json({success:"service provider"});
+        res.json({success:"service provider"});
 });
 
 router.get('/newPlayer', function (req, res) {
-    res.status(200).json({success:"player"});
+    res.json({success:"player"});
 });
 
 router.post('/newPlayer', upload.any(), function (req, res) {
@@ -74,7 +74,7 @@ router.post('/newPlayer', upload.any(), function (req, res) {
 });
 
 router.get('/newServiceProvider', function (req, res) {
-   res.status(200).json({success:"service provider"});
+   res.json({success:"service provider"});
 });
 
 router.post('/newServiceProvider', upload.any(), function (req, res) {
@@ -82,18 +82,18 @@ router.post('/newServiceProvider', upload.any(), function (req, res) {
 });
 
 router.get('/login', function (req, res) {
-    res.status(200).json({success:"login"});
+    res.json({success:"login"});
 });
 
 router.post('/login', passport.authenticate('local'), function (req, res) {
-    res.status(200).json({success:"User authenticated successfully"});
+    res.json({success:"User authenticated successfully"});
 });
 
 router.get('/logout', function (req, res) {
     if(req.user)
     {
         req.logout();
-        res.status(200).json({success:"Logged out successfully"});
+        res.redirect('/');
     }
     else
         res.status(400).json({error:"Cannot logout if you are not logged in"});
