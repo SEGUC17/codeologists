@@ -35,19 +35,19 @@ let visitorController = {
 	createPlayer: function (req, res) {
 		Player.findOne({ username: req.body.username }, function (err, user) {
 			if (user)
-				res.render('newPlayer', { error: 'Username already used' });
+				res.status(400).json({ error: 'Username already used' });
 			else {
 
 				hasher(req.body.password).hash(function (error, hash) {
 					if (error)
-						throw new Error(error.message);
+						res.status(400).json({ error: error.message});
 
 
 					var player = new Player();
 					player.name = req.body.name;
 					player.username = req.body.username;
 					if (!validateEmail(req.body.email)) {
-						res.send("Email not in correct format");
+						res.status(400).json({error:"Email not in correct format"});
 						return;
 					}
 					player.email = req.body.email;
@@ -62,17 +62,17 @@ let visitorController = {
 					player.password = hash;
 
 					if (!req.body.email || !req.body.name || !req.body.location || !req.body.phone_number || !req.body.username || !req.body.birthdate || !req.body.password) {
-						res.send("Missing data");
+						res.status(400).json({error:"Missing data"});
 						return;
 					}
 
 
 					player.save(function (err, player) {
 						if (err)
-							res.send(err);
+							res.status(500).json({error:err});
 						else {
 
-							res.redirect('/');
+							res.json({success:"New player created"});
 						}
 					});
 
@@ -86,19 +86,19 @@ let visitorController = {
 	createServiceProvider: function (req, res) {
 		ServiceProvider.findOne({ username: req.body.username }, function (err, user) {
 			if (user)
-				res.render('newServiceProvider', { error: 'Username already used' });
+				res.status(400).json({ error: 'Username already used' });
 			else {
 
 				hasher(req.body.password).hash(function (error, hash) {
 					if (error)
-						throw new Error(error.message);
+						res.status(400).json({ error: error.message});
 
 
 					var service = new ServiceProvider();
 					service.name = req.body.name;
 					service.username = req.body.username;
 					if (!validateEmail(req.body.email)) {
-						res.send("Email not in correct format");
+						res.status(400).json({error:"Email not in correct format"});
 						return;
 					}
 					service.email = req.body.email;
@@ -112,16 +112,16 @@ let visitorController = {
 					service.password = hash;
 
 					if (!req.body.email || !req.body.name || !req.body.location || !req.body.phone_number || !req.body.username || !req.body.mode || !req.body.password) {
-						res.send("Missing data");
+						res.status(400).json({error:"Missing data"});
 						return;
 					}
 
 					service.save(function (err, service) {
 						if (err)
-							res.send(err);
+							res.status(500).json({error:err});
 						else {
 
-							res.redirect('/');
+							res.json({success:"New service provider created"});
 						}
 					});
 
