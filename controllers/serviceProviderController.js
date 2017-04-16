@@ -17,62 +17,6 @@ function validateEmail(email) {
     return re.test(email);
 }
 
-//most probably should be moved to bookingController
-function acceptBooking(booking) {
-    Arena.findOne({ _id: booking.arena }, function (err, arenaa) {
-        var schedule = arenaa.schedule;
-        var indices = getScheduleIndices(booking.bookMonth, booking.bookDay);
-        var dayIndex = indices.dayIndex;
-        var weekIndex = indices.weekIndex;
-        var start = booking.start_index;
-        var end = booking.end_index;
-        var ok = true;
-        //use checkAvailable function from arenaController
-        for (var i = start; i <= end; i++) {
-            if (schedule[weekIndex][dayIndex][i] != 0) {
-                ok = false;
-                break;
-            }
-        }
-        if (ok) {
-            Booking.find({ arena: arenaa._id, bookDay: booking.bookDay, bookMonth: booking.bookMonth }
-                , function (err, allBookings) {
-                    if (!err) {
-                        async.each(allBookings, function (currentBooking, callback) {
-                            if (!(currentBooking.accepted) && !(currentBooking._id.equals(booking._id))) {
-                                var start1 = currentBooking.start_index;
-                                var end1 = currentBooking.end_index;
-                                if ((start1 >= start && start1 <= end) || (end1 >= start && end1 <= end)) {
-                                    Arena.findOne({ _id: currentBooking.arena }, function (err, arenaa) {
-                                        var notification = 'Unfortunately,your booking on day ' + (currentBooking.bookDay) + ' on month ' +
-                                            (currentBooking.bookMonth) + ' for ' + (arenaa.name) + ' from '
-                                            + getTimeFromIndex(start1) + ' to ' + getTimeFromIndex(end1) + ' has been rejected';
-                                        Player.findOne({ _id: currentBooking.player }, function (err, playerr) {
-                                            playerr.notifications.push(notification);
-                                            playerr.save();
-                                            Booking.remove({ _id: currentBooking._id }, function (err, result) {
-
-                                            });
-
-                                        });
-                                    });
-                                }
-                            }
-                        }, function (err) {
-                        })
-                    }
-                    for (var i = start; i <= end; i++) {
-                        arenaa.schedule[weekIndex][dayIndex][i] = booking._id;
-                    }
-                    arenaa.accepted = true;
-                    arenaa.markModified('schedule');
-                    arenaa.save(function (err) {
-
-                    })
-                });
-        }
-    })
-}
 var getScheduleIndices = function (month1, day1) {
     var date = new Date();
     date.setHours(0, 0, 0, 0);

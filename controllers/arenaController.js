@@ -73,20 +73,20 @@ function checkAvailable(endIndex, schedule, startIndex) {
 
 function commentOnArena(req, res) {
 
-    if(!req.body.comment)
-      res.status(400).json({error: "bad request, add a comment"});
+    if (!req.body.comment)
+        res.status(400).json({ error: "bad request, add a comment" });
 
     if (req.user.type == 'Player') {
         Arena.findOne({ _id: req.params.id }, function (err, arena) {
             if (err) {
-                res.json({error: err.message});
+                res.json({ error: err.message });
                 return;
             }
             var content = req.body.comment;
             arena.comments.push({ Content: content, time_stamp: new Date(), player: req.user.username });
             arena.save(function (err) {
                 if (err) {
-                    res.json({error: err.message});
+                    res.json({ error: err.message });
                     return;
                 }
                 res.json(arena);
@@ -95,7 +95,7 @@ function commentOnArena(req, res) {
         });
     }
     else {
-        res.json({error: "not allowed to comment"});
+        res.json({ error: "not allowed to comment" });
     }
 };
 function viewarena(req, res) {
@@ -107,31 +107,26 @@ function editarena(req, res) {
     var arenaid = req.params.arenaid;
     Arena.findOne({ _id: arenaid }, function (err, arena) {
         if (err) {
-            req.flash('error', 'this page is not available');
-            return res.redirect('/');
+            return res.status(500).json({ error: err.message });
         }
         if (!arena) {
-            req.flash('error', 'this page is not available');
-            return res.redirect('/');
+            return res.status(400).json({ error: 'the arena is not found' });
         }
         if (req.user && arena.service_provider == req.user._id) {
             return res.render('editarena', { arena: arena });
         } else {
-            req.flash('error', 'this page is not available');
-            return res.redirect('/');
+            return res.status(400).json({ error: 'the arena is not found' });
         }
     });
 };
-function editarenainfo(req, res, nxt) {
+function editarenainfo(req, res) {
     var arenaid = req.params.arenaid;
     Arena.findOne({ _id: arenaid }, function (err, arena) {
         if (err) {
-            req.flash('error', 'this page is not available');
-            return res.redirect('/');
+            return res.status(500).json({ error: err.message });
         }
         if (!arena) {
-            req.flash('error', 'this page is not available');
-            return res.redirect('/');
+            return res.status(400).json({ error: 'the arena is not found' });
         }
         if (req.user && arena.service_provider == req.user._id) {
             arena.rules_and_regulations = req.body.rules_and_regulations;
@@ -142,15 +137,12 @@ function editarenainfo(req, res, nxt) {
             arena.price = req.body.price;
             arena.save(function (err) {
                 if (err) {
-                    console.log(err);
-                    return nxt(err);
+                    return res.status(500).json({ error: err.message });
                 }
-                req.flash('info', 'your arena info is updated successfully');
-                return res.redirect('/viewarena/' + arenaid);
+                return res.json({ arena });
             });
         } else {
-            req.flash('error', 'this page is not available');
-            return res.redirect('/');
+            return res.status(400).json({ error: 'you are not autherized to view this page' });
         }
     });
 };
@@ -158,12 +150,10 @@ function editdefaultschedule(req, res, nxt) {
     var arenaid = req.params.arenaid;
     Arena.findOne({ _id: arenaid }, function (err, arena) {
         if (err) {
-            req.flash('error', 'this page is not available');
-            return res.redirect('/');
+            return res.status(500).json({ error: err.message });
         }
         if (!arena) {
-            req.flash('error', 'this page is not available');
-            return res.redirect('/');
+            return res.status(400).json({ error: 'the arena is not found' });
         }
         if (req.user && arena.service_provider == req.user._id) {
             var new_sch = new Array(7).fill(new Array(48).fill(0));
@@ -180,15 +170,12 @@ function editdefaultschedule(req, res, nxt) {
             arena.default_weekly_schedule = new_sch;
             arena.save(function (err) {
                 if (err) {
-                    console.log(err);
-                    return nxt(err);
+                    return res.status(500).json({ error: err.message });
                 }
             });
-            req.flash('info', 'your default schedule is updated successfully');
-            return res.redirect('/viewarena/' + arenaid);
+            return res.json({ arena });
         } else {
-            req.flash('error', 'this page is not available');
-            return res.redirect('/');
+            return res.status(400).json({ error: 'you are not autherized to view this page' });;
         }
     });
 }
@@ -197,30 +184,25 @@ function addimage(req, res, nxt) {
     var arenaid = req.params.arenaid;
     Arena.findOne({ _id: arenaid }, function (err, arena) {
         if (err) {
-            req.flash('error', 'this page is not available');
-            return res.redirect('/');
+            return res.status(500).json({ error: err.message });
         }
         if (!arena) {
-            req.flash('error', 'this page is not available');
-            return res.redirect('/');
+            return res.status(400).json({ error: 'the arena is not found' });
         }
         if (req.user && arena.service_provider == req.user._id) {
             arena.photos.push(newimage);
             arena.save(function (err) {
                 if (err) {
-                    console.log(err);
-                    return nxt(err);
+                    return res.status(500).json({ error: err.message });
                 }
             });
-            req.flash('info', 'your new arena image is uploaded successfully');
-            return res.redirect('/viewarena/' + arenaid);
+            return res.json({ arena });
         } else {
-            req.flash('error', 'this page is not available');
-            res.redirect('/');
+            return res.status(400).json({ error: 'you are not autherized to view this page' });
         }
     });
 }
- function setUnavailable (req, res) {
+function setUnavailable(req, res) {
     if (req.user && (req.user.type == "ServiceProvider")) {
         ServiceProvider.findOne({ username: req.user.username }, function (err, sp) {
             Arena.findOne({ _id: req.params.arena_id }, function (err2, arena) {
@@ -266,242 +248,242 @@ function addimage(req, res, nxt) {
                                     for (var i = 0; i < 48; i++) {
                                         arena.schedule[weekIndex][dayIndex][i] = before_edit[i];
                                     };
-                                    res.json({error:"You can not set booked slots to be unavailable"});
+                                    res.json({ error: "You can not set booked slots to be unavailable" });
                                 }
                                 else {
                                     arena.markModified("schedule");
                                     arena.save(function (err, arr) {
                                         if (err) {
-                                            res.json({error : "error in arena DB"});
+                                            res.json({ error: "error in arena DB" });
                                         }
                                     });
-                                    res.status(200).json({schedule : arena.schedule});
+                                    res.json({ schedule: arena.schedule });
                                 }
 
                             }
                             else {
-                                res.status(404).json({error:"error, wrong arena id"}); 
-                              };
+                                res.status(404).json({ error: "error, wrong arena id" });
+                            };
                         });
                     }
                     else {
                         //if one of the fields in req.body isn't delivered 
-                     res.json({error:"Missing data"});
+                        res.json({ error: "Missing data" });
                     }
                 }
                 else {
                     //if the arena does not belong to this service provider or there's no such arena 
-                    res.status(404).json({error:"You are not allowed to view this page or there's no such arena"});
-                     }
+                    res.status(404).json({ error: "You are not allowed to view this page or there's no such arena" });
+                }
             });
         });
     }
     else {
         //if the user(visitor) isn't logged in or he is logged in but he is not a service provider
-        res.status(403).json({error:"You are not allowed to view this page"}); 
-        
+        res.status(403).json({ error: "You are not allowed to view this page" });
+
     }
 
 }
 
-         function setAvailable (req, res) {
-            if (req.user && (req.user.type == "ServiceProvider")) {
-                ServiceProvider.findOne({ username: req.user.username }, function (err, sp) {
-                    Arena.findOne({ _id: req.params.arena_id }, function (err2, arena) {
+function setAvailable(req, res) {
+    if (req.user && (req.user.type == "ServiceProvider")) {
+        ServiceProvider.findOne({ username: req.user.username }, function (err, sp) {
+            Arena.findOne({ _id: req.params.arena_id }, function (err2, arena) {
 
-                        //checking if this arena belongs to that user(service provider)
-                        if (arena && arena.service_provider.equals(sp._id)) {
+                //checking if this arena belongs to that user(service provider)
+                if (arena && arena.service_provider.equals(sp._id)) {
 
-                            var startIndex = req.body.startIndex;
-                            var endIndex = req.body.endIndex;
-                            var day = req.body.day;
-                            var month = req.body.month;
+                    var startIndex = req.body.startIndex;
+                    var endIndex = req.body.endIndex;
+                    var day = req.body.day;
+                    var month = req.body.month;
 
-                            //checking if all required fields are delivered
-                            if (month && day && endIndex && startIndex) {
+                    //checking if all required fields are delivered
+                    if (month && day && endIndex && startIndex) {
 
-                                var Indices = serviceProviderController.getScheduleIndices(month, day);
-                                var weekIndex = Indices.weekIndex;
-                                var dayIndex = Indices.dayIndex;
+                        var Indices = serviceProviderController.getScheduleIndices(month, day);
+                        var weekIndex = Indices.weekIndex;
+                        var dayIndex = Indices.dayIndex;
 
-                                Arena.findById(req.params.arena_id, function (err, arena) {
-                                    var schedule = arena.schedule;
+                        Arena.findById(req.params.arena_id, function (err, arena) {
+                            var schedule = arena.schedule;
 
-                                    //making the slots between the startIndex and the endIndex (inclusive) available
-                                    for (var i = startIndex; i <= endIndex; i++) {
-                                        schedule[weekIndex][dayIndex][i] = 0;
-                                    };
+                            //making the slots between the startIndex and the endIndex (inclusive) available
+                            for (var i = startIndex; i <= endIndex; i++) {
+                                schedule[weekIndex][dayIndex][i] = 0;
+                            };
 
-                                    arena.schedule = schedule;
-                                    arena.markModified("schedule");
-                                    arena.save(function (err) {
-                                        if (err) {
-                                            res.json({error:"error in arena DB"});
-                                        }
-                                    });
-                                    res.status(200).json({schedule : arena.schedule});
-                                });
+                            arena.schedule = schedule;
+                            arena.markModified("schedule");
+                            arena.save(function (err) {
+                                if (err) {
+                                    res.json({ error: "error in arena DB" });
+                                }
+                            });
+                            res.status(200).json({ schedule: arena.schedule });
+                        });
 
-                            }
-                            else {
-                                //if one of the fields in req.body isn't delivered 
-                               res.json({error:"Missing data"});
-                            }
-                        }
-                        else {
-                            //if the arena does not belong to this service provider or there's no such arena
-                            res.status(404).json({error:"You are not allowed to view this page or there's no such arena"});
-                        }
-                    });
-                });
-            }
-            else {
-                //if the user(visitor) isn't logged in or he is logged in but he is not a service provider   
-                res.status(403).json({error:"You are not allowed to view this page"});
-            }
-        } 
-        function createArena (req, res) {
-            if (req.user && (req.user.type != "ServiceProvider")) {
-                res.send("Not authenticated");
-                return;
-            }
-
-
-            // initializing the arena
-            var rules = req.body.rules_and_regulations;
-            var name = req.body.name;
-            var address = req.body.address;
-            var location = req.body.location;
-            var size = req.body.size;
-            var type = req.body.type;
-            var price = req.body.price;
-            var ratings_count = 0;
-            var avg_rating = 0;
-
-            if (!name || !address || !location || !size || !type || !price) {
-                res.send("missing input");
-                return;
-            }
-
-            // storing photos
-            var photos = [];
-            for (var i = 0; req.files && req.files[i]; i++) {
-                photos.push(req.files[i].buffer);
-            }
-            // creating default schedule
-            var default_schedule = [];
-            var day = req.body.saturday;
-            var sat = new Array(48).fill(0);
-            for (var i = 0; day && i < day.length; i++) {
-                sat[day[i]] = -1;
-            }
-
-            day = req.body.sunday;
-            var sun = new Array(48).fill(0);
-            for (var i = 0; day && i < day.length; i++) {
-                sun[day[i]] = -1;
-            }
-
-            day = req.body.monday;
-            var mon = new Array(48).fill(0);
-            for (var i = 0; day && i < day.length; i++) {
-                mon[day[i]] = -1;
-            }
-
-            day = req.body.tuesday;
-            var tues = new Array(48).fill(0);
-            for (var i = 0; day && i < day.length; i++) {
-                tues[day[i]] = -1;
-            }
-
-            day = req.body.wednesday;
-            var wed = new Array(48).fill(0);
-            for (var i = 0; day && i < day.length; i++) {
-                wed[day[i]] = -1;
-            }
-
-            day = req.body.thursday;
-            var thurs = new Array(48).fill(0);
-            for (var i = 0; day && i < day.length; i++) {
-                thurs[day[i]] = -1;
-            }
-
-            day = req.body.friday;
-            var fri = new Array(48).fill(0);
-            for (var i = 0; day && i < day.length; i++) {
-                fri[day[i]] = -1;
-            }
-
-            default_schedule.push(sat);
-            default_schedule.push(sun);
-            default_schedule.push(mon);
-            default_schedule.push(tues);
-            default_schedule.push(wed);
-            default_schedule.push(thurs);
-            default_schedule.push(fri);
-
-            var normal_schedule = [];
-            var weekNo = 4;
-            var daysNo = 7;
-            var slotsNo = 48;
-            for (var i = 0; i < weekNo; i++) {
-                var oneWeek = [];
-                for (var j = 0; j < daysNo; j++) {
-                    var oneDay = [];
-                    for (var k = 0; k < slotsNo; k++) {
-                        oneDay.push(default_schedule[j][k]);
                     }
-                    oneWeek.push(oneDay);
-                }
-                normal_schedule.push(oneWeek);
-            }
-
-            var user = req.user.username;
-            var servProv;
-            ServiceProvider.findOne({ username: user }, function (err, doc) {
-                if (err) {
-                    res.send(err);
+                    else {
+                        //if one of the fields in req.body isn't delivered 
+                        res.json({ error: "Missing data" });
+                    }
                 }
                 else {
-                    servProv = doc._id;
-
-                    var newArena = new Arena({
-                        service_provider: servProv,
-                        rules_and_regulations: rules,
-                        name: name,
-                        address: address,
-                        location: location,
-                        avg_rating: avg_rating,
-                        size: size,
-                        type: type,
-                        price: price,
-                        photos: photos,
-                        ratings_count: ratings_count,
-                        default_weekly_schedule: default_schedule,
-                        schedule: normal_schedule
-                    });
-
-
-                    newArena.save(function (err) {
-                        if (err)
-                            res.send(err);
-                        return;
-                    });
-                    res.redirect('/'); // to be changed
+                    //if the arena does not belong to this service provider or there's no such arena
+                    res.status(404).json({ error: "You are not allowed to view this page or there's no such arena" });
                 }
-            })
+            });
+        });
+    }
+    else {
+        //if the user(visitor) isn't logged in or he is logged in but he is not a service provider   
+        res.status(403).json({ error: "You are not allowed to view this page" });
+    }
+}
+function createArena(req, res) {
+    if (req.user && (req.user.type != "ServiceProvider")) {
+        res.send("Not authenticated");
+        return;
+    }
+
+
+    // initializing the arena
+    var rules = req.body.rules_and_regulations;
+    var name = req.body.name;
+    var address = req.body.address;
+    var location = req.body.location;
+    var size = req.body.size;
+    var type = req.body.type;
+    var price = req.body.price;
+    var ratings_count = 0;
+    var avg_rating = 0;
+
+    if (!name || !address || !location || !size || !type || !price) {
+        res.send("missing input");
+        return;
+    }
+
+    // storing photos
+    var photos = [];
+    for (var i = 0; req.files && req.files[i]; i++) {
+        photos.push(req.files[i].buffer);
+    }
+    // creating default schedule
+    var default_schedule = [];
+    var day = req.body.saturday;
+    var sat = new Array(48).fill(0);
+    for (var i = 0; day && i < day.length; i++) {
+        sat[day[i]] = -1;
+    }
+
+    day = req.body.sunday;
+    var sun = new Array(48).fill(0);
+    for (var i = 0; day && i < day.length; i++) {
+        sun[day[i]] = -1;
+    }
+
+    day = req.body.monday;
+    var mon = new Array(48).fill(0);
+    for (var i = 0; day && i < day.length; i++) {
+        mon[day[i]] = -1;
+    }
+
+    day = req.body.tuesday;
+    var tues = new Array(48).fill(0);
+    for (var i = 0; day && i < day.length; i++) {
+        tues[day[i]] = -1;
+    }
+
+    day = req.body.wednesday;
+    var wed = new Array(48).fill(0);
+    for (var i = 0; day && i < day.length; i++) {
+        wed[day[i]] = -1;
+    }
+
+    day = req.body.thursday;
+    var thurs = new Array(48).fill(0);
+    for (var i = 0; day && i < day.length; i++) {
+        thurs[day[i]] = -1;
+    }
+
+    day = req.body.friday;
+    var fri = new Array(48).fill(0);
+    for (var i = 0; day && i < day.length; i++) {
+        fri[day[i]] = -1;
+    }
+
+    default_schedule.push(sat);
+    default_schedule.push(sun);
+    default_schedule.push(mon);
+    default_schedule.push(tues);
+    default_schedule.push(wed);
+    default_schedule.push(thurs);
+    default_schedule.push(fri);
+
+    var normal_schedule = [];
+    var weekNo = 4;
+    var daysNo = 7;
+    var slotsNo = 48;
+    for (var i = 0; i < weekNo; i++) {
+        var oneWeek = [];
+        for (var j = 0; j < daysNo; j++) {
+            var oneDay = [];
+            for (var k = 0; k < slotsNo; k++) {
+                oneDay.push(default_schedule[j][k]);
+            }
+            oneWeek.push(oneDay);
         }
+        normal_schedule.push(oneWeek);
+    }
+
+    var user = req.user.username;
+    var servProv;
+    ServiceProvider.findOne({ username: user }, function (err, doc) {
+        if (err) {
+            res.send(err);
+        }
+        else {
+            servProv = doc._id;
+
+            var newArena = new Arena({
+                service_provider: servProv,
+                rules_and_regulations: rules,
+                name: name,
+                address: address,
+                location: location,
+                avg_rating: avg_rating,
+                size: size,
+                type: type,
+                price: price,
+                photos: photos,
+                ratings_count: ratings_count,
+                default_weekly_schedule: default_schedule,
+                schedule: normal_schedule
+            });
+
+
+            newArena.save(function (err) {
+                if (err)
+                    res.send(err);
+                return;
+            });
+            res.redirect('/'); // to be changed
+        }
+    })
+}
 let arenaController = {
     bookHours: bookHours,
     checkAvailable: checkAvailable,
     commentOnArena: commentOnArena,
     viewarena: viewarena,
     editarena: editarena,
-    editarenainfo,
+    editarenainfo: editarenainfo,
     editdefaultschedule: editdefaultschedule,
     addimage: addimage,
-    setUnavailable:setUnavailable,
-    setAvailable:setAvailable,
-    createArena:createArena,
+    setUnavailable: setUnavailable,
+    setAvailable: setAvailable,
+    createArena: createArena,
 }
 module.exports = arenaController;

@@ -38,6 +38,7 @@ var bookWeekly = function (req, res) {
 
 let playerController = {
 
+  bookWeekly: bookWeekly,
 
   edit_profile_page: function (req, res) { // prepar the edit profile page
     //retrieve the players's record from DB to be able to fill the fields to be changed

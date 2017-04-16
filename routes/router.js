@@ -8,6 +8,7 @@ var path = require('path');
 var playerController = require('../controllers/playerController');
 var bookingController = require('../controllers/bookingController');
 var arenaController = require('../controllers/arenaController');
+var gameController = require('../controllers/gameController');
 var serviceProviderController = require('../controllers/serviceProviderController');
 var visitorController = require('../controllers/visitorController');
 var Player = require('../models/Player');
@@ -103,15 +104,15 @@ router.post('/arenas', visitorController.view_all);
 
 router.post('/arenaDetails', ensureAuthenticated, visitorController.view_details_of_arena);
 
-router.get('/viewgames', ensureAuthenticated, playerController.viewgames);
+router.get('/viewgames', ensureAuthenticated, gameController.viewgames);
 
-router.get('/editarena/:arenaid', ensureAuthenticated, serviceProviderController.editarena);
+router.get('/editarena/:arenaid', ensureAuthenticated,arenaController.editarena);
 
-router.post('/editarenainfo/:arenaid', ensureAuthenticated, serviceProviderController.editarenainfo);
+router.post('/editarenainfo/:arenaid', ensureAuthenticated, arenaController.editarenainfo);
 
-router.post('/editdefaultschedule/:arenaid', ensureAuthenticated, serviceProviderController.editdefaultschedule);
+router.post('/editdefaultschedule/:arenaid', ensureAuthenticated, arenaController.editdefaultschedule);
 
-router.post('/addarenaimage/:arenaid', ensureAuthenticated, upload.any(), serviceProviderController.addimage);
+router.post('/addarenaimage/:arenaid', ensureAuthenticated, upload.any(), arenaController.addimage);
 
 router.post('/profile/blacklist', ensureAuthenticated, serviceProviderController.add_to_blacklist);
 
@@ -134,14 +135,14 @@ router.post('/PlayerRatesBooking/:id', ensureAuthenticated, bookingController.pl
 router.get('/createArena', ensureAuthenticated, function (req, res) {
     res.render('createarena');
 });
-router.post('/createArena', ensureAuthenticated, upload.any(), serviceProviderController.createArena);
-router.post('/cancelBooking/:bookingID', ensureAuthenticated, playerController.cancelBooking);
+router.post('/createArena', ensureAuthenticated, upload.any(), arenaController.createArena);
+router.post('/cancelBooking/:bookingID', ensureAuthenticated, bookingController.cancelBooking);
 
 router.post('/turnAcceptModeOn', ensureAuthenticated, serviceProviderController.turnAutoAcceptModeOn);
 router.post('/turnAcceptModeOff', ensureAuthenticated, serviceProviderController.turnAutoAcceptModeOff);
-router.post('/acceptBooking', ensureAuthenticated, serviceProviderController.acceptBooking2);
-router.post('/rejectBooking', ensureAuthenticated, serviceProviderController.rejectBooking);
-router.post('/createGame', ensureAuthenticated, playerController.createGame);
+router.post('/acceptBooking', ensureAuthenticated, bookingController.acceptBooking2);
+router.post('/rejectBooking', ensureAuthenticated, bookingController.rejectBooking);
+router.post('/createGame', ensureAuthenticated, gameController.createGame);
 
 router.post("/sp/arena/:arena_id",ensureAuthenticated, function (req, res) {
     if (req.body.flag == 1) {
@@ -150,7 +151,7 @@ router.post("/sp/arena/:arena_id",ensureAuthenticated, function (req, res) {
     else
         arenaController.setAvailable(req, res);
 });
-router.get('/arena/:arenaName/viewBookings', ensureAuthenticated, serviceProviderController.viewBookings)
+router.get('/arena/:arenaName/viewBookings', ensureAuthenticated, bookingController.viewBookings)
 
 router.post('/arena/:arenaName/bookWeekly', ensureAuthenticated, playerController.bookWeekly);
 
@@ -159,9 +160,9 @@ router.post('/arena/:arenaName/bookWeekly', ensureAuthenticated, playerControlle
 router.post('/arena/:arenaName/bookHours', ensureAuthenticated, bookingController.createBooking);
 
 
-router.post('/RequestGame/:id', ensureAuthenticated, playerController.requestgame);
-router.post('/AcceptRequest/:id', ensureAuthenticated, playerController.acceptrequest);
-router.post('/RejectRequest/:id', ensureAuthenticated, playerController.rejectrequest);
+router.post('/RequestGame/:id', ensureAuthenticated, gameController.requestgame);
+router.post('/AcceptRequest/:id', ensureAuthenticated, gameController.acceptrequest);
+router.post('/RejectRequest/:id', ensureAuthenticated, gameController.rejectrequest);
 
 
 module.exports = router;
