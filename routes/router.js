@@ -158,9 +158,9 @@ router.post('/arena/:arenaName/bookWeekly', ensureAuthenticated, playerControlle
 router.post('/arena/:arenaName/bookHours', ensureAuthenticated, bookingController.createBooking);
 
 
-router.post('/RequestGame/:id', ensureAuthenticated, playerController.requestgame);
-router.post('/AcceptRequest/:id', ensureAuthenticated, playerController.acceptrequest);
-router.post('/RejectRequest/:id', ensureAuthenticated, playerController.rejectrequest);
+router.post('/RequestGame/:id', ensureAuthenticated, gameController.requestgame);
+router.post('/AcceptRequest/:id', ensureAuthenticated, gameController.acceptrequest);
+router.post('/RejectRequest/:id', ensureAuthenticated, gameController.rejectrequest);
 
 
 module.exports = router;
