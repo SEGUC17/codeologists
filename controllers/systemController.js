@@ -2,7 +2,7 @@ var Arena = require('../models/Arena');
 var Game = require('../models/Game');
 var Booking = require('../models/Booking');
 var Player = require('../models/Player');
-
+var async = require('async');
 
 /* 
 updateSchedule() is supposed to update the schedule of all arenas at the start of a new week  by setting the 4th week of the  
@@ -13,21 +13,15 @@ function updateSchedule() {
     Arena.find(function (err, arenaArr) {
 
         if (!err) {
-            arenaArr.forEach(function (arena, index) {
-                //shift the schedule by one
-                shiftArr(arena.schedule);
-                for (var i = 0; i < 7; i++) {
-                    for (var j = 0; i < 48; j++) {
-                        //set last week to default_weekly_schedule then save
-                        arena.schedule[3][i][j] = arena.default_weekly_schedule[i][j];
-                    }
-
-                }
-                arena.markModified("schedule");
-                arena.save(function (err) {
-                    if (err)
-                        console.log(err);
+            async.each(arenaArr,function(arena){
+                arena.schedule.shift();
+                arena.schedule.push(arena.default_weekly_schedule);
+                arena.markModified('schedule');
+                arena.save(function(arenaSaveErr){
+                    console.log("Arena Save Error " + arenaSaveErr);
                 })
+            },function(asyncErr){
+                console.log("Async has encountered an error "+ asyncErr);
             })
         }
         else {

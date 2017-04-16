@@ -8,25 +8,25 @@ var createBooking = function (req, res) {
         if (req.body.month && req.body.month && req.body.startIndex && req.body.endIndex) {
             if (err) {
                 console.log(err);
-                res.json({ err: err });
+                res.json({ error: err });
             }
             else if (!player) {
-                res.json({ err: "Please log in as a Player first" });
+                res.json({ error: "Please log in as a Player first" });
             }
             else {
                 arenaController.bookHours(req.body.month, req.body.day, req.body.startIndex, req.body.endIndex, new Date(), req.params.arenaName, player._id, function (err2) {
                     if (bookingErr) {
-                        res.json({ err: bookingErr });
+                        res.json({ error: bookingErr });
 
                     }
                     else {
-                        res.json({ err: null });
+                        res.json({ error: null });
                     }
                 })
             }
         }
         else {
-            res.json({ err: "Incomplete input data " });
+            res.json({ error: "Incomplete input data " });
         }
     })
 }
@@ -34,26 +34,26 @@ var createBooking = function (req, res) {
 function viewBookings(req, res) {
     Arena.findOne({name:req.params.arenaName}, function (err, foundArena) {
         if (err) {
-            res.json({ err: err });
+            res.json({ error: err });
         }
         else if (!foundArena) {
 
-            res.json({ err: "Sorry Broken Link, this arena may have been deleted, removed or is no longer existant" });
+            res.json({ error: "Sorry Broken Link, this arena may have been deleted, removed or is no longer existant" });
 
         }
         else {
             ServiceProvider.findById(foundArena.service_provider, function (errSp, serviceProvider) {
                 if (errSp) {
-                    res.json({ err: "Internal server Error, Sorry for the inconvenience !" });
+                    res.json({ error: "Internal server Error, Sorry for the inconvenience !" });
                 }
                 else if (serviceProvider) {
 
                     if (serviceProvider.username == req.user.username) {
                         //find all pending requests where the request time is greater than today, the arena is the current arena  and have not been accepted
-                        Booking.find({ accepted: false, arena: foundArena._id }).$where('(new Date(new Date().getFullYear(),this.bookMonth,this.bookDay))>(new Date())').exec(function (err, bookingArr) {
+                        Booking.find({ accepted: false, arena: foundArena._id }).$where('(new Date(new Date().getFullYear(),this.bookMonth,this.bookDay))>(new Date())').exec(function (arenaErr, bookingArr) {
                             //TODO: render a view (will be done in Sprint 2 ISA)
-                            if (err) {
-                                res.json({ err: "Error finding pending requests" });
+                            if (arenaErr) {
+                                res.json({ error: "Error finding pending requests" });
                             }
                             else {
 
@@ -63,11 +63,11 @@ function viewBookings(req, res) {
                         })
                     }
                     else {
-                        res.json({ err: "sorry not your arena" });
+                        res.json({ error: "sorry not your arena" });
                     }
                 }
                 else {
-                    res.json({ err: "Internal Server Error sorry :'(" });
+                    res.json({ error: "Internal Server Error sorry :'(" });
                 };
             })
 
