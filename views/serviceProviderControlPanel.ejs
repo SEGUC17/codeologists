@@ -1,0 +1,15 @@
+<html>
+<head>
+<title> Service Provider Control Panel</title>
+</head>
+<body>
+
+<div   id="viewBookingsRoot">
+<div id="myArenas" >
+    <button  v-for="arena in myArenas"  @click="selectArena(arena.name)"> {{arena.name}}</button>
+</div>
+<booking v-for = "Booking in Bookings" :key="Booking._id"> <template slot="player">{{Booking.playerName}}</template></booking>
+</div>
+</body>
+<script src="./js/app.js"></script>
+</html>

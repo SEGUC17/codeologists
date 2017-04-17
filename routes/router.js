@@ -56,16 +56,18 @@ router.get('/', function (req, res) {
 });
 
 router.get('/register', function (req, res) {
-    res.json({success:"choose type"});
+    res.render('chooseType');
 });
 
 router.post('/register', function (req, res) {
     if (req.body.player)
-        res.json({success:"player"});
+        res.render('newPlayer');
     else
-        res.json({success:"service provider"});
+        res.render('newServiceProvider');
 });
-
+router.get('/controlpanel',function(req,res){
+    res.render('serviceProviderControlPanel');
+})
 router.get('/newPlayer', function (req, res) {
     res.json({success:"player"});
 });
@@ -83,7 +85,7 @@ router.post('/newServiceProvider', upload.any(), function (req, res) {
 });
 
 router.get('/login', function (req, res) {
-    res.json({success:"login"});
+    res.render('login');
 });
 
 router.post('/login', passport.authenticate('local'), function (req, res) {
@@ -103,6 +105,8 @@ router.get('/logout', function (req, res) {
 router.post('/arenas', visitorController.view_all);
 
 router.post('/arenaDetails', ensureAuthenticated, visitorController.view_details_of_arena);
+
+router.get('/getArenas',ensureAuthenticated,arenaController.getArenas);
 
 router.get('/viewgames', ensureAuthenticated, gameController.viewgames);
 

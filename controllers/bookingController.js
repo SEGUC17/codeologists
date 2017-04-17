@@ -1,7 +1,7 @@
 var Player = require('../models/Player');
 var arenaController = require('./arenaController');
 var Arena = require('../models/Arena');
-var serviceProvider = require('../models/ServiceProvider');
+var ServiceProvider = require('../models/ServiceProvider');
 var Booking = require('../models/Booking');
 var createBooking = function (req, res) {
     Player.findOne({ username: req.user.username }, function (err, player) {

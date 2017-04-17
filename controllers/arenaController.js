@@ -473,7 +473,22 @@ function createArena(req, res) {
         }
     })
 }
+const getArenas = function (req, res) {
+    if (req.user.type == 'ServiceProvider') {
+        Arena.find({ service_provider: req.user._id },'name', function (dbErr, arenaArr) {
+            if (dbErr)
+                res.status(500).json({ error: "Sorry We have Encountered an internal server error" });
+            else {
+                res.json(arenaArr);
+            }
+        })
+    }
+    else {
+        res.status(403).json({ error: "Please Log In as a Service Provider /Arena owner to view the list of pending booking requests" });
+    }
+}
 let arenaController = {
+    getArenas:getArenas,
     bookHours: bookHours,
     checkAvailable: checkAvailable,
     commentOnArena: commentOnArena,
