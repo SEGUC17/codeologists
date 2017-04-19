@@ -334,6 +334,16 @@ let serviceProviderController =
             });
         },
 
+        myArenas : function(req,res){
+            Arena.find({service_provider : req.user._id},function(err,arenas){
+                if(err){
+                    return res.json({error : err});
+                }else{
+                    return res.json(arenas);
+                }
+            });
+        },
+
         edit_profile_page: function (req, res) { // prepar the edit profile page
             //retrieve the players's record from DB to be able to fill the fields to be changed
             ServiceProvider.findOne({ username: req.user.username }, function (err, result) {

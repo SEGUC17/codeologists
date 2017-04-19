@@ -113,13 +113,14 @@ function editarena(req, res) {
             return res.status(400).json({ error: 'the arena is not found' });
         }
         if (req.user && arena.service_provider == req.user._id) {
-            return res.render('editarena', { arena: arena });
+            return res.json(arena);
         } else {
             return res.status(400).json({ error: 'the arena is not found' });
         }
     });
 };
 function editarenainfo(req, res) {
+    console.log(req.body);
     var arenaid = req.params.arenaid;
     Arena.findOne({ _id: arenaid }, function (err, arena) {
         if (err) {
@@ -129,6 +130,20 @@ function editarenainfo(req, res) {
             return res.status(400).json({ error: 'the arena is not found' });
         }
         if (req.user && arena.service_provider == req.user._id) {
+
+            req.checkBody('rules_and_regulations', 'Rules and Regulations are required.').notEmpty();
+            req.checkBody('address', 'Address is required.').notEmpty();
+            req.checkBody('location', 'Location is required.').notEmpty();
+            req.checkBody('size', 'The arena size is required.').notEmpty();
+            req.checkBody('type', 'The arena type is required.').notEmpty();
+            req.checkBody('price', 'The price are required.').notEmpty();
+
+            var errors = req.validationErrors();
+
+            if (errors) {
+                return res.status(400).json(errors);
+            }
+
             arena.rules_and_regulations = req.body.rules_and_regulations;
             arena.address = req.body.address;
             arena.location = req.body.location;
@@ -139,7 +154,7 @@ function editarenainfo(req, res) {
                 if (err) {
                     return res.status(500).json({ error: err.message });
                 }
-                return res.json({ arena });
+                return res.json(arena);
             });
         } else {
             return res.status(400).json({ error: 'you are not autherized to view this page' });
@@ -173,7 +188,7 @@ function editdefaultschedule(req, res, nxt) {
                     return res.status(500).json({ error: err.message });
                 }
             });
-            return res.json({ arena });
+            return res.json(arena);
         } else {
             return res.status(400).json({ error: 'you are not autherized to view this page' });;
         }
@@ -196,7 +211,7 @@ function addimage(req, res, nxt) {
                     return res.status(500).json({ error: err.message });
                 }
             });
-            return res.json({ arena });
+            return res.json(arena);
         } else {
             return res.status(400).json({ error: 'you are not autherized to view this page' });
         }

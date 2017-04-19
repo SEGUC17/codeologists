@@ -100,6 +100,8 @@ router.get('/logout', function (req, res) {
         res.status(400).json({error:"Cannot logout if you are not logged in"});
 });
 
+router.get('/myArenas',ensureAuthenticated, serviceProviderController.myArenas);
+
 router.post('/arenas', visitorController.view_all);
 
 router.post('/arenaDetails', ensureAuthenticated, visitorController.view_details_of_arena);
