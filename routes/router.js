@@ -36,7 +36,7 @@ function ensureAuthenticated(req, res, next) {
 
 router.get('/', function (req, res) {
     // setting username and type for testing
-    res.render('index');
+    res.render('serviceProviderControlPanel');
 });
 
 
@@ -52,7 +52,8 @@ router.post('/edit_provider_profile', ensureAuthenticated, upload.array('profile
 router.post('/search', visitorController.filter);
 
 router.get('/', function (req, res) {
-    res.render('index');
+    console.log('dgdf');
+    res.render('serviceProviderControlPanel');
 });
 
 router.get('/register', function (req, res) {
@@ -104,7 +105,7 @@ router.get('/logout', function (req, res) {
 
 router.post('/arenas', visitorController.view_all);
 
-router.post('/arenaDetails', ensureAuthenticated, visitorController.view_details_of_arena);
+router.get('/arena/:arenaName/show', ensureAuthenticated, visitorController.view_details_of_arena);
 
 router.get('/getArenas',ensureAuthenticated,arenaController.getArenas);
 

@@ -4,10 +4,16 @@
 </head>
 <body>
 
+<div id="schedlueRoot">
+<calender></calender>
+<router-view v-on:hide="hideDayDetails"  v-on:showagain="showDayDetails" v-show="dayDetailsShown" ></router-view>
+</div>
 <div   id="viewBookingsRoot">
-<div id="myArenas" >
+
+<div id="arenas" v-if="false">
     <button  v-for="arena in myArenas"  @click="selectArena(arena.name)"> {{arena.name}}</button>
 </div>
+
 <booking v-for = "Booking in Bookings" :key="Booking._id"> <template slot="player">{{Booking.playerName}}</template></booking>
 </div>
 </body>

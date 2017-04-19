@@ -16,7 +16,6 @@ var Arena = require('./models/Arena');
 
 
 schedule.scheduleJob({ hour: 00, minute: 00, dayOfWeek: 5 }, systemController.updateSchedule);
-schedule.scheduleJob({ hour: 07, minute: 00, dayOfWeek: 5 }, systemController.collectGarbage);
 
 //database connection url
 var db_url = "mongodb://localhost:27017/db";
@@ -45,6 +44,6 @@ app.use(require('./routes/router.js'));
 
 
 //start server
-app.listen(8080, function () {
+app.listen(8081, function () {
   console.log("app listening on port 8080");
 });

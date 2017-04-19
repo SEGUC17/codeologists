@@ -185,12 +185,12 @@ let visitorController = {
 
 		var blacklisted = 0;
 
-		Arena.find({ name: req.body.name }, function (err, result) {
+		Arena.find({ name: req.params.arenaName }, function (err, result) {
 			if (err)
-				res.json({ error: err });
+				res.status(404).json({ error: err });
 			else {
 				if (result.length == 0)
-					res.json({ error: "No Arenas Found in That Location." });
+					res.status(403).json({ error: "No Arenas Found in That Location." });
 				else {
 					var id = require('mongodb').ObjectID(result[0].service_provider);
 					ServiceProvider.findById(id, function (err, service) {
@@ -205,9 +205,9 @@ let visitorController = {
 						}
 
 						if (blacklisted == 0)
-							res.json(result);
+							res.status(200).json(result);
 						else
-							res.json({ error: "No Arenas" });
+							res.status(404).json({ error: "No Arenas" });
 					})
 
 				}
