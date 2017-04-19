@@ -4491,7 +4491,12 @@ var querystring = __webpack_require__(39);
       no_search: true,
       search_type: 'name',
       search_value: '',
-      arenas: []
+      arenas: [''],
+      count: '',
+      start: '',
+      end: '',
+      active: '',
+      elements: 0
     };
   },
   created: function created() {
@@ -4508,12 +4513,50 @@ var querystring = __webpack_require__(39);
         search_type: this.search_type,
         search_value: this.search_value
       })).then(function (response) {
+        _this.count = response.data.count;
+        _this.start = response.data.start;
+        _this.end = response.data.end;
+        _this.active = response.data.active;
         _this.no_search = false;
-        _this.arenas = response.data.result;
+        _this.elements = _this.end - _this.start;
+        _this.arenas = [''];
+        for (var i = 0; i < _this.end; i++) {
+          _this.arenas.push(response.data.result[i]);
+        }
       }).catch(function (error) {
         alert(error.response.data.error);_this.arenas = [];_this.search_value = '';
         _this.search_type = 'name';
         _this.no_search = true;
+        _this.count = '';
+        _this.elements = '';
+        _this.arenas = [''];
+      });
+    },
+    onindex: function onindex(event) {
+      var _this2 = this;
+
+      axios.post('/search', querystring.stringify({
+        search_type: this.search_type,
+        index: event.target.value,
+        search_value: this.search_value
+      })).then(function (response) {
+        _this2.count = response.data.count;
+        _this2.start = response.data.start;
+        _this2.end = response.data.end;
+        _this2.elements = _this2.end - _this2.start;
+        _this2.active = response.data.active;
+        _this2.no_search = false;
+        _this2.arenas = [''];
+        for (var i = _this2.start; i < _this2.end; i++) {
+          _this2.arenas.push(response.data.result[i]);
+        }
+      }).catch(function (error) {
+        alert(error.response.data.error);_this2.arenas = [];_this2.search_value = '';
+        _this2.search_type = 'name';
+        _this2.no_search = true;
+        _this2.count = '';
+        _this2.arenas = [''];
+        _this2.elements = '';
       });
     }
   }
@@ -7349,20 +7392,22 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "name": "submit",
       "value": "search"
     }
-  })]), _vm._v(" "), (_vm.no_search) ? _c('h1', [_vm._v("select search type and enter search value to show you the matched Arenas")]) : _vm._e(), _vm._v(" "), _vm._l((_vm.arenas), function(arena) {
-    return _c('div', [_c('h3', {
+  })]), _vm._v(" "), (_vm.no_search) ? _c('h1', [_vm._v("select search type and enter search value to show you the matched Arenas")]) : _vm._e(), _vm._v(" "), _vm._l((_vm.elements), function(n) {
+    return _c('div', [_c('h3', [_vm._v(_vm._s(_vm.arenas[n].name))]), _vm._v(" "), _c('h3', [_vm._v(_vm._s(_vm.arenas[n].location))]), _vm._v(" "), _c('h3', [_vm._v(_vm._s(_vm.arenas[n].price))]), _vm._v(" "), _c('hr')])
+  }), _vm._v(" "), _vm._l((_vm.count), function(n) {
+    return _c('input', {
+      attrs: {
+        "type": "submit",
+        "id": n,
+        "name": "submit"
+      },
       domProps: {
-        "textContent": _vm._s(arena.name)
+        "value": n
+      },
+      on: {
+        "click": _vm.onindex
       }
-    }), _vm._v(" "), _c('h3', {
-      domProps: {
-        "textContent": _vm._s(arena.price)
-      }
-    }), _vm._v(" "), _c('h3', {
-      domProps: {
-        "textContent": _vm._s(arena.location)
-      }
-    }), _vm._v(" "), _c('hr')])
+    })
   })], 2)
 },staticRenderFns: []}
 module.exports.render._withStripped = true
