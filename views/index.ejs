@@ -1,10 +1,41 @@
-<%include _header%>
+<!DOCTYPE html>
+<html>
 
-<%if(currentUser && currentUser.type=='ServiceProvider'){%>
-<a href="/createArena">create arena</a>
-<%}else{%>
-<%}%>
+<head>
+	<title>Main view</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.0/css/bulma.css">
+</head>
+
+<body>
+
+	<div id="app">
+
+		<nav class="nav has-shadow">
+			<div class="container">
+				<div class="nav-left">
+					<nav class="tabs is-boxed">
+						<div class="container">
+							<ul>
+								<router-link tag="li" to="/" exact><a>Home</a></router-link>
+
+								<router-link tag="li" to="/myArenas"><a>My Arenas</a></router-link>
+
+								<router-link tag="li" to="/login"><a>login</a></router-link>
+
+							</ul>
+						</div>
+					</nav>
+				</div>
+			</div>
+		</nav>
+
+		<router-view></router-view>
 
 
+	</div>
 
-<%include _footer%>
+	<script src="./js/app.js"></script>
+
+</body>
+
+</html>

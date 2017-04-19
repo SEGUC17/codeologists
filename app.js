@@ -13,7 +13,8 @@ var passport = require('passport');
 var flash = require('connect-flash');
 var Booking = require('./models/Booking');
 var Arena = require('./models/Arena');
-
+var logger=require('morgan');
+var validator = require('express-validator');
 
 schedule.scheduleJob({ hour: 00, minute: 00, dayOfWeek: 5 }, systemController.updateSchedule);
 schedule.scheduleJob({ hour: 07, minute: 00, dayOfWeek: 5 }, systemController.collectGarbage);
@@ -22,6 +23,7 @@ schedule.scheduleJob({ hour: 07, minute: 00, dayOfWeek: 5 }, systemController.co
 var db_url = "mongodb://localhost:27017/db";
 mongoose.Promise = Promise;
 
+app.use(logger('dev'));
 
 // config app
 app.set('view engine', 'ejs');
@@ -29,6 +31,7 @@ app.set('views', path.resolve(__dirname, 'views'));
 mongoose.connect(db_url);
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(validator());
 app.use(cookieParser());
 
 app.use(session({
