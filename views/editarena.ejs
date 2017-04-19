@@ -1,0 +1,35 @@
+<%include _header%>
+	<h1>HELLOOOOOOOO</h1>
+
+
+	<form action="/editarenainfo/<%=arena._id%>" method="post">
+		<input type="text" name="rules_and_regulations">rules_and_regulations<br>
+		<input type="text" name="address">address<br>
+		<input type="text" name="location">location<br>
+		<input type="text" name="size">size<br>
+		<input type="text" name="type">type<br>
+		<input type="text" name="price">price<br>
+		<input type="submit" value="edit"><br>
+	</form>
+	<br>
+	<br>
+
+	<form action="/addarenaimage/<%=arena._id%>" method="post" enctype="multipart/form-data">
+		<input type="file" name="newimage"><br>
+		<input type="submit" value="add image">
+	</form>
+	<br>
+	<br>
+
+	<form action="/editdefaultschedule/<%=arena._id%>" method="post">
+		<% for(var i =0 ;i < 7 ;i++) {%>
+			<%for(var j=0;j<48;j++) { %>
+				<input type="checkbox" name="schedule" value="<%=i%>,<%=j%>"  >
+			<%}%>
+			<br>
+		<%}%>
+		<input type="submit"value="edit default schedule">
+	</form>
+
+
+	<%include _footer%>

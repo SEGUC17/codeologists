@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title></title>
+  <style>
+    .alert {
+      padding: 20px;
+      background-color: #f44336;
+      color: white;
+      opacity: 1;
+      transition: opacity 0.6s;
+      margin-bottom: 15px;
+    }
+    
+    .alert.warning {
+      background-color: #ff9800;
+    }
+    
+    .closebtn {
+      margin-left: 15px;
+      color: white;
+      font-weight: bold;
+      float: right;
+      font-size: 22px;
+      line-height: 20px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    
+    .closebtn:hover {
+      color: black;
+    }
+  </style>
+</head>
+
+<body>
+  <form autocomplete="off" class="form" enctype="multipart/form-data" method="POST" action="/edit_provider_profile">
+    <%if(err){%>
+      <div class="alert">
+        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+        <strong><%= err%></strong>
+      </div>
+      <%}%>
+        <label for="name">name</label><br>
+        <input name="name" type="text" id="name" value="<%= result.name %>"><br>
+        <label for="old_password">old_password</label><br>
+        <input name="old_password" type="password" id="old_password" placeholder="old password"><br>
+        <label for="new_password">new_password</label><br>
+        <input name="new_password" type="password" id="new_password"><br>
+        <label for="email">email</label><br>
+        <input name="email" type="text" id="email" value="<%= result.email %>"><br>
+        <label for="phone_number">phone_number</label><br>
+        <input name="phone_number" type="text" id="phone_number" value="<%= result.phone_number %>"><br>
+        <label for="profile_pic">profile_pic</label><br>
+        <input id="profile_pic" type="file" class="form-control" name="profile_pic" accept="image/*"><br>
+        <% if(result.mode == true){%>
+          <label for="on">AutoAccept_mode_on</label>
+          <input type="radio" id="on" name="mode" value="on" class="radio" checked><br>
+          <label for="off">AutoAccept_mode_off</label>
+          <input type="radio" id="off" name="mode" value="off" class="radio"><br>
+          <%}else{%>
+            <label for="on">AutoAccept_mode_on</label>
+            <input type="radio" id="on" name="mode" value="on" class="radio"><br>
+            <label for="off">AutoAccept_mode_off</label>
+            <input type="radio" id="off" name="mode" value="off" class="radio" checked><br>
+            <%}%>
+              
+
+              <input class="btn-primary form-control" type="submit" value="edit">
+              <% if(result.profile_pic.data) {%>
+                <img src="data:image/*;base64,<%= result.profile_pic.data.toString('base64')%>"> </img>
+                <%}%>
+  </form>
+
+
+
+
+</body>
+
+</html>

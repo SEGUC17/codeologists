@@ -1,0 +1,26 @@
+<%include _header%>
+
+<form action="/createArena" method="post" enctype="multipart/form-data">
+	<input type="text" name="name">
+	<input type="text" name="address">
+	<input type="text" name="location">
+	<input type="text" name="size">
+	<input type="text" name="type">
+	<input type="text" name="price">
+	<input type="file" name="photos">
+<%var days=["saturday", "sunday", "monday", "tuesday", "wednesday", "thursday", "friday"];%>
+	<% for(var i =0 ;i < 7 ;i++) {%>
+			<%for(var j=0;j<48;j++) { %>
+				<input type="checkbox" name="<%=days[i]%>" value="<%=j%>"  >"<%=days[i]%>"
+			<%}%>
+			<br>
+		<%}%>
+
+
+
+	<input type="submit" name="submit" value="create">
+</form>
+
+
+
+<%include _footer%>
