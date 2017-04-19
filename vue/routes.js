@@ -1,37 +1,40 @@
 import VueRouter from 'vue-router';
 
-let routes=[
-	{
-		path : '/',
-		component : require('./views/Home')
-	},
+let routes = [{
+        path: '/',
+        component: require('./views/Home')
+    },
 
-	{
-		path : '/about',
-		component : require('./views/About')
-	},
+    {
+        path: '/about',
+        component: require('./views/About')
+    },
 
-	{
-		path : '/myArenas',
-		component : require('./views/MyArenas')
-	},
+    {
+        path: '/myArenas',
+        component: require('./views/MyArenas')
+    },
 
-	{
-		path : '/login',
-		component : require('./views/Login')
-	},
+    {
+        path: '/login',
+        component: require('./views/Login')
+    },
 
-	{
-		path : '/editArena',
-		component : require('./views/EditArena')
-	}
+    {
+        path: '/editArena',
+        component: require('./views/EditArena')
+    },
 
+    {
+        path: '/blackList',
+        component: require('./views/Blacklist')
+    }
 ];
 
 
 export default new VueRouter({
-	routes ,
+    routes,
 
-	linkActiveClass : 'is-active'
+    linkActiveClass: 'is-active'
 
 });
