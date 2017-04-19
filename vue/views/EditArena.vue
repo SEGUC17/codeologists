@@ -46,15 +46,22 @@
 		
 		<!--Start of adding a new arena image-->
 
-		<form method="post" action="/addimage" @submit.prevent="addImage" enctype="multipart/form-data">
-			
-			<input id="image" name="image" type="file">
+		<!-- Start of display images-->
 
-			<div class="control">
-				<button class="button is-primary">Add Image</button>
+		<img v-for="photo in photos" class="mySlides" src="paris.jpg" style="width:100%" alt="arena_image">
+
+
+		<!-- End of display images-->
+
+		<form autocomplete="off" method="POST" enctype="multipart/form-data" @submit.prevent="addImage">
+    
+     		<label for="new_image">New Image</label><br>
+     			<input id ="new_image" type="file" class="form-control" name="new_image" accept="image/*" @change="onFile" multiple><br>
+     
+     		<div class="control">
+				<button class="button is-primary">Add</button>
 			</div>
-
-		</form>
+   		</form>
 
 		<!--End of adding a new arena image-->
 
@@ -74,14 +81,19 @@
 					size : '',
 					price : '',
 					type : ''
-				})
+				}),
+				photos : {},
+				files : '',
+				schedule : []
 			}
 		},
 
 		created(){
 			Event.$on('edit-arena',arena=> {
 				this.form=new Form(arena);
-			});
+				this.photos=[].concat(arena.photos);
+				this.schedule=arena.default_weekly_schedule;
+			});		
 		},
 
 		methods : {
@@ -96,8 +108,20 @@
 			},
 
 			addImage(){
-				alert("hey");
-			}
+				var dataForm = new FormData();
+				dataForm.append('new_image',this.files[0]);
+				axios.post('/addarenaimage/'+this.form._id,dataForm)
+				.then(arena =>{
+					this.$router.push('/myArenas');
+				})
+				.catch(err =>{
+					alert(err);
+				});
+			},
+
+			onFile(event){
+            	this.files = event.target.files
+            }
 		}
 
 	}
