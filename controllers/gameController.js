@@ -1,12 +1,13 @@
+var Game = require('../models/Game');
 var createGame = function (req, res) {
 
     if (!(req.body.size) || !(req.body.location) || !(req.body.start_date) ||
-        !(req.body.end_date) || !(req.user._id)) {
+        !(req.body.end_date) || !(req.user.username)) {
         res.send('Missing fields');
         return;
     }
 
-    var creator2 = req.user._id;
+    var creator2 = req.user.username;
     var size2 = req.body.size;
     var location2 = req.body.location;
     //var arenas2 = req.body.arenas;
@@ -35,23 +36,22 @@ function viewgames(req, res) {
         if (err)
             res.json({error : err.message});
         else
-            res.json({games : games});
+            res.json(games);
     });
-};
-function requestgame(req, res, nxt) {
+};function requestgame(req, res, nxt) {
 
     var NewReq = { playerUsername: req.user.username, comment: req.body.comment, accepted: false };
     var id = req.params.id;
     if (id == null) {
-        res.send('can not send a game request of undefined game');
+         res.status(500).json({ error: 'can not send a game request of undefined game' });
     }
     if (NewReq.playerUsername == null) {
-        res.send('can not request a game  for unauthorized user');
+                         res.status(401).json({ error: 'can not request a game  for unauthorized user' });
     }
 
     Game.findOne({ _id: id }, function (err, game) {
         if (err) {
-            return res.send(err);
+                            res.status(400).json({ error: err });
         } else {
             var arrayLength = game.requests.length;
             for (var i = 0; i < arrayLength; i++) {
@@ -63,7 +63,8 @@ function requestgame(req, res, nxt) {
             }
             game.requests.push(NewReq);
             game.save(nxt);
-            res.redirect('/viewgames');
+            res.json(game);
+
         }
     });
 }
@@ -72,17 +73,19 @@ function acceptrequest(req, res, nxt) {
     var playerUsername = req.body.playerUsername;
     var currentuser = req.user.username;
     if (id == null) {
-        res.send('can not accept a game request of undefined game');
+                 res.status(400).json({ error: 'can not accept a game request of undefined game' });
     }
     if (playerUsername == null) {
-        res.send('can not accept a game request of undefined user');
+         res.status(400).json({ error: 'can not accept a game request of undefined user' });
+
     }
     if (currentuser == null) {
-        res.send('can not accept a game request for unauthorized user');
+                 res.status(401).json({ error: 'can not accept a game request for unauthorized user' });
+
     }
     Game.findOne({ _id: id }, function (err, game) {
         if (err) {
-            return res.send(err);
+                            res.status(400).json({ error: err });
         } else {
             var arrayLength = game.requests.length;
             for (var i = 0; i < arrayLength; i++) {
@@ -94,11 +97,11 @@ function acceptrequest(req, res, nxt) {
 
                     Player.findOne({ username: playerUsername }, function (err, player) {
                         if (err) {
-                            return res.send(err);
+                            res.status(400).json({ error: err });
                         } else {
                             player.notifications.push(currentuser.concat(' has accepted your request'));
                             player.save(nxt);
-                            res.redirect('/viewgames');
+                             res.json(game);
 
                         }
                     });
@@ -118,17 +121,21 @@ function rejectrequest(req, res, nxt) {
     var playerUsername = req.body.playerUsername;
     var currentuser = req.user.username;
     if (id == null) {
-        res.send('can not reject a game request of undefined game');
+
+    res.status(400).json({ error: 'can not reject a game request of undefined game' });
+
     }
     if (playerUsername == null) {
-        res.send('can not reject a game request of undefined user');
+                 res.status(400).json({ error: 'can not reject a game request of undefined user' });
     }
     if (currentuser == null) {
-        res.send('can not reject a game request for unauthorized user');
+        
+         res.status(401).json({ error: 'can not reject a game request for unauthorized user' });
+
     }
     Game.findOne({ _id: id }, function (err, game) {
         if (err) {
-            return nxt(err);
+                            res.status(400).json({ error: err });
         } else {
             var arrayLength = game.requests.length;
             for (var i = 0; i < arrayLength; i++) {
@@ -140,11 +147,13 @@ function rejectrequest(req, res, nxt) {
 
                     Player.findOne({ username: playerUsername }, function (err, player) {
                         if (err) {
-                            return res.send(err);
+                            res.status(400).json({ error: err });
+                            
                         } else {
                             player.notifications.push(currentuser.concat(' has rejected your request'));
                             player.save(nxt);
-                            res.redirect('/viewgames');
+                            res.json(game);
+
 
                         }
                     });
@@ -154,14 +163,39 @@ function rejectrequest(req, res, nxt) {
         }
     });
 }
+function myrequests(req, res) {
+var currentuser = req.user.username;
+   Game.findOne({ creator: currentuser }, function (err, game) {
+        if (err) {
+                            res.status(400).json({ error: err });
+        } else {
+            res.json(game.requests);
+                                                      console.log("Here I am 2");
 
+        }
+    });
+};
+function mygame(req, res) {
+var currentuser = req.user.username;
+
+   Game.findOne({ creator: currentuser }, function (err, game) {
+        if (err) {
+                            res.status(400).json({ error: err });
+        } else {
+            res.json(game._id);
+                                          console.log("Here I am");
+
+        }
+    });
+};
 let gameController = {
     createGame: createGame,
     viewgames: viewgames,
-    requestgame : requestgame,
     acceptrequest: acceptrequest,
     rejectrequest: rejectrequest,
-
+    requestgame:requestgame,
+    myrequests:myrequests,
+    mygame:mygame
 }
 
 module.exports = gameController;

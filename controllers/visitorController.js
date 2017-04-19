@@ -53,8 +53,8 @@ let visitorController = {
 					player.email = req.body.email;
 					player.phone_number = req.body.phone_number;
 					player.location = req.body.location;
-					if (req.files[0])
-						player.profile_pic.data = req.files[0].buffer;
+					if (req.files)
+						player.profile_pic.data = req.files.buffer;
 					player.birthdate = req.body.birthdate;
 					player.ratings_count = 0;
 
