@@ -1,10 +1,18 @@
-<%include _header%>
+<!DOCTYPE html>
+<html>
 
-<%if(currentUser && currentUser.type=='ServiceProvider'){%>
-<a href="/createArena">create arena</a>
-<%}else{%>
-<%}%>
+<head>
+  <title></title>
+</head>
+<body>
+  <div id="app">
+      <router-link to="/search" exact>Search</router-link>
+        <router-link to="/edit_profile" exact>edit</router-link>
+      <router-view></routerview>
+  </div>
+<script src = '/appVue.js'></script>
 
 
+</body>
 
-<%include _footer%>
+</html>

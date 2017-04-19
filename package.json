@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "async": "^2.3.0",
+    "axios": "^0.16.1",
     "body-parser": "^1.17.1",
     "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.3",
@@ -25,6 +26,11 @@
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "password-hash-and-salt": "^0.1.4",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "vue": "^2.2.6",
+    "vue-router": "^2.4.0"
+  },
+  "devDependencies": {
+    "laravel-mix": "^0.10.0"
   }
 }
