@@ -34,10 +34,10 @@ function ensureAuthenticated(req, res, next) {
     }
 }
 
-router.get('/', function (req, res) {
-    // setting username and type for testing
-    res.render('index');
-});
+// router.get('/', function (req, res) {
+//     // setting username and type for testing
+//     res.json({ out: 'out'});
+// });
 
 
 router.get('/edit_profile', ensureAuthenticated, function (req, res, next) {
@@ -127,6 +127,8 @@ router.post('/profile/whitelist', ensureAuthenticated, serviceProviderController
 router.post('/profile/whitelist/phone', ensureAuthenticated, serviceProviderController.add_to_whitelist_phone);
 
 router.post('/profile/removewhitelist', ensureAuthenticated, serviceProviderController.remove_from_whitelist);
+
+router.get('/arena/:id/getComments', ensureAuthenticated, arenaController.getComments);
 
 router.post('/arena/:id/comment', ensureAuthenticated, arenaController.commentOnArena);
 

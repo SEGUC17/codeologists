@@ -24,8 +24,12 @@ let routes=[
 	{
 		path : '/editArena',
 		component : require('./views/EditArena')
-	}
+	},
 
+	{
+		path : '/comment',
+		component : require('./views/commentOnArena')
+	}
 ];
 
 
