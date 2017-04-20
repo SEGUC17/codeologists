@@ -51,7 +51,7 @@ let serviceProviderController =
 
                     hasher(req.body.old_password).verifyAgainst(result.password, function (err, verified) {
                         if (err) {
-                            res.status(500).json(error:err.message);
+                            res.status(500).json({error:err.message});
                             return;
                         }
                         else {
