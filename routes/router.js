@@ -70,8 +70,14 @@ router.get('/newPlayer', function (req, res) {
     res.json({success:"player"});
 });
 
-router.post('/newPlayer', upload.any(), function (req, res) {
-    visitorController.createPlayer(req, res);
+router.post('/signup', upload.any(), function (req, res) {
+    if(req.body.type=='player')
+    {
+        visitorController.createPlayer(req, res);
+    }
+    else
+        visitorController.createServiceProvider(req, res);
+
 });
 
 router.get('/newServiceProvider', function (req, res) {

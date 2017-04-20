@@ -24,6 +24,11 @@ let routes=[
 	{
 		path : '/editArena',
 		component : require('./views/EditArena')
+	},
+
+	{
+		path: '/signup',
+		component : require('./views/Signup')
 	}
 
 ];
