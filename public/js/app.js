@@ -4576,14 +4576,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
 	data: function data() {
 		return {
-			accept: "/RequestGame/:" + this.id,
+			form: new Form({
+				comment: ""
+			}),
 			games: [],
-			comment: "",
 			showmodal: false
 		};
 	},
@@ -4598,10 +4600,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 	methods: {
 		onsubmit: function onsubmit(game) {
-			axios.post('/RequestGame/' + game._id, {
-				comment: this.comment
+			this.form.submit('post', '/RequestGame/' + game._id).then(function (response) {
+				return alert(response);
+			}).catch(function (errors) {
+				return alert(errors);
 			});
-			alert("Request was sent successfully");
 		}
 	}
 });
@@ -4716,44 +4719,51 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    data: function data() {
-        return {
-            visible: true,
-            requests: [{ playerUsername: "dkdl", comment: "dlk" }, { playerUsername: "dkdl", comment: "dlk" }],
-            id: ""
-        };
+  data: function data() {
+    return {
+      form: new Form({
+        playerUsername: ""
+      }),
+      requests: [],
+      id: ""
+    };
+  },
+  mounted: function mounted() {
+    var _this = this;
+
+    axios.get("/myrequests").then(function (res) {
+      _this.requests = res.data;
+    });
+
+    axios.get("/mygame").then(function (res) {
+      _this.id = res.data;
+    });
+  },
+
+  methods: {
+    acc: function acc(request) {
+      this.form.playerUsername = request.playerUsername;
+      this.form.submit('post', '/AcceptRequest/' + this.id).then(function (response) {
+        return alert(response);
+      }).catch(function (errors) {
+        return alert(errors);
+      });
+      this.requests.splice(this.requests.indexOf(request), 1);
     },
-    mounted: function mounted() {
-        var _this = this;
-
-        axios.get("/myrequests").then(function (res) {
-            _this.requests = res.data;
-        });
-
-        axios.get("/mygame").then(function (res) {
-            _this.id = res.data;
-        });
-    },
-
-    methods: {
-        acc: function acc(request) {
-            axios.post('/AcceptRequest/' + this.id, {
-                playerUsername: request.playerUsername
-            });
-            alert("Request was accepted successfully");
-            this.visible = false;
-        },
-        rej: function rej(request) {
-            axios.post('/RejectRequest/' + this.id, {
-                playerUsername: request.playerUsername
-            });
-            alert("Request sent rejected successfully");
-            this.visible = false;
-        }
+    rej: function rej(request) {
+      this.form.playerUsername = request.playerUsername;
+      this.form.submit('post', '/RejectRequest/' + this.id).then(function (response) {
+        return alert(response);
+      }).catch(function (errors) {
+        return alert(errors);
+      });
+      this.requests.splice(this.requests.indexOf(request), 1);
     }
+  }
 });
 
 /***/ }),
@@ -7638,39 +7648,45 @@ if (false) {
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', [_c('h1', [_vm._v(" " + _vm._s(_vm.requests))]), _vm._v(" "), _vm._l((_vm.requests), function(request) {
+  return _c('div', _vm._l((_vm.requests), function(request) {
     return _c('div', [_c('article', {
-      directives: [{
-        name: "show",
-        rawName: "v-show",
-        value: (_vm.visible),
-        expression: "visible"
-      }],
       staticClass: "message"
     }, [_c('div', {
       staticClass: "message-header"
-    }, [_c('p', [_vm._v("Requet details: " + _vm._s(this.requests))])]), _vm._v(" "), _c('h1', [_vm._v(" " + _vm._s(_vm.requests))]), _vm._v(" "), _c('h1', [_vm._v(" " + _vm._s(request))]), _vm._v(" "), _c('h3', [_vm._v("Player Username :" + _vm._s(request.playerUsername))]), _vm._v(" "), _c('h3', [_vm._v("Comment :" + _vm._s(request.comment) + " ")]), _vm._v(" "), _c('button', {
-      staticClass: "button is-info",
+    }, [_c('p', [_vm._v("Requet details: " + _vm._s(this.requests))])]), _vm._v(" "), _c('h3', [_vm._v("Player Username :" + _vm._s(request.playerUsername))]), _vm._v(" "), _c('h3', [_vm._v("Comment :" + _vm._s(request.comment) + " ")]), _vm._v(" "), _c('form', {
       attrs: {
-        "type": "submit"
+        "action": "/AcceptRequest",
+        "method": "POST"
       },
       on: {
-        "click": function($event) {
+        "submit": function($event) {
+          $event.preventDefault();
           _vm.acc(request)
         }
       }
-    }, [_vm._v("Accept")]), _vm._v(" "), _c('button', {
+    }, [_c('button', {
       staticClass: "button is-info",
       attrs: {
         "type": "submit"
+      }
+    }, [_vm._v("Accept")])]), _vm._v(" "), _c('form', {
+      attrs: {
+        "action": "/RejectRequest",
+        "method": "POST"
       },
       on: {
-        "click": function($event) {
+        "submit": function($event) {
+          $event.preventDefault();
           _vm.rej(request)
         }
       }
-    }, [_vm._v("Reject")])])])
-  })], 2)
+    }, [_c('button', {
+      staticClass: "button is-info",
+      attrs: {
+        "type": "submit"
+      }
+    }, [_vm._v("Reject")])])])])
+  }))
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -7688,7 +7704,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   return _c('div', _vm._l((_vm.games), function(game) {
     return _c('div', [_c('article', {
       staticClass: "message"
-    }, [_vm._m(0, true), _vm._v(" "), _c('h3', [_vm._v("Creator : " + _vm._s(game.creator))]), _vm._v(" "), _c('h3', [_vm._v("Size : " + _vm._s(game.size))]), _vm._v(" "), _c('h3', [_vm._v("Location : " + _vm._s(game.location))]), _vm._v(" "), _c('h3', [_vm._v("Start date  : " + _vm._s(game.startdate))]), _vm._v(" "), _c('h3', [_vm._v("End date : " + _vm._s(game.enddate))]), _vm._v(" "), _c('button', {
+    }, [_vm._m(0, true), _vm._v(" "), _c('h3', [_vm._v("ID : " + _vm._s(game._id))]), _vm._v(" "), _c('h3', [_vm._v("Creator : " + _vm._s(game.creator))]), _vm._v(" "), _c('h3', [_vm._v("Size : " + _vm._s(game.size))]), _vm._v(" "), _c('h3', [_vm._v("Location : " + _vm._s(game.location))]), _vm._v(" "), _c('h3', [_vm._v("Start date  : " + _vm._s(game.start_date))]), _vm._v(" "), _c('h3', [_vm._v("End date : " + _vm._s(game.end_date))]), _vm._v(" "), _c('button', {
       staticClass: "button is-info",
       attrs: {
         "type": "button"
@@ -7706,7 +7722,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       staticClass: "modal-content"
     }, [_c('form', {
       attrs: {
-        "action": _vm.accept,
+        "action": "/RequestGame",
         "method": "POST"
       },
       on: {
@@ -7719,20 +7735,20 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       directives: [{
         name: "model",
         rawName: "v-model",
-        value: (_vm.comment),
-        expression: "comment"
+        value: (_vm.form.comment),
+        expression: "form.comment"
       }],
       staticClass: "textarea",
       attrs: {
         "placeholder": "Add a comment..."
       },
       domProps: {
-        "value": (_vm.comment)
+        "value": (_vm.form.comment)
       },
       on: {
         "input": function($event) {
           if ($event.target.composing) { return; }
-          _vm.comment = $event.target.value
+          _vm.form.comment = $event.target.value
         }
       }
     }), _vm._v(" "), _c('button', {

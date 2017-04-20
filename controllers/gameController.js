@@ -1,4 +1,5 @@
 var Game = require('../models/Game');
+var Player=require('../models/Player');
 var createGame = function (req, res) {
 
     if (!(req.body.size) || !(req.body.location) || !(req.body.start_date) ||
@@ -43,27 +44,34 @@ function viewgames(req, res) {
     var NewReq = { playerUsername: req.user.username, comment: req.body.comment, accepted: false };
     var id = req.params.id;
     if (id == null) {
-         res.status(500).json({ error: 'can not send a game request of undefined game' });
+    res.status(500).json({ error: 'can not send a game request of undefined game' });
     }
     if (NewReq.playerUsername == null) {
-                         res.status(401).json({ error: 'can not request a game  for unauthorized user' });
+     res.status(401).json({ error: 'can not request a game  for unauthorized user' });
     }
+
 
     Game.findOne({ _id: id }, function (err, game) {
         if (err) {
-                            res.status(400).json({ error: err });
+                            res.status(400).json(err);
+
         } else {
+
             var arrayLength = game.requests.length;
+            if(game.creator==req.user.username){
+                res.send("Can't send a request because it's your own game");
+                return;
+            }
             for (var i = 0; i < arrayLength; i++) {
                 var n = game.requests[i].playerUsername.localeCompare(NewReq.playerUsername);
                 if (n == 0) {
-                    res.send("You have already sent the same request before");
+                    res.send("You have already sent the same request before !");
                     return;
                 }
             }
             game.requests.push(NewReq);
             game.save(nxt);
-            res.json(game);
+            res.send("Request sent Successfully !");
 
         }
     });
@@ -87,21 +95,21 @@ function acceptrequest(req, res, nxt) {
         if (err) {
                             res.status(400).json({ error: err });
         } else {
-            var arrayLength = game.requests.length;
-            for (var i = 0; i < arrayLength; i++) {
+            
+            for (var i = 0; i < game.requests.length; i++) {
                 var n = game.requests[i].playerUsername.localeCompare(playerUsername);
                 if (n == 0) {
-
-                    game.requests[i].accepted = true;
+                   // game.requests[i].accepted = true;
+                  game.requests.splice(i);
+                  game.markModified("requests");
                     game.save();
-
                     Player.findOne({ username: playerUsername }, function (err, player) {
                         if (err) {
                             res.status(400).json({ error: err });
                         } else {
                             player.notifications.push(currentuser.concat(' has accepted your request'));
                             player.save(nxt);
-                             res.json(game);
+                            res.send("Request was Accepted successfully");
 
                         }
                     });
@@ -137,28 +145,28 @@ function rejectrequest(req, res, nxt) {
         if (err) {
                             res.status(400).json({ error: err });
         } else {
-            var arrayLength = game.requests.length;
-            for (var i = 0; i < arrayLength; i++) {
+
+            for (var i = 0; i < game.requests.length; i++) {
                 var n = game.requests[i].playerUsername.localeCompare(playerUsername);
                 if (n == 0) {
-                    //delete game.requests[i];
                     game.requests.splice(i);
                     game.save(nxt);
-
                     Player.findOne({ username: playerUsername }, function (err, player) {
                         if (err) {
-                            res.status(400).json({ error: err });
+                            res.status(400).json(err);
                             
                         } else {
                             player.notifications.push(currentuser.concat(' has rejected your request'));
+                           game.markModified("requests");
                             player.save(nxt);
-                            res.json(game);
+                            res.send("Request was rejected successfully");
 
 
                         }
                     });
 
                 }
+
             }
         }
     });
@@ -167,11 +175,15 @@ function myrequests(req, res) {
 var currentuser = req.user.username;
    Game.findOne({ creator: currentuser }, function (err, game) {
         if (err) {
-                            res.status(400).json({ error: err });
+        res.status(400).json({ error: err });
+        return;
         } else {
+            if(game==null){
+                res.json([]);
+                return;
+            }
             res.json(game.requests);
-                                                      console.log("Here I am 2");
-
+            return;
         }
     });
 };
@@ -180,11 +192,15 @@ var currentuser = req.user.username;
 
    Game.findOne({ creator: currentuser }, function (err, game) {
         if (err) {
-                            res.status(400).json({ error: err });
+         res.status(400).json({ error: err });
+         return;
         } else {
+            if(game==null){
+                res.json("");
+                return;
+            }
             res.json(game._id);
-                                          console.log("Here I am");
-
+            return;
         }
     });
 };

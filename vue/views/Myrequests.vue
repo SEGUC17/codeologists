@@ -1,18 +1,19 @@
 <template>
 <div>
-  <h1> {{requests}}</h1>
    <div v-for="request in requests">
-<article class="message" v-show="visible">
+<article class="message" >
     <div class="message-header">
         <p>Requet details: {{this.requests}}</p>
       </div>
-      <h1> {{requests}}</h1>
-       <h1> {{request}}</h1>
+
     <h3>Player Username :{{request.playerUsername}}</h3>
     <h3>Comment :{{request.comment}} </h3>
-
-   <button type="submit" class="button is-info" @click="acc(request)">Accept</button>
-   <button type="submit" class="button is-info" @click="rej(request)">Reject</button>
+<form action="/AcceptRequest" method="POST" @submit.prevent="acc(request)">
+   <button type="submit" class="button is-info" >Accept</button>
+   </form>
+   <form action="/RejectRequest" method="POST" @submit.prevent="rej(request)">
+   <button type="submit" class="button is-info" >Reject</button>
+   </form>
      </article>
 </div>
 </div>
@@ -24,8 +25,10 @@
   export default {
     data(){
         return{
-          visible:true,
-          requests:[{playerUsername:"dkdl",comment:"dlk"},{playerUsername:"dkdl",comment:"dlk"}],
+          form: new Form({
+            playerUsername:""
+          }),
+          requests:[],
           id:""
         };
    },
@@ -42,19 +45,16 @@
   },
   methods:{
   acc(request){
-     axios.post('/AcceptRequest/'+this.id,{
-        playerUsername:request.playerUsername
-        });
-    alert("Request was accepted successfully");
-    this.visible=false;
+    this.form.playerUsername=request.playerUsername;
+     this.form.submit('post','/AcceptRequest/'+this.id).then(response => alert(response))
+    .catch(errors => alert(errors));
+     this.requests.splice(this.requests.indexOf(request),1);
   }
 ,rej(request){
-    axios.post('/RejectRequest/'+this.id,{
-        playerUsername:request.playerUsername
-        });
-    alert("Request sent rejected successfully");
-    this.visible=false;
-
+  this.form.playerUsername=request.playerUsername;
+     this.form.submit('post','/RejectRequest/'+this.id).then(response => alert(response))
+    .catch(errors => alert(errors));
+         this.requests.splice(this.requests.indexOf(request),1);
     }
 
    }
