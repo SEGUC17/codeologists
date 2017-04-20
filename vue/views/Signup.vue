@@ -53,7 +53,8 @@
 			</div>
 			<div class="control">
 				<label  class="label">Profile picture</label>
-				<input type="file" name="profile_pic" class="input" placeholder="Profile picture" v-on:change="form.profile_pic">
+				<img :src="form.profile_pic">
+				<input type="file" name="profile_pic" class="input" placeholder="Profile picture" @change="onFileChange">
 			</div>
 			<div class="control">
 				<button class="button is-primary">Sign Up!</button>
@@ -79,7 +80,7 @@
 					phone_number : '',
 					birthdate : '',
 					mode:'',
-					profile_pic:{}
+					profile_pic:'/default-user-image.png'
 				})
 			}
 		},
@@ -87,13 +88,29 @@
 		methods : {
 			signup(){
 				this.form.submit('post','/signup')
-				.then(function (res) {
+				.then(res => {
 					this.$router.push('/');;
 				})
 				.catch(err => {
-					
+					console.log(err);
 				});
-			}
+			},
+			onFileChange(e) {
+		      var files = e.target.files || e.dataTransfer.files;
+		      if (!files.length)
+		        return;
+		      this.createImage(files[0]);
+		    },
+		    createImage(file) {
+		      var image = new Image();
+		      var reader = new FileReader();
+		      var vm = this;
+
+		      reader.onload = (e) => {
+		        vm.form.profile_pic = e.target.result;
+		      };
+		      reader.readAsDataURL(file);
+		    }
 		}
 
 	}
