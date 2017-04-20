@@ -1,7 +1,7 @@
 var Arena = require('../models/Arena');
 function compute(req, res, result) {
 	if (result.length == 0) {
-		res.status(404)json({erro:"no Arena matches your value"});
+		res.status(404).json({erro:"no Arena matches your value"});
 		return;
 	} else {
 		var tmp = 0;
