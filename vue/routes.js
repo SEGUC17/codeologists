@@ -24,6 +24,21 @@ let routes=[
 	{
 		path : '/editArena',
 		component : require('./views/EditArena')
+	},
+
+	{
+		path: '/createArena',
+		component: require('./views/createArena')
+	},
+
+	{
+		path: '/editArena',
+		component: require('./views/EditArena')
+	},
+
+	{
+		path: '/cancelBooking',
+		component: require('./views/delete_booking')
 	}
 
 ];

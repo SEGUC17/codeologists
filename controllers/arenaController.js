@@ -282,12 +282,12 @@ function setUnavailable(req, res) {
                         });
                     }
                     else {
-                        //if one of the fields in req.body isn't delivered 
+                        //if one of the fields in req.body isn't delivered
                         res.json({ error: "Missing data" });
                     }
                 }
                 else {
-                    //if the arena does not belong to this service provider or there's no such arena 
+                    //if the arena does not belong to this service provider or there's no such arena
                     res.status(404).json({ error: "You are not allowed to view this page or there's no such arena" });
                 }
             });
@@ -341,7 +341,7 @@ function setAvailable(req, res) {
 
                     }
                     else {
-                        //if one of the fields in req.body isn't delivered 
+                        //if one of the fields in req.body isn't delivered
                         res.json({ error: "Missing data" });
                     }
                 }
@@ -353,13 +353,18 @@ function setAvailable(req, res) {
         });
     }
     else {
-        //if the user(visitor) isn't logged in or he is logged in but he is not a service provider   
+        //if the user(visitor) isn't logged in or he is logged in but he is not a service provider
         res.status(403).json({ error: "You are not allowed to view this page" });
     }
 }
 function createArena(req, res) {
+    if(!user)
+    {
+      res.json({error:'This action can not be done'});
+      return;
+    }
     if (req.user && (req.user.type != "ServiceProvider")) {
-        res.send("Not authenticated");
+        res.json({error: "Not authenticated user"});
         return;
     }
 
@@ -376,7 +381,7 @@ function createArena(req, res) {
     var avg_rating = 0;
 
     if (!name || !address || !location || !size || !type || !price) {
-        res.send("missing input");
+        res.json({error: "missing input"});
         return;
     }
 
@@ -479,12 +484,12 @@ function createArena(req, res) {
             });
 
 
-            newArena.save(function (err) {
+            newArena.save(function (err, doc) {
                 if (err)
                     res.send(err);
-                return;
+                else
+                    res.json(doc);
             });
-            res.redirect('/'); // to be changed
         }
     })
 }
