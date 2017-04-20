@@ -166,5 +166,6 @@ router.post('/RequestGame/:id', ensureAuthenticated, gameController.requestgame)
 router.post('/AcceptRequest/:id', ensureAuthenticated, gameController.acceptrequest);
 router.post('/RejectRequest/:id', ensureAuthenticated, gameController.rejectrequest);
 
+router.get('/getTheMode' , ensureAuthenticated , serviceProviderController.getTheMode);
 
 module.exports = router;

@@ -187,7 +187,7 @@ function playerRateBooking(req, res) {
 function acceptBooking(booking) {
     Arena.findOne({ _id: booking.arena }, function (err, arenaa) {
         var schedule = arenaa.schedule;
-        var indices = getScheduleIndices(booking.bookMonth, booking.bookDay);
+        var indices = serviceProviderController.getScheduleIndices(booking.bookMonth, booking.bookDay);
         var dayIndex = indices.dayIndex;
         var weekIndex = indices.weekIndex;
         var start = booking.start_index;
@@ -212,7 +212,8 @@ function acceptBooking(booking) {
                                     Arena.findOne({ _id: currentBooking.arena }, function (err, arenaa) {
                                         var notification = 'Unfortunately,your booking on day ' + (currentBooking.bookDay) + ' on month ' +
                                             (currentBooking.bookMonth) + ' for ' + (arenaa.name) + ' from '
-                                            + getTimeFromIndex(start1) + ' to ' + getTimeFromIndex(end1) + ' has been rejected';
+                                            + serviceProviderController.getTimeFromIndex(start1) + ' to ' + 
+                                            serviceProviderController.getTimeFromIndex(end1) + ' has been rejected';
                                         Player.findOne({ _id: currentBooking.player }, function (err, playerr) {
                                             playerr.notifications.push(notification);
                                             playerr.save();
@@ -243,21 +244,21 @@ function acceptBooking(booking) {
 
 function acceptBooking2(req, res) {
     if (req.user.type != 'ServiceProvider') {
-        res.send('You are not authorized to do this');
+        res.json(403,{error:'You are not authorized to do this'});
         return;
     }
     Booking.findById(req.body.bookingId, function (err, bookingObj) {
         if (err || !bookingObj)
-            res.send("no such booking or bad request");
+            res.json(400, {error :"no such booking or bad request"});
         else {
             var booking = bookingObj;
             Arena.findOne({ _id: booking.arena }, function (err, arenaa) {
                 if (!arenaa.service_provider.equals(req.user._id)) {
-                    res.send('You are not authorized to do this');
+                    res.json(403,{error : 'You are not authorized to do this'});
                     return;
                 }
                 var schedule = arenaa.schedule;
-                var indices = getScheduleIndices(booking.bookMonth, booking.bookDay);
+                var indices = serviceProviderController.getScheduleIndices(booking.bookMonth, booking.bookDay);
                 var dayIndex = indices.dayIndex;
                 var weekIndex = indices.weekIndex;
                 var start = booking.start_index;
@@ -270,7 +271,7 @@ function acceptBooking2(req, res) {
                     }
                 }
                 if (!ok) {
-                    res.send('This is not a free time');
+                    res.json(400,{error:'This is not a free time'});
                 }
                 else {
                     Booking.find({ arena: arenaa._id, bookDay: booking.bookDay, bookMonth: booking.bookMonth }
@@ -285,7 +286,8 @@ function acceptBooking2(req, res) {
                                                 if (!err && arenaa) {
                                                     var notification = 'Unfortunately,your booking on day ' + (currentBooking.bookDay) + ' on month ' +
                                                         (currentBooking.bookMonth) + ' for ' + (arenaa.name) + ' from '
-                                                        + getTimeFromIndex(start1) + ' to ' + getTimeFromIndex(end1) + ' has been rejected';
+                                                        + serviceProviderController.getTimeFromIndex(start1) + ' to ' 
+                                                        + serviceProviderController.getTimeFromIndex(end1) + ' has been rejected';
                                                     Player.findOne({ _id: currentBooking.player }, function (err, playerr) {
                                                         if (!err && playerr) {
                                                             playerr.notifications.push(notification);
@@ -300,7 +302,7 @@ function acceptBooking2(req, res) {
                                         }
                                     }
                                 }, function (err) {
-                                    res.send('there are conflicting bookings');
+                                    res.json(400,{error :'there are conflicting bookings'});
                                 })
                             }
                             for (var i = start; i <= end; i++) {
@@ -310,15 +312,15 @@ function acceptBooking2(req, res) {
                             bookingObj.accepted = true;
                             bookingObj.save(function (err) {
                                 if (err)
-                                    res.send(err);
+                                    res.json(400,{error : 'error while booking'});
                             })
 
                             arenaa.markModified('schedule');
                             arenaa.save(function (err) {
                                 if (err)
-                                    res.send('error while saving');
+                                    res.json(400,{error : 'error while saving'});
                                 else
-                                    res.send('done');
+                                    res.json(200,{success:'done'});
                             })
                         });
                 }
@@ -329,15 +331,15 @@ function acceptBooking2(req, res) {
 function handleBooking(id) {
     Booking.findOne({ _id: id }, function (err, booking2) {
         if (err || !booking2)
-            res.send('There is no such booking');
+            res.json(400 ,{error :'There is no such booking'}  );
         else
             Arena.findOne({ _id: booking2.arena }, function (err, arena) {
                 if (err || !arena)
-                    res.send('Not a valid booking');
+                    res.json(400 , {error :'Not a valid booking'});
                 else
                     ServiceProvider.findOne({ _id: arena.service_provider }, function (err, serviceProvider) {
                         if (err || !serviceProvider)
-                            res.send('Not a valid booking');
+                            res.json(400 ,{error : 'Not a valid booking'});
                         else {
                             if (serviceProvider.mode == true)
                                 acceptBooking(booking2);
@@ -347,40 +349,45 @@ function handleBooking(id) {
     });
 }
 function rejectBooking(req, res) {
-    if (!(req.body.bookingId))
-        res.send('Missing field');
+    if (!(req.body.bookingId)){
+        res.json (400 ,{error :'Missing field'});
+        return;
+    }
     if (req.user.type != 'ServiceProvider') {
-        res.send('You are not authorized to do this');
+        res.json(403 ,{error :'You are not authorized to do this'});
         return;
     }
     var bookingID = req.body.bookingId;
     Booking.findOne({ _id: bookingID }, function (err, curBooking) {
         if (err || !curBooking) {
-            res.send('Not a valid Booking');
+            res.json(400,{error :'Not a valid Booking'});
             return;
         }
         Arena.findOne({ _id: curBooking.arena }, function (err, arenaa) {
 
             var arenaName = arenaa.name;
             if (err || !arenaa) {
-                res.send('Not a valid Booking');
+                res.json(400 ,{error :'Not a valid Booking'});
             }
             else {
-                var indices = getScheduleIndices(curBooking.bookMonth, curBooking.bookDay);
+                var indices = serviceProviderController.getScheduleIndices(curBooking.bookMonth, curBooking.bookDay);
                 var dayIndex = indices.dayIndex;
                 var weekIndex = indices.weekIndex;
                 var start = curBooking.start_index;
                 var end = curBooking.end_index;
                 var notification = 'Unfortunately,your booking on day ' + (curBooking.bookDay) + ' on month ' +
                     (curBooking.bookMonth) + ' for ' + (arenaa.name) + ' from '
-                    + getTimeFromIndex(start) + ' to ' + getTimeFromIndex(end) + ' has been rejected';
+                    + serviceProviderController.getTimeFromIndex(start) + ' to ' + 
+                    serviceProviderController.getTimeFromIndex(end) + ' has been rejected';
 
                 Player.findOne({ _id: curBooking.player }, function (err, playerr) {
                     playerr.notifications.push(notification);
                     playerr.save();
                     Booking.remove({ _id: curBooking._id }, function (err, result) {
                         if (err)
-                            res.send(err);
+                            res.json(400 ,{error : "This booking can not be rejected"});
+                        else
+                            res.json(200 ,{success : "The booking has been rejected successfully"});
                     });
                 });
             }
