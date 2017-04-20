@@ -2,6 +2,7 @@ var Vue = require('vue');
 var axios = require('axios');
 window.Vue = Vue;
 window.axios = axios;
+window.Event =new Vue();
 import vueRouter from 'vue-router';
 import router from './router.js'
 import booking from './components/booking.vue';
@@ -67,6 +68,10 @@ var bookHours = new Vue({
     },
     data:{
         dayDetailsShown:true,
+    },
+    created(){
+        Event.$on('showagain',this.showDayDetails);
+        Event.$on('hide',this.hideDayDetails);
     }
 })
 

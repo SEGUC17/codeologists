@@ -17,6 +17,10 @@ function validateEmail(email) {
     return re.test(email);
 }
 
+function IndexAPI(req,res){
+    res.json(getScheduleIndices(req.params.month,req.params.day));
+}
+
 var getScheduleIndices = function (month1, day1) {
     var date = new Date();
     date.setHours(0, 0, 0, 0);
@@ -40,7 +44,7 @@ var getTimeFromIndex = function (index) {
 //to be moved to booking controller : acceptBooking , acceptBooking2 , handleBooking, rejectBooking,
 let serviceProviderController =
     {
-
+        IndexAPI:IndexAPI,
         getScheduleIndices: getScheduleIndices,
         getTimeFromIndex: getTimeFromIndex,
         turnAutoAcceptModeOn: function (req, res) {

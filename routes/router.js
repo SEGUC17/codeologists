@@ -102,10 +102,10 @@ router.get('/logout', function (req, res) {
     else
         res.status(400).json({error:"Cannot logout if you are not logged in"});
 });
-
+router.get('/getIndex/:day/:month',serviceProviderController.IndexAPI);
 router.post('/arenas', visitorController.view_all);
 
-router.get('/arena/:arenaName/show', ensureAuthenticated, visitorController.view_details_of_arena);
+router.get('/arena/:arenaName/show',visitorController.view_details_of_arena);
 
 router.get('/getArenas',ensureAuthenticated,arenaController.getArenas);
 

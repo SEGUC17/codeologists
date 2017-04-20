@@ -186,8 +186,10 @@ let visitorController = {
 		var blacklisted = 0;
 
 		Arena.find({ name: req.params.arenaName }, function (err, result) {
-			if (err)
+			if (err) {
 				res.status(404).json({ error: err });
+				console.log("1");
+			}
 			else {
 				if (result.length == 0)
 					res.status(403).json({ error: "No Arenas Found in That Location." });
@@ -205,6 +207,7 @@ let visitorController = {
 						}
 
 						if (blacklisted == 0)
+
 							res.status(200).json(result);
 						else
 							res.status(404).json({ error: "No Arenas" });

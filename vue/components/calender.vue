@@ -9,8 +9,9 @@ export default {
         },
         showDayDetails:function(){
             //TODO:handle re-showing the dayDetails component
-            this.$emit('showagain');
-        }
+            Event.$emit('showagain');
+        },
+       
     },
     data(){
         return {
@@ -18,9 +19,12 @@ export default {
             errors:{}
         }
     },
+    
     mounted(){
-        axios.get('/arena/12/show').then(res => arena = (res.data) ).catch(error => errors = (error));
-    }
+        
+        axios.get('/arena/12/show').then(res => this.arena = (res.data) ).catch(error => this.errors = (error.data));
+    },
+    
 }
 </script>
 <template>
