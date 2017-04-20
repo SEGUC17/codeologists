@@ -6,8 +6,6 @@ var serviceProviderController = require('./serviceProviderController');
 var Arena = require('../models/Arena');
 var Booking = require('../models/Booking');
 var ServiceProvider = require('../models/ServiceProvider');
-var Game = require('../models/Game');
-var arenaController = require('./arenaController');
 function date_calc(year, month, day) {
   if (month < 10)  //if month is one digit pad it with zero
     month = "0" + month;
@@ -20,41 +18,21 @@ function validateEmail(email) {
   return re.test(email);
 }
 
-var bookWeekly = function (req, res) {
-  var indicies = SpController.getScheduleIndicies(month, day);
-  Arena.findById(req.params.arenaId, function (err, foundArena) {
-    if (err) {
-      res.send("No such Arena");
-
-    }
-    else {
-
-    }
-  })
-}
-//should be moved to bookingController :cancelBooking,createBooking,playerRateBooking
-//should be moved to gameContwroller : createGame , requestgame , acceptrequest , rejectrequest,viewgames
-//should be moved to arenaController : commentOnArena,commentOnArena
 
 let playerController = {
-
-  bookWeekly: bookWeekly,
-
   edit_profile_page: function (req, res) { // prepar the edit profile page
     //retrieve the players's record from DB to be able to fill the fields to be changed
-    Player.findOne({username : "hossamfawzy96"}, function (err, result) {
+    Player.findOne({ username: req.user.username }, function (err, result) {
       if (err)
         res.status(500).json({error: err.message});
       else {
-        res.json({ error:'', result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate()) });
+        res.json({result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate()) });
 
       }
     })
   },
   edit_profile_info: function (req, res) { //accepting new info and update the DB record
-    console.log(req.body);
-    console.log(req.files);
-    Player.findOne({ username: "hossamfawzy96" }, function (err, result) {
+    Player.findOne({ username: req.user.username }, function (err, result) {
       if (err)
           res.status(500).json({error: err.message});
       else {
@@ -77,7 +55,7 @@ let playerController = {
 
 
         hasher(req.body.old_password).verifyAgainst(result.password, function (err, verified) {
-          if (verified) {
+          if (!verified) {
             res.status(422).json({ error: "wrong password !", result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate()) });
             return;
           }
@@ -125,8 +103,6 @@ let playerController = {
               }
               result.location = req.body.location;
               result.birthdate = req.body.birthdate;
-              console.log(result);
-              console.log("rrrrrrrrrrrrrrrrr");
               result.save(function (err) {
                 if (err) {
                     res.status(500).json({error: err.message});
