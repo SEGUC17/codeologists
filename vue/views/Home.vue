@@ -17,7 +17,8 @@
 	export default {
 		data(){
 			return {
-				statuses : []
+				statuses : [],
+				pp:''
 			}
 		},
 

@@ -18,11 +18,13 @@
 							<ul>
 								<router-link tag="li" to="/" exact><a>Home</a></router-link>
 
-								<router-link tag="li" to="/myArenas"><a>My Arenas</a></router-link>
+								<router-link tag="li" to="/myArenas" v-show="user&type=='Service Provider'"><a>My Arenas</a></router-link>
 
-								<router-link tag="li" to="/login"><a>login</a></router-link>
+								<router-link tag="li" to="/login" v-show="!user"><a>Login</a></router-link>
 
-								<router-link tag="li" to="/signup"><a>Signup</a></router-link>
+								<router-link tag="li" to="/signup" v-show="!user"><a>Signup</a></router-link>
+
+								<a v-show="user" @click="logout">Logout</a>
 
 							</ul>
 						</div>
