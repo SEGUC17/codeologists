@@ -1,5 +1,6 @@
 <template>
 	<div>
+	     <router-link to="/Search" tag="button">Search</router-link>
 		<div class="w3-display-container">
 			  <img src="image/1.jpg" alt="Lights" style="width: 100%" >
 			  <div class="w3-display-middle w3-large">
