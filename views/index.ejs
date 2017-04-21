@@ -21,7 +21,7 @@
 							<ul>
 								<router-link tag="li" to="/" exact><a>Home</a></router-link>
 
-								<router-link tag="li" to="/myArenas" v-show="user&type=='Service Provider'"><a>My Arenas</a></router-link>
+								<router-link tag="li" to="/myArenas" v-if="type=='ServiceProvider'"><a>My Arenas</a></router-link>
 
 								<router-link tag="li" to="/login" v-show="!user"><a>Login</a></router-link>
 

@@ -79,7 +79,7 @@
 					email : '',
 					phone_number : '',
 					birthdate : '',
-					mode:'',
+					mode:'checked',
 					profile_pic:'/default-user-image.png'
 				})
 			}

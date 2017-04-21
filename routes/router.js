@@ -71,12 +71,13 @@ router.get('/newPlayer', function (req, res) {
 });
 
 router.post('/signup', upload.any(), function (req, res) {
-    if(req.body.type=='player')
-    {
-        visitorController.createPlayer(req, res);
-    }
-    else
-        visitorController.createServiceProvider(req, res);
+    // if(req.body.type=='player')
+    // {
+    //     visitorController.createPlayer(req, res);
+    // }
+    // else
+    //     visitorController.createServiceProvider(req, res);
+    visitorController.createUser(req,res);
 
 });
 

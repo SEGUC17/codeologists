@@ -118,6 +118,7 @@ new Vue({
         Event.$on('loggedIn', data => {
             this.user = data.user;
             this.type = data.type;
+            console.log(this.type);
         })
     },
 
@@ -125,6 +126,8 @@ new Vue({
         logout(){
             axios.get('/logout').then(res =>{
                 this.user=false;
+                this.type='';
+                this.$router.push('/');
             }).catch(err => {
                 console.log(err);
             });
