@@ -35,7 +35,9 @@
 
     mounted(){
         axios.get("/myrequests").then(res=>{
-        this.requests=res.data
+          for(var i=res.data.length-1 ;i>=0;i--){
+          this.requests.push(res.data[i]);
+        }
         }); 
 
         axios.get("/mygame").then(res=>{

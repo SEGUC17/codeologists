@@ -33,6 +33,10 @@ let routes=[
 	{
 		path:'/games',
 		component: require('./views/Games')
+	},
+	{
+		path:'/notifications',
+		component: require('./views/Notifications')
 	}
 
 ];

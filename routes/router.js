@@ -166,6 +166,7 @@ router.get('/mygame',ensureAuthenticated,gameController.mygame);
 router.post('/RequestGame/:id', ensureAuthenticated, gameController.requestgame);
 router.post('/AcceptRequest/:id', ensureAuthenticated, gameController.acceptrequest);
 router.post('/RejectRequest/:id', ensureAuthenticated, gameController.rejectrequest);
+router.get('/myNotifications',ensureAuthenticated,playerController.myNotifications);
 
 
 module.exports = router;

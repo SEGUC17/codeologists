@@ -71,6 +71,7 @@ function viewgames(req, res) {
             }
             game.requests.push(NewReq);
             game.save(nxt);
+            console.log(game);
             res.send("Request sent Successfully !");
 
         }
@@ -107,8 +108,11 @@ function acceptrequest(req, res, nxt) {
                         if (err) {
                             res.status(400).json({ error: err });
                         } else {
-                            player.notifications.push(currentuser.concat(' has accepted your request'));
+
+                            player.notifications.push(currentuser.concat(' has accepted your request to play the game on ').concat(game.start_date));
+
                             player.save(nxt);
+                            // console.log(player);
                             res.send("Request was Accepted successfully");
 
                         }
@@ -150,14 +154,15 @@ function rejectrequest(req, res, nxt) {
                 var n = game.requests[i].playerUsername.localeCompare(playerUsername);
                 if (n == 0) {
                     game.requests.splice(i);
+                   game.markModified("requests");
                     game.save(nxt);
+
                     Player.findOne({ username: playerUsername }, function (err, player) {
                         if (err) {
                             res.status(400).json(err);
                             
                         } else {
-                            player.notifications.push(currentuser.concat(' has rejected your request'));
-                           game.markModified("requests");
+                            player.notifications.push(currentuser.concat(' has rejected your request to play the game on ').concat(game.start_date));
                             player.save(nxt);
                             res.send("Request was rejected successfully");
 
