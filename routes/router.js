@@ -70,8 +70,14 @@ router.get('/newPlayer', function (req, res) {
     res.json({ success: "player" });
 });
 
-router.post('/newPlayer', upload.any(), function (req, res) {
-    visitorController.createPlayer(req, res);
+router.post('/signup', upload.any(), function (req, res) {
+    if(req.body.type=='player')
+    {
+        visitorController.createPlayer(req, res);
+    }
+    else
+        visitorController.createServiceProvider(req, res);
+
 });
 
 router.get('/newServiceProvider', function (req, res) {
@@ -87,13 +93,14 @@ router.get('/login', function (req, res) {
 });
 
 router.post('/login', passport.authenticate('local'), function (req, res) {
-    res.json({ success: "User authenticated successfully" });
+    res.json({success:"User authenticated successfully",user:req.user.name, type:req.user.type});
+
 });
 
 router.get('/logout', function (req, res) {
     if (req.user) {
         req.logout();
-        res.redirect('/');
+        res.json({success:"You have been logged out successfully"});
     }
     else
         res.status(400).json({ error: "Cannot logout if you are not logged in" });

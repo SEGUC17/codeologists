@@ -107,6 +107,28 @@ new Vue({
 
     el: '#app',
 
-    router
+	router,
+
+    data:{
+        user:false,
+        type:''
+    },
+
+    mounted(){
+        Event.$on('loggedIn', data => {
+            this.user = data.user;
+            this.type = data.type;
+        })
+    },
+
+    methods:{
+        logout(){
+            axios.get('/logout').then(res =>{
+                this.user=false;
+            }).catch(err => {
+                console.log(err);
+            });
+        }
+    }
 
 });
