@@ -29,7 +29,13 @@ let routes=[
 	{
 		path : '/comment',
 		component : require('./views/commentOnArena')
+	},
+
+	{
+		path : '/rating',
+		component : require('./views/NonRatedBookings')
 	}
+
 ];
 
 

@@ -53,12 +53,12 @@ let visitorController = {
 					player.email = req.body.email;
 					player.phone_number = req.body.phone_number;
 					player.location = req.body.location;
-					if (req.files[0])
+					if (req.files)
 						player.profile_pic.data = req.files[0].buffer;
 					player.birthdate = req.body.birthdate;
 					player.ratings_count = 0;
 
-					// Store hash (incl. algorithm, iterations, and salt) 
+					// Store hash (incl. algorithm, iterations, and salt)
 					player.password = hash;
 
 					if (!req.body.email || !req.body.name || !req.body.location || !req.body.phone_number || !req.body.username || !req.body.birthdate || !req.body.password) {
@@ -108,7 +108,7 @@ let visitorController = {
 						service.profile_pic.data = req.files[0].buffer;
 					service.mode = req.body.mode ? true : false;
 
-					// Store hash (incl. algorithm, iterations, and salt) 
+					// Store hash (incl. algorithm, iterations, and salt)
 					service.password = hash;
 
 					if (!req.body.email || !req.body.name || !req.body.location || !req.body.phone_number || !req.body.username || !req.body.mode || !req.body.password) {

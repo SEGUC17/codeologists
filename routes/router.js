@@ -130,11 +130,13 @@ router.post('/profile/removewhitelist', ensureAuthenticated, serviceProviderCont
 
 router.get('/arena/:id/getComments', ensureAuthenticated, arenaController.getComments);
 
+router.get('/getNameOfPlayer/:id', ensureAuthenticated, playerController.getPlayer);
+
 router.post('/arena/:id/comment', ensureAuthenticated, arenaController.commentOnArena);
 
-router.post('/ProviderRatesBooking/:id', ensureAuthenticated, bookingController.providerRateBooking);
+router.get('/getUnratedBookings', ensureAuthenticated, bookingController.getUnratedBookings);
 
-router.post('/PlayerRatesBooking/:id', ensureAuthenticated, bookingController.playerRateBooking);
+router.post('/rateBooking/:id', ensureAuthenticated, bookingController.rateBooking);
 
 router.get('/createArena', ensureAuthenticated, function (req, res) {
     res.render('createarena');

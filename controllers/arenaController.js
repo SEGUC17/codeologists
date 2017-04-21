@@ -74,7 +74,7 @@ function checkAvailable(endIndex, schedule, startIndex) {
 function getComments(req, res) {
   Arena.findOne({ _id: req.params.id }, function (err, arena) {
     if(err){
-      res.json({ error: err.message });
+      res.status(400).json({ error: err.message });
       return;
     }
     return res.json({comments: arena.comments});
@@ -88,7 +88,7 @@ function commentOnArena(req, res) {
   if (req.user.type == 'Player') {
     Arena.findOne({ _id: req.params.id }, function (err, arena) {
       if (err) {
-        res.json({ error: err.message });
+        res.status(400).json({ error: err.message });
         return;
       }
       var content = req.body.comment;
@@ -96,7 +96,7 @@ function commentOnArena(req, res) {
       arena.comments.push(comment);
       arena.save(function (err) {
         if (err) {
-          res.json({ error: err.message });
+          res.status(400).json({ error: err.message });
           return;
         }
       });
@@ -104,7 +104,7 @@ function commentOnArena(req, res) {
     });
   }
   else {
-    res.json({ error: "not allowed to comment" });
+    res.status(400).json({ error: "not allowed to comment" });
   }
 };
 function viewarena(req, res) {
