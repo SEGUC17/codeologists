@@ -2,7 +2,7 @@ import './bootstrap';
 
 import router from './routes';
 
-window.Event=new Vue();
+window.Event = new Vue();
 
 class Errors {
 
@@ -40,7 +40,7 @@ class Errors {
 }
 
 
-window.Form=class Form {
+window.Form = class Form {
 
     constructor(data) {
         this.originalData = data;
@@ -72,7 +72,7 @@ window.Form=class Form {
 
     submit(requestType, url) {
         return new Promise((resolve, reject) => {
-            axios[requestType](url,querystring.stringify(this.data()),{headers : { "Content-Type": "application/x-www-form-urlencoded" }})
+            axios[requestType](url, querystring.stringify(this.data()), { headers: { "Content-Type": "application/x-www-form-urlencoded" } })
                 .then(response => {
                     this.onSuccess(response.data);
 
@@ -92,11 +92,11 @@ window.Form=class Form {
     }
 
     onFail(errors) {
-        var errs=[];
-        for(var i =0;i<errors.length;i++){
-            var e=errors[i];
-            var param=e.param;
-            errs[e.param]=e.msg;
+        var errs = [];
+        for (var i = 0; i < errors.length; i++) {
+            var e = errors[i];
+            var param = e.param;
+            errs[e.param] = e.msg;
         }
         this.errors.record(errs);
     }
@@ -105,8 +105,33 @@ window.Form=class Form {
 
 new Vue({
 
-	el : '#app',
+    el: '#app',
 
-	router
+	router,
+
+    data:{
+        user:false,
+        type:'',
+        showLogin:false
+    },
+
+    mounted(){
+        Event.$on('loggedIn', data => {
+            this.user = data.user;
+            this.type = data.type;
+            this.showLogin = false;
+        })
+    },
+
+    methods:{
+        logout(){
+            axios.get('/logout').then(res =>{
+                this.user=false;
+                this.type='';
+            }).catch(err => {
+                console.log(err);
+            });
+        }
+    }
 
 });

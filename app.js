@@ -13,7 +13,7 @@ var passport = require('passport');
 var flash = require('connect-flash');
 var Booking = require('./models/Booking');
 var Arena = require('./models/Arena');
-var logger=require('morgan');
+var logger = require('morgan');
 var validator = require('express-validator');
 
 schedule.scheduleJob({ hour: 00, minute: 00, dayOfWeek: 5 }, systemController.updateSchedule);
@@ -29,7 +29,7 @@ app.use(logger('dev'));
 app.set('view engine', 'ejs');
 app.set('views', path.resolve(__dirname, 'views'));
 mongoose.connect(db_url);
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(path.resolve(__dirname, './public')));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(validator());
 app.use(cookieParser());

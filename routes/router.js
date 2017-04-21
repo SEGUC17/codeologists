@@ -56,26 +56,32 @@ router.get('/', function (req, res) {
 });
 
 router.get('/register', function (req, res) {
-    res.json({success:"choose type"});
+    res.json({ success: "choose type" });
 });
 
 router.post('/register', function (req, res) {
     if (req.body.player)
-        res.json({success:"player"});
+        res.json({ success: "player" });
     else
-        res.json({success:"service provider"});
+        res.json({ success: "service provider" });
 });
 
 router.get('/newPlayer', function (req, res) {
-    res.json({success:"player"});
+    res.json({ success: "player" });
 });
 
-router.post('/newPlayer', upload.any(), function (req, res) {
-    visitorController.createPlayer(req, res);
+router.post('/signup', upload.any(), function (req, res) {
+    if(req.body.type=='player')
+    {
+        visitorController.createPlayer(req, res);
+    }
+    else
+        visitorController.createServiceProvider(req, res);
+
 });
 
 router.get('/newServiceProvider', function (req, res) {
-   res.json({success:"service provider"});
+    res.json({ success: "service provider" });
 });
 
 router.post('/newServiceProvider', upload.any(), function (req, res) {
@@ -83,24 +89,24 @@ router.post('/newServiceProvider', upload.any(), function (req, res) {
 });
 
 router.get('/login', function (req, res) {
-    res.json({success:"login"});
+    res.json({ success: "login" });
 });
 
 router.post('/login', passport.authenticate('local'), function (req, res) {
-    res.json({success:"User authenticated successfully"});
+    res.json({success:"User authenticated successfully",user:req.user.name, type:req.user.type});
+
 });
 
 router.get('/logout', function (req, res) {
-    if(req.user)
-    {
+    if (req.user) {
         req.logout();
-        res.redirect('/');
+        res.json({success:"You have been logged out successfully"});
     }
     else
-        res.status(400).json({error:"Cannot logout if you are not logged in"});
+        res.status(400).json({ error: "Cannot logout if you are not logged in" });
 });
 
-router.get('/myArenas',ensureAuthenticated, serviceProviderController.myArenas);
+router.get('/myArenas', ensureAuthenticated, serviceProviderController.myArenas);
 
 router.post('/arenas', visitorController.view_all);
 
@@ -108,7 +114,7 @@ router.post('/arenaDetails', ensureAuthenticated, visitorController.view_details
 
 router.get('/viewgames', ensureAuthenticated, gameController.viewgames);
 
-router.get('/editarena/:arenaid', ensureAuthenticated,arenaController.editarena);
+router.get('/editarena/:arenaid', ensureAuthenticated, arenaController.editarena);
 
 router.post('/editarenainfo/:arenaid', ensureAuthenticated, arenaController.editarenainfo);
 
@@ -146,7 +152,7 @@ router.post('/acceptBooking', ensureAuthenticated, bookingController.acceptBooki
 router.post('/rejectBooking', ensureAuthenticated, bookingController.rejectBooking);
 router.post('/createGame', ensureAuthenticated, gameController.createGame);
 
-router.post("/sp/arena/:arena_id",ensureAuthenticated, function (req, res) {
+router.post("/sp/arena/:arena_id", ensureAuthenticated, function (req, res) {
     if (req.body.flag == 1) {
         arenaController.setUnavailable(req, res);
     }

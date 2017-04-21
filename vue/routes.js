@@ -1,50 +1,78 @@
 import VueRouter from 'vue-router';
 
-let routes=[
+let routes = [
 	{
-		path : '/',
-		component : require('./views/Home')
+		path: '/',
+		component: require('./views/Home')
 	},
 
 	{
-		path : '/about',
-		component : require('./views/About')
+		path: '/about',
+		component: require('./views/About')
 	},
 
 	{
-		path : '/myArenas',
-		component : require('./views/MyArenas')
+		path: '/myArenas',
+		component: require('./views/MyArenas')
 	},
 
 	{
-		path : '/login',
-		component : require('./views/Login')
+		path: '/login-signup',
+		components:{
+			default : require('./views/Home'),
+			loginModal : require('./views/LoginSignup')
+		},
+
+		children: [
+        {
+          path: 'login',
+          component: require('./views/Login')
+        },
+        {
+          path: 'signup',
+          component: require('./views/Signup')
+        }
+      ]
+
 	},
 
 	{
 		path : '/editArena',
 		component : require('./views/EditArena')
 	},
+  
 	{
 		path:'/myrequests',
 		component : require('./views/Myrequests')
 
 	},
+  
 	{
 		path:'/games',
 		component: require('./views/Games')
 	},
+  
 	{
 		path:'/notifications',
 		component: require('./views/Notifications')
-	}
+	},
+
+	{
+    	path:'/viewArenas',
+    	component: require('./views/Arenas.vue')
+    },
+
+    {
+    	path:'/arenaDetails',
+    	component: require('./views/ArenaDetails.vue')
+    }
 
 ];
 
 
 export default new VueRouter({
-	routes ,
+	routes,
 
-	linkActiveClass : 'is-active'
+	linkActiveClass: 'is-active'
 
 });

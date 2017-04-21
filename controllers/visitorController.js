@@ -33,38 +33,65 @@ let visitorController = {
 
 
 	createPlayer: function (req, res) {
+		if(req.body.password=='')
+		{
+
+			req.checkBody('name', 'Name is required.').notEmpty();
+            req.checkBody('username', 'Username is required.').notEmpty();
+            req.checkBody('password', 'Password is required.').notEmpty();
+            req.checkBody('email', 'Email is required.').isEmail();
+            req.checkBody('email', 'Email is required.').notEmpty();
+            req.checkBody('location', 'Location is required.').notEmpty();
+            req.checkBody('phone_number', 'Phone number is required.').notEmpty();
+            req.checkBody('birthdate', 'Birthdate is required.').notEmpty();
+            var errors = req.validationErrors();
+
+           
+            return res.status(400).json(errors);
+            
+		}
 		Player.findOne({ username: req.body.username }, function (err, user) {
 			if (user)
-				res.status(400).json({ error: 'Username already used' });
+				return res.status(400).json([{param: 'username' ,msg:'Username already used'}]);
 			else {
 
 				hasher(req.body.password).hash(function (error, hash) {
 					if (error)
-						res.status(400).json({ error: error.message });
+						return res.status(500).json({ error: error.message });
 
+
+					req.checkBody('name', 'Name is required.').notEmpty();
+		            req.checkBody('username', 'Username is required.').notEmpty();
+		            req.checkBody('password', 'Password is required.').notEmpty();
+		            req.checkBody('email', 'Email is required.').notEmpty();
+		            req.checkBody('email', 'Email not in correct format').isEmail();
+		            req.checkBody('location', 'Location is required.').notEmpty();
+		            req.checkBody('phone_number', 'Phone number is required.').notEmpty();
+		            req.checkBody('birthdate', 'Birthdate is required.').notEmpty();
+		            req.checkBody('birthdate', 'Birthdate no in correct format').isDate();
+
+		            var errors = req.validationErrors();
+
+		            if (errors) {
+		                return res.status(400).json(errors);
+		            }
 
 					var player = new Player();
 					player.name = req.body.name;
 					player.username = req.body.username;
-					if (!validateEmail(req.body.email)) {
-						res.status(400).json({ error: "Email not in correct format" });
-						return;
-					}
 					player.email = req.body.email;
 					player.phone_number = req.body.phone_number;
 					player.location = req.body.location;
-					if (req.files)
-						player.profile_pic.data = req.files.buffer;
+
+					if (req.body.profile_pic.charAt(0)!='/')
+						player.profile_pic.data = req.body.profile_pic;
+
 					player.birthdate = req.body.birthdate;
 					player.ratings_count = 0;
 
 					// Store hash (incl. algorithm, iterations, and salt) 
 					player.password = hash;
 
-					if (!req.body.email || !req.body.name || !req.body.location || !req.body.phone_number || !req.body.username || !req.body.birthdate || !req.body.password) {
-						res.status(400).json({ error: "Missing data" });
-						return;
-					}
 
 
 					player.save(function (err, player) {
@@ -84,6 +111,22 @@ let visitorController = {
 	},
 
 	createServiceProvider: function (req, res) {
+		if(req.body.password=='')
+		{
+
+			req.checkBody('name', 'Name is required.').notEmpty();
+            req.checkBody('username', 'Username is required.').notEmpty();
+            req.checkBody('password', 'Password is required.').notEmpty();
+            req.checkBody('email', 'Email is required.').isEmail();
+            req.checkBody('email', 'Email is required.').notEmpty();
+            req.checkBody('location', 'Location is required.').notEmpty();
+            req.checkBody('phone_number', 'Phone number is required.').notEmpty();
+            req.checkBody('mode', 'Mode is required.').notEmpty();
+            var errors = req.validationErrors();
+
+            return res.status(400).json(errors);
+            
+		}
 		ServiceProvider.findOne({ username: req.body.username }, function (err, user) {
 			if (user)
 				res.status(400).json({ error: 'Username already used' });
@@ -94,27 +137,41 @@ let visitorController = {
 						res.status(400).json({ error: error.message });
 
 
+
+					req.checkBody('name', 'Name is required.').notEmpty();
+		            req.checkBody('username', 'Username is required.').notEmpty();
+		            req.checkBody('password', 'Password is required.').notEmpty();
+		            req.checkBody('email', 'Email is required.').notEmpty();
+		            req.checkBody('email', 'Email not in correct format').isEmail();
+		            req.checkBody('location', 'Location is required.').notEmpty();
+		            req.checkBody('phone_number', 'Phone number is required.').notEmpty();
+		            req.checkBody('mode', 'Mode is required.').notEmpty();
+		       
+		            var errors = req.validationErrors();
+
+		            if (errors) {
+		                return res.status(400).json(errors);
+		            }
+
+
 					var service = new ServiceProvider();
 					service.name = req.body.name;
 					service.username = req.body.username;
-					if (!validateEmail(req.body.email)) {
-						res.status(400).json({ error: "Email not in correct format" });
-						return;
-					}
+					
 					service.email = req.body.email;
 					service.phone_number = req.body.phone_number;
 					service.location = req.body.location;
-					if (req.files[0])
-						service.profile_pic.data = req.files[0].buffer;
+
+
+
+					if (req.body.profile_pic.charAt(0)!='/')
+						service.profile_pic.data = req.body.profile_pic;
 					service.mode = req.body.mode ? true : false;
 
 					// Store hash (incl. algorithm, iterations, and salt) 
 					service.password = hash;
 
-					if (!req.body.email || !req.body.name || !req.body.location || !req.body.phone_number || !req.body.username || !req.body.mode || !req.body.password) {
-						res.status(400).json({ error: "Missing data" });
-						return;
-					}
+					
 
 					service.save(function (err, service) {
 						if (err)
@@ -156,7 +213,7 @@ let visitorController = {
 
 										for (var k = 0; k < blacklist.length; k++) {//loop searching in blacklist of service provider
 
-											if (req.user._id == blacklist[k]) {
+											if (req.user && req.user._id == blacklist[k]) {
 												result.splice(i, 1);
 												break;
 											}
@@ -170,7 +227,6 @@ let visitorController = {
 							res.json(result);
 							return;
 						}
-
 						res.json(result);
 					})
 				}

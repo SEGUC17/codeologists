@@ -35,9 +35,10 @@ function viewgames(req, res) {
 
     Game.find(function (err, games) {
         if (err)
-            res.json({error : err.message});
+            res.json({ error: err.message });
         else
             res.json(games);
+
     });
 };function requestgame(req, res, nxt) {
 
