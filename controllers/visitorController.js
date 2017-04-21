@@ -45,6 +45,7 @@ let visitorController = {
             req.checkBody('email', 'Email is required.').notEmpty();
             req.checkBody('location', 'Location is required.').notEmpty();
             req.checkBody('phone_number', 'Phone number is required.').notEmpty();
+            req.checkBody('phone_number', 'Phone number is not correct.').isNumeric();
             if(req.body.type=='player'){
             	req.checkBody('birthdate', 'Birthdate is required.').notEmpty();
             	req.checkBody('birthdate', 'Birthdate no in correct format').isDate();
@@ -76,6 +77,7 @@ let visitorController = {
 		            req.checkBody('email', 'Email not in correct format').isEmail();
 		            req.checkBody('location', 'Location is required.').notEmpty();
 		            req.checkBody('phone_number', 'Phone number is required.').notEmpty();
+		            req.checkBody('phone_number', 'Phone number is not correct.').isNumeric();
 		            if(req.body.type=='player'){
 			            req.checkBody('birthdate', 'Birthdate is required.').notEmpty();
 			            req.checkBody('birthdate', 'Birthdate no in correct format').isDate();

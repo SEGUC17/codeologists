@@ -28,7 +28,7 @@
 			login(){
 				this.form.submit('post','/login')
 				.then(res => {
-					console.log(res);
+					//console.log(res);
 					Event.$emit('loggedIn',{user:res.user,type:res.type});
 					this.$router.push('/');
 				})
