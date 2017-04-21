@@ -17,8 +17,23 @@ let routes = [
 	},
 
 	{
-		path: '/login',
-		component: require('./views/Login')
+		path: '/login-signup',
+		components:{
+			default : require('./views/Home'),
+			loginModal : require('./views/LoginSignup')
+		},
+
+		children: [
+        {
+          path: 'login',
+          component: require('./views/Login')
+        },
+        {
+          path: 'signup',
+          component: require('./views/Signup')
+        }
+      ]
+
 	},
 
 	{
@@ -27,9 +42,14 @@ let routes = [
 	},
 
 	{
-		path: '/signup',
-		component : require('./views/Signup')
-	}
+    	path:'/viewArenas',
+    	component: require('./views/Arenas.vue')
+    },
+
+    {
+    	path:'/arenaDetails',
+    	component: require('./views/ArenaDetails.vue')
+    }
 
 ];
 

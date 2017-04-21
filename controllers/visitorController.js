@@ -214,7 +214,7 @@ let visitorController = {
 
 										for (var k = 0; k < blacklist.length; k++) {//loop searching in blacklist of service provider
 
-											if (req.user._id == blacklist[k]) {
+											if (req.user && req.user._id == blacklist[k]) {
 												result.splice(i, 1);
 												break;
 											}
@@ -228,7 +228,6 @@ let visitorController = {
 							res.json(result);
 							return;
 						}
-
 						res.json(result);
 					})
 				}
