@@ -20,7 +20,10 @@
     created(){
       axios.get('/viewPlayerBookings')
       .then(res => this.bookings=res.data)
-      .catch(err => alert(err.response.data.error));
+      .catch(err => {
+        alert(err.response.data.error),
+        this.$router.push('/');
+    });
     },
 
     methods: {
