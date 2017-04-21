@@ -1,7 +1,9 @@
 var Player = require('../models/Player');
 var arenaController = require('./arenaController');
+var serviceProviderController = require('./serviceProviderController');
 var Arena = require('../models/Arena');
 var serviceProvider = require('../models/ServiceProvider');
+var async = require("async");
 var Booking = require('../models/Booking');
 var createBooking = function (req, res) {
     Player.findOne({ username: req.user.username }, function (err, player) {
@@ -14,10 +16,9 @@ var createBooking = function (req, res) {
                 res.json({ err: "Please log in as a Player first" });
             }
             else {
-                arenaController.bookHours(req.body.month, req.body.day, req.body.startIndex, req.body.endIndex, new Date(), req.params.arenaName, player._id, function (err2) {
+                (require('./arenaController')).bookHours(req.body.month, req.body.day, req.body.startIndex, req.body.endIndex, new Date(), req.params.arenaName, player._id, function (bookingErr) {
                     if (bookingErr) {
                         res.json({ err: bookingErr });
-
                     }
                     else {
                         res.json({ err: null });
@@ -184,8 +185,53 @@ function playerRateBooking(req, res) {
 
 }
 
+function viewBookings(req, res) {
+    Arena.findOne({name:req.params.arenaName}, function (err, foundArena) {
+        if (err) {
+            res.json({ error: err });
+        }
+        else if (!foundArena) {
+
+            res.json({ error: "Sorry Broken Link, this arena may have been deleted, removed or is no longer existant" });
+
+        }
+        else {
+            serviceProvider.findById(foundArena.service_provider, function (errSp, serviceProvider) {
+                console.log(foundArena.service_provider);
+                if (errSp) {
+                    res.json({ error: "Internal server Error, Sorry for the inconvenience !" });
+                }
+                else if (serviceProvider) {
+
+                    if (serviceProvider.username == req.user.username) {
+                        //find all pending requests where the request time is greater than today, the arena is the current arena  and have not been accepted
+                        Booking.find({ accepted: false, arena: foundArena.name }).$where('(new Date(new Date().getFullYear(),this.bookMonth,this.bookDay))>(new Date())').exec(function (arenaErr, bookingArr) {
+                          
+                            if (arenaErr) {
+                                res.json({ error: "Error finding pending requests" });
+                            }
+                            else {
+
+                                res.json(bookingArr);
+                            }
+
+                        })
+                    }
+                    else {
+                        res.json({ error: "sorry not your arena" });
+                    }
+                }
+                else {
+                    res.json({ error: "Internal Server Error sorry :'(" });
+                };
+            })
+
+        }
+    });
+}
+
 function acceptBooking(booking) {
-    Arena.findOne({ _id: booking.arena }, function (err, arenaa) {
+    Arena.findOne({ name : booking.arena }, function (err, arenaa) {
         var schedule = arenaa.schedule;
         var indices = serviceProviderController.getScheduleIndices(booking.bookMonth, booking.bookDay);
         var dayIndex = indices.dayIndex;
@@ -247,12 +293,12 @@ function acceptBooking2(req, res) {
         res.json(403,{error:'You are not authorized to do this'});
         return;
     }
-    Booking.findById(req.body.bookingId, function (err, bookingObj) {
+    Booking.findById(req.params.bookingID, function (err, bookingObj) {
         if (err || !bookingObj)
             res.json(400, {error :"no such booking or bad request"});
         else {
             var booking = bookingObj;
-            Arena.findOne({ _id: booking.arena }, function (err, arenaa) {
+            Arena.findOne({ name : booking.arena }, function (err, arenaa) {
                 if (!arenaa.service_provider.equals(req.user._id)) {
                     res.json(403,{error : 'You are not authorized to do this'});
                     return;
@@ -274,26 +320,32 @@ function acceptBooking2(req, res) {
                     res.json(400,{error:'This is not a free time'});
                 }
                 else {
-                    Booking.find({ arena: arenaa._id, bookDay: booking.bookDay, bookMonth: booking.bookMonth }
+                    Booking.find({ arena: arenaa.name, bookDay: booking.bookDay, bookMonth: booking.bookMonth }
                         , function (err, allBookings) {
                             if (!err && allBookings) {
                                 async.each(allBookings, function (currentBooking, callback) {
-                                    if (!(currentBooking.accepted) && !(currentBooking._id.equals(booking._id))) {
+                                    if (!(currentBooking.accepted) && !(currentBooking._id.equals(booking._id))) 
+                                    {
                                         var start1 = currentBooking.start_index;
                                         var end1 = currentBooking.end_index;
-                                        if ((start1 >= start && start1 <= end) || (end1 >= start && end1 <= end)) {
-                                            Arena.findOne({ _id: currentBooking.arena }, function (err, arenaa) {
-                                                if (!err && arenaa) {
+                                        if ((start1 >= start && start1 <= end) || (end1 >= start && end1 <= end)) 
+                                        {
+                                            Arena.findOne({ name: currentBooking.arena }, function (err, arenaa) 
+                                            {
+                                                if (!err && arenaa) 
+                                                {
                                                     var notification = 'Unfortunately,your booking on day ' + (currentBooking.bookDay) + ' on month ' +
                                                         (currentBooking.bookMonth) + ' for ' + (arenaa.name) + ' from '
                                                         + serviceProviderController.getTimeFromIndex(start1) + ' to ' 
                                                         + serviceProviderController.getTimeFromIndex(end1) + ' has been rejected';
-                                                    Player.findOne({ _id: currentBooking.player }, function (err, playerr) {
-                                                        if (!err && playerr) {
+                                                    Player.findOne({ _id: currentBooking.player }, function (err, playerr) 
+                                                    {
+                                                        if (!err && playerr) 
+                                                        {
                                                             playerr.notifications.push(notification);
                                                             playerr.save();
-                                                            Booking.remove({ _id: currentBooking._id }, function (err, result) {
-
+                                                            Booking.remove({ _id: currentBooking._id }, function (err, result) 
+                                                            {
                                                             });
                                                         }
                                                     });
@@ -330,26 +382,16 @@ function acceptBooking2(req, res) {
 }
 function handleBooking(id) {
     Booking.findOne({ _id: id }, function (err, booking2) {
-        if (err || !booking2)
-            res.json(400 ,{error :'There is no such booking'}  );
-        else
-            Arena.findOne({ _id: booking2.arena }, function (err, arena) {
-                if (err || !arena)
-                    res.json(400 , {error :'Not a valid booking'});
-                else
-                    ServiceProvider.findOne({ _id: arena.service_provider }, function (err, serviceProvider) {
-                        if (err || !serviceProvider)
-                            res.json(400 ,{error : 'Not a valid booking'});
-                        else {
-                            if (serviceProvider.mode == true)
-                                acceptBooking(booking2);
-                        }
-                    })
-            });
+        Arena.findOne({ name : booking2.arena }, function (err, arena) {
+            serviceProvider.findOne({ _id: arena.service_provider }, function (err, serviceProvider) {
+                if (serviceProvider.mode == true)
+                    acceptBooking(booking2);
+                })
+        });
     });
 }
 function rejectBooking(req, res) {
-    if (!(req.body.bookingId)){
+    if (!(req.params.bookingID)){
         res.json (400 ,{error :'Missing field'});
         return;
     }
@@ -357,13 +399,13 @@ function rejectBooking(req, res) {
         res.json(403 ,{error :'You are not authorized to do this'});
         return;
     }
-    var bookingID = req.body.bookingId;
+    var bookingID = req.params.bookingID;
     Booking.findOne({ _id: bookingID }, function (err, curBooking) {
         if (err || !curBooking) {
             res.json(400,{error :'Not a valid Booking'});
             return;
         }
-        Arena.findOne({ _id: curBooking.arena }, function (err, arenaa) {
+        Arena.findOne({ name: curBooking.arena }, function (err, arenaa) {
 
             var arenaName = arenaa.name;
             if (err || !arenaa) {

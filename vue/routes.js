@@ -32,7 +32,13 @@ let routes=[
 	{
 		path : '/changeMode',
 		component : require('./views/changeMode')
+	},
+	
+	{
+		path : '/ViewPendingBookings',
+		component : require('./views/ViewPendingBookings')
 	}
+
 
 ];
 

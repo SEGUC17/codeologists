@@ -1,4 +1,6 @@
 var serviceProviderController = require('./serviceProviderController');
+var bookingController = require('./bookingController');
+
 var ServiceProvider = require('../models/ServiceProvider');
 var Arena = require('../models/Arena');
 var Booking = require('../models/Booking');
@@ -8,8 +10,8 @@ var bookHours = function (month, day, startIndex, endIndex, timestamp, arenaName
     //create Booking
     var indices = serviceProviderController.getScheduleIndices(month, day);
 
-    Arena.findById(arenaID, function (err, foundArena) {
-
+    Arena.findOne({name : arenaName}, function (err, foundArena) {
+        console.log(err);
         if (!err && foundArena) {
             if (indices.dayIndex >= 0 && indices.weekIndex >= 0 && indices.dayIndex <= 6 && indices.weekIndex <= 3 && startIndex <= endIndex) {
                 if (checkAvailable(parseInt(endIndex, 10), foundArena.schedule[indices.weekIndex][indices.dayIndex], parseInt(startIndex, 10))) {
@@ -29,7 +31,7 @@ var bookHours = function (month, day, startIndex, endIndex, timestamp, arenaName
                                     callback(errSave);
                                 }
                                 else {
-                                    serviceProviderController.handleBooking(bookingObj._id);
+                                    bookingController.handleBooking(bookingObj._id);
                                     return callback(null);
                                 }
                             })
@@ -119,6 +121,23 @@ function editarena(req, res) {
         }
     });
 };
+
+const getArenas = function (req, res) {
+    if (req.user.type == 'ServiceProvider') {
+        Arena.find({ service_provider: req.user._id },'name', function (dbErr, arenaArr) {
+            if (dbErr)
+                res.status(500).json({ error: "Sorry We have Encountered an internal server error" });
+            else {
+                res.json(arenaArr);
+            }
+        })
+    }
+    else {
+        res.status(403).json({ error: "Please Log In as a Service Provider /Arena owner to view the list of pending booking requests" });
+    }
+}
+
+
 function editarenainfo(req, res) {
     console.log(req.body);
     var arenaid = req.params.arenaid;
@@ -500,5 +519,6 @@ let arenaController = {
     setUnavailable: setUnavailable,
     setAvailable: setAvailable,
     createArena: createArena,
+    getArenas : getArenas
 }
 module.exports = arenaController;

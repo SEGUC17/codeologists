@@ -55,6 +55,12 @@ router.get('/', function (req, res) {
     res.render('index');
 });
 
+
+router.get('/panel', function (req, res) {
+    res.render('serviceProviderControlPanel');
+});
+
+
 router.get('/register', function (req, res) {
     res.json({success:"choose type"});
 });
@@ -142,8 +148,8 @@ router.post('/cancelBooking/:bookingID', ensureAuthenticated, bookingController.
 
 router.post('/turnAcceptModeOn', ensureAuthenticated, serviceProviderController.turnAutoAcceptModeOn);
 router.post('/turnAcceptModeOff', ensureAuthenticated, serviceProviderController.turnAutoAcceptModeOff);
-router.post('/acceptBooking', ensureAuthenticated, bookingController.acceptBooking2);
-router.post('/rejectBooking', ensureAuthenticated, bookingController.rejectBooking);
+router.post('/acceptBooking/:bookingID', ensureAuthenticated, bookingController.acceptBooking2);
+router.post('/rejectBooking/:bookingID', ensureAuthenticated, bookingController.rejectBooking);
 router.post('/createGame', ensureAuthenticated, gameController.createGame);
 
 router.post("/sp/arena/:arena_id",ensureAuthenticated, function (req, res) {
@@ -157,9 +163,10 @@ router.get('/arena/:arenaName/viewBookings', ensureAuthenticated, bookingControl
 
 router.post('/arena/:arenaName/bookWeekly', ensureAuthenticated, playerController.bookWeekly);
 
-
 //book free hours
 router.post('/arena/:arenaName/bookHours', ensureAuthenticated, bookingController.createBooking);
+
+router.get('/getArenas',ensureAuthenticated,arenaController.getArenas);
 
 
 router.post('/RequestGame/:id', ensureAuthenticated, gameController.requestgame);

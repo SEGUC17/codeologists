@@ -1,6 +1,6 @@
 <template>
 <div>
-<label>Toggle the Mode  </label>
+<label>Toggle the Mode    :</label>
 <label class="switch">
   <input type="checkbox" v-on:click="notify()" :checked="mode" >
   <div class="slider round"></div>
@@ -68,7 +68,6 @@ input:checked + .slider:before {
 
 
 <script >
-	
 export default {
 		data(){
 			return {
@@ -79,13 +78,9 @@ export default {
 		created(){ 
 			axios.get('/getTheMode')
         .then(res => {
-        //  console.log(res)
           this.mode = res.data.mode;
-         // console.log(res.data.mode);
         })
         .catch(err => {
-          console.log(err.error);
-          alert("try again222");
         });
 		},
 
@@ -99,7 +94,7 @@ export default {
             this.mode = false;
           })
           .catch(err => {
-            alert("try again333");
+            this.$router.push('/');
           });
         }
         else
@@ -109,13 +104,10 @@ export default {
             this.mode = true;
           })
           .catch(err => {
-            alert("try again444");
+            this.$router.push('/');
           });
         }
       }
 		}
-
 	}
-
-
 </script>

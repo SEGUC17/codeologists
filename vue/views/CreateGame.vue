@@ -4,8 +4,6 @@
 
 	<div>
 		
-		<!--Start of edit arena info form-->
-
 		<form method="post" action="/createGame" @submit.prevent="createGame" @keydown="form.errors.clear($event.target.name)">
 			<div class="control">
 				<label for="name" class="label">Size</label>
@@ -32,16 +30,11 @@
 				<button class="button is-primary">Create a Game</button>
 			</div>
 		</form>
-
-		<!--End of edit arena info form-->
-		
-
 	</div>
 
 </template>
 
 <script>
-
 	export default {
 		data(){
 			return {
@@ -60,17 +53,13 @@
 
 		methods : {
 			createGame(){
-				//console.log(this.form.errors);
 				this.form.submit('post','/createGame')
 				.then(res => {
-					alert(res.success);
 					this.$router.push('/');
 				})
 				.catch(err => {
-					alert(err.error);
 				});
 			}
 		}
-
 	}
 </script>
