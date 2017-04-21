@@ -101,6 +101,12 @@
 
 								<router-link tag="li" to="/login" v-show="!user"><a>Login</a></router-link>
 
+
+								<router-link tag="li" to="/login"><a>login</a></router-link>
+								<router-link tag="li" to="/myrequests"><a>My requests</a></router-link>
+								<router-link tag="li" to="/games"><a>Available Games</a></router-link>
+								<router-link tag="li" to="/notifications"><a>Notifications</a></router-link>
+
 								<router-link tag="li" to="/signup" v-show="!user"><a>Signup</a></router-link>
 
 								<a v-show="user" @click="logout">Logout</a>

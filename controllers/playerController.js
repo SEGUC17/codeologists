@@ -142,6 +142,25 @@ let playerController = {
 
     });
   },
+  myNotifications:function(req,res){
+    var currentuser = req.user.username;
+   Player.findOne({ username: currentuser }, function (err,player) {
+        if (err) {
+        res.status(400).json({ error: err });
+        return;
+        } else {
+            // if(player==null){
+            //     res.json([]);
+            //     return;
+            // }
+            // console.log(player);
+            res.json(player.notifications);
+            return;
+        }
+    });
+  },
+
+
 }
 
 module.exports = playerController;

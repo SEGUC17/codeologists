@@ -83,10 +83,9 @@ let visitorController = {
 					player.phone_number = req.body.phone_number;
 					player.location = req.body.location;
 
-					
-
 					if (req.body.profile_pic.charAt(0)!='/')
 						player.profile_pic.data = req.body.profile_pic;
+
 					player.birthdate = req.body.birthdate;
 					player.ratings_count = 0;
 

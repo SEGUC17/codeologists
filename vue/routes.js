@@ -40,6 +40,22 @@ let routes = [
 		path : '/editArena',
 		component : require('./views/EditArena')
 	},
+  
+	{
+		path:'/myrequests',
+		component : require('./views/Myrequests')
+
+	},
+  
+	{
+		path:'/games',
+		component: require('./views/Games')
+	},
+  
+	{
+		path:'/notifications',
+		component: require('./views/Notifications')
+	},
 
 	{
     	path:'/viewArenas',

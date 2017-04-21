@@ -1,0 +1,26 @@
+<html>
+
+<body>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.0/css/bulma.css">
+<div id="root">
+  <div v-for="game in games">
+
+     <game :Creator="game.creator" :Size="game.size"  :Startdate="game.start_date" :Enddate="game.end_date" :Location="game.location" :id="game._id">
+     	<div class="tabs is-right">
+              <button type="button" @click="showmodal=true" >Send a request</button>
+    </div>
+     </game>
+     
+
+     <modal v-if="showmodal" @close="showmodal=false" ></modal>
+</div>
+</div>  
+
+<script src="https://unpkg.com/vue"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="/vue/main.js" ></script>
+
+
+</body>
+
+</html>
