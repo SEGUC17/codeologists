@@ -3,13 +3,13 @@
 
 
 	<div>
-		
+
 		<!--Start of edit arena info form-->
 
 		<form method="post" action="/editarenainfo" @submit.prevent="saveChanges" @keydown="form.errors.clear($event.target.name)">
 			<div class="control">
 				<label for="name" class="label">Rules and Regulations</label>
-				<input type="text" name="rules_and_regulations" class="input" placeholder="rules and regulations" v-model="form.rules_and_regulations" >
+				<input type="text" name="rules_and_regulations" class="input" placeholder="rules and regulations" v-model="form.rules_and_regulations">
 				<span class="help is-danger" v-if="form.errors.has('rules_and_regulations')" v-text="form.errors.get('rules_and_regulations')"></span>
 			</div>
 			<div class="control">
@@ -43,62 +43,202 @@
 		</form>
 
 		<!--End of edit arena info form-->
-		
-		<!--Start of adding a new arena image-->
 
-		<form method="post" action="/addimage" @submit.prevent="addImage" enctype="multipart/form-data">
-			
-			<input id="image" name="image" type="file">
+		<!--Start of images part-->
+
+		<!-- Start of display images-->
+
+		<!--img v-for="photo in photos" class="mySlides" :src="getPath(photo)" style="width:100%"-->
+
+		<div class="w3-row-padding">
+			<div class="w3-third" v-for="photo in photos">
+				<img :src="getPath(photo)" style="width:100%" @click="dispalyImage(getPath(photo))" alt="arena image">
+			</div>
+		</div>
+
+		<!-- Modal for full size images on click-->
+		<div id="modal01" class="w3-modal w3-black" style="padding-top:0" onclick="this.style.display='none'">
+			<div class="w3-modal-content w3-animate-zoom w3-center w3-transparent w3-padding-64">
+				<img id="img01" class="w3-image">
+			</div>
+		</div>
+
+		<!-- End of display images-->
+
+
+		<form autocomplete="off" method="POST" enctype="multipart/form-data" @submit.prevent="addImage">
+
+			<label for="new_image">New Image</label><br>
+			<input id="new_image" type="file" class="form-control" name="new_image" accept="image/*" @change="onFile" multiple><br>
 
 			<div class="control">
-				<button class="button is-primary">Add Image</button>
+				<button class="button is-primary">Add</button>
 			</div>
-
 		</form>
 
-		<!--End of adding a new arena image-->
+		<!--End of images part-->
+
+		<!--Start of the schedule part-->
+		<h5>{{days[currentDay]}}</h5>
+		<div class="w3-dropdown-hover">
+			<button class="w3-button w3-black">Choose Day</button>
+			<div class="w3-dropdown-content w3-bar-block w3-border">
+				<a v-for="i in 7" class="w3-bar-item w3-button" @click="selectDay(i-1)">{{days[i-1]}}</a>
+			</div>
+		</div>
+
+
+		<table v-for="j in 7" v-if="j-1==currentDay" class="table is-bordered">
+			<tr>
+				<td v-for="i in 12" :class="{ 'w3-pale-red': schedule[j-1][i-1]==-1, 'w3-pale-green': schedule[j-1][i-1]==0 }">
+					<p>{{slots[i-1]}}</p>
+					<input type="checkbox" name="daySlot" @click="toggleSlot(j-1,i-1)" :checked="schedule[j-1][i-1]==-1">
+				</td>
+			</tr>
+
+			<tr>
+				<td v-for="i in 12" :class="{ 'w3-pale-red': schedule[j-1][i+11]==-1, 'w3-pale-green': schedule[j-1][i+11]==0 }">
+					<p>{{slots[11+i]}}</p>
+					<input type="checkbox" name="daySlot" @click="toggleSlot(j-1,i+11)" :checked="schedule[j-1][11+i]==-1">
+				</td>
+			</tr>
+
+			<tr>
+				<td v-for="i in 12" :class="{ 'w3-pale-red': schedule[j-1][23+i]==-1, 'w3-pale-green': schedule[j-1][23+i]==0 }">
+					<p>{{slots[23+i]}}</p>
+					<input type="checkbox" name="daySlot" @click="toggleSlot(j-1,i+23)" :checked="schedule[j-1][23+i]==-1">
+				</td>
+			</tr>
+
+			<tr>
+				<td v-for="i in 12" :class="{ 'w3-pale-red': schedule[j-1][35+i]==-1, 'w3-pale-green': schedule[j-1][35+i]==0 }">
+					<p>{{slots[35+i]}}</p>
+					<input type="checkbox" name="daySlot" @click="toggleSlot(j-1,i+35)" :checked="schedule[j-1][35+i]==-1">
+				</td>
+			</tr>
+		</table>
+
+		<button @click="updateSchedule">Update Schedule</button>
+
+		<!--End of the schedule part-->
 
 	</div>
 
 </template>
 
 <script>
-
 	export default {
-		data(){
+		data() {
 			return {
-				form : new Form({
-					rules_and_regulations : '',
-					location : '',
-					address : '',
-					size : '',
-					price : '',
-					type : ''
-				})
+				form: new Form({
+					rules_and_regulations: '',
+					location: '',
+					address: '',
+					size: '',
+					price: '',
+					type: ''
+				}),
+				photos: {},
+				files: '',
+				schedule: [],
+				slots: [],
+				days: [],
+				currentDay: 0
 			}
 		},
 
-		created(){
-			Event.$on('edit-arena',arena=> {
-				this.form=new Form(arena);
+		created() {
+			Event.$on('edit-arena', arena => {
+				this.form = new Form(arena);
+				this.photos = [].concat(arena.photos);
+				this.schedule = arena.default_weekly_schedule;
+				this.slots = new Array(48);
+				var start = 11;
+				var am = true;
+				for (var i = 0; i < 48; i += 2) {
+					var t1 = (start % 12 + 1) + ":00";
+					var t2 = (start % 12 + 1) + ":30";
+					var t3 = ((start + 1) % 12 + 1) + ":00";
+					this.slots[i] = t1 + " : " + t2 + (am ? " AM" : " PM");
+					this.slots[i + 1] = t2 + " : " + t3 + (am ? " AM" : " PM");
+					start++;
+					if (i == 22)
+						am = false;
+				}
+
+				this.days = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+				this.currentDay = 0;
+
+
 			});
 		},
 
-		methods : {
-			saveChanges(){
-				this.form.submit('post','/editarenainfo/'+this.form._id)
-				.then(arena => {
-					this.$router.push('/myArenas');
-				})
-				.catch(err => {
-					alert(err);
-				});
+		methods: {
+			saveChanges() {
+				this.form.submit('post', '/editarenainfo/' + this.form._id)
+					.then(arena => {
+						this.$router.push('/myArenas');
+					})
+					.catch(err => {
+						alert(err);
+					});
 			},
 
-			addImage(){
-				alert("hey");
+			addImage() {
+				var dataForm = new FormData();
+				dataForm.append('new_image', this.files[0]);
+				axios.post('/addarenaimage/' + this.form._id, dataForm)
+					.then(arena => {
+						this.$router.push('/myArenas');
+					})
+					.catch(err => {
+						alert(err);
+					});
+			},
+
+			onFile(event) {
+				this.files = event.target.files
+			},
+
+			getPath(photo) {
+				return 'data:image/*;base64,' + (new Buffer(photo.data.data).toString('base64'));
+			},
+
+			// Modal Image Gallery
+			dispalyImage(element) {
+				document.getElementById("img01").src = element;
+				document.getElementById("modal01").style.display = "block";
+			},
+
+			selectDay(day) {
+				this.currentDay = day;
+			},
+
+			toggleSlot(day, slot) {
+				if (this.schedule[day][slot] == 0) {
+					this.schedule[day][slot] = -1;
+				} else {
+					this.schedule[day][slot] = 0;
+				}
+			},
+
+			updateSchedule() {
+				var x = [];
+				for (var i = 0; i < 7; i++)
+					for (var j = 0; j < 48; j++)
+						if (this.schedule[i][j] == -1)
+							x.push(i + "," + j);
+				axios.post('/editdefaultschedule/' + this.form._id, querystring.stringify({ schedule: x }), { headers: { "Content-Type": "application/x-www-form-urlencoded" } })
+					.then(arena => {
+						this.$router.push('/myArenas');
+					})
+					.catch(err => {
+						alert(err);
+					});
 			}
+
 		}
 
 	}
+
 </script>

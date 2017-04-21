@@ -1,4 +1,5 @@
 <template>
+
 		<form action="/login" method="post" @submit.prevent="login" @keydown="error=false">
 			<input type="text" name="username" v-model="form.username" class="input" placeholder="Username">	
 			<input type="password" name="password" v-model="form.password" class="input" placeholder="Password">
