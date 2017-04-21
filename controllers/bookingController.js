@@ -32,7 +32,7 @@ var createBooking = function (req, res) {
 }
 
 function viewBookings(req, res) {
-    Arena.findOne({name:req.params.arenaName}, function (err, foundArena) {
+    Arena.findOne({ name: req.params.arenaName }, function (err, foundArena) {
         if (err) {
             res.json({ err: err });
         }
@@ -134,11 +134,10 @@ var cancelBooking = function (req, res) {
 };
 function playerRateBooking(req, res) {
 
-          if(!req.body.rating || parseInt(req.body.rating) > 5 || parseInt(req.body.rating) < 1)
-          {
-            res.status(400).json({error: "bad request, enter a proper rating!"});
-            return;
-          }
+    if (!req.body.rating || parseInt(req.body.rating) > 5 || parseInt(req.body.rating) < 1) {
+        res.status(400).json({ error: "bad request, enter a proper rating!" });
+        return;
+    }
 
     Booking.findOne({ _id: req.params.id }, function (err, booking) {
         booking.arena_rating = parseInt(req.body.rating);
@@ -146,18 +145,18 @@ function playerRateBooking(req, res) {
         //save arena rating at booking
         booking.save(function (err) {
             if (err) {
-                res.json({error: err.message});
+                res.json({ error: err.message });
                 return;
             }
         });
         Arena.findOne({ _id: booking.arena }, function (err, arena) {
             var rating = parseInt(req.body.rating);
             if (err) {
-                res.json({error: err.message});
+                res.json({ error: err.message });
                 return;
             }
             if (!arena) {
-                res.status(404).json({error: "arena not found!"});
+                res.status(404).json({ error: "arena not found!" });
                 return;
             }
 
@@ -174,7 +173,7 @@ function playerRateBooking(req, res) {
             // save rating at arena
             arena.save(function (err) {
                 if (err) {
-                    res.json({error: err.message});
+                    res.json({ error: err.message });
                     return;
                 }
             });
@@ -387,61 +386,60 @@ function rejectBooking(req, res) {
         });
     });
 }
- function providerRateBooking (req, res) {
-   if(!req.body.rating || parseInt(req.body.rating) > 5 || parseInt(req.body.rating) < 1)
-   {
-     res.status(400).json({error: "bad request, enter a proper rating!"});
-     return;
+function providerRateBooking(req, res) {
+    if (!req.body.rating || parseInt(req.body.rating) > 5 || parseInt(req.body.rating) < 1) {
+        res.status(400).json({ error: "bad request, enter a proper rating!" });
+        return;
     }
 
-            Booking.findOne({ _id: req.params.id }, function (err, booking) {
+    Booking.findOne({ _id: req.params.id }, function (err, booking) {
+        if (err) {
+            res.json({ error: err.message });
+            return;
+        }
+        if (!booking)
+            res.status(404).json({ error: "booking not found" });
+
+        booking.player_rating = parseInt(req.body.rating);
+        booking.save(function (err) {
+            if (err) {
+                res.json({ error: err.message });
+                return;
+            }
+        });
+        res.json(booking);
+        // find player
+        Player.findOne({ _id: booking.player }, function (err, player) {
+            var rating = parseInt(req.body.rating);
+            if (err) {
+                res.json({ error: err.message });
+                return;
+            }
+            if (!player) {
+                res.status(404).json({ error: "player not found!" });
+                return;
+            }
+            // update rating
+            if (!player.ratings_count)
+                player.ratings_count = 0;
+
+            if (!player.avg_rating)
+                player.avg_rating = 0;
+
+            player.avg_rating = ((player.avg_rating * player.ratings_count) + rating) / (player.ratings_count + 1);
+
+            player.ratings_count++;
+            // save rating at player
+            player.save(function (err) {
                 if (err) {
-                    res.json({error: err.message});
+                    res.json({ error: err.message });
                     return;
                 }
-                if (!booking)
-                    res.status(404).json({error: "booking not found"});
-
-                booking.player_rating = parseInt(req.body.rating);
-                booking.save(function (err) {
-                    if (err) {
-                        res.json({error: err.message});
-                        return;
-                    }
-                });
-                res.json(booking);
-                // find player
-                Player.findOne({ _id: booking.player }, function (err, player) {
-                    var rating = parseInt(req.body.rating);
-                    if (err) {
-                        res.json({error: err.message});
-                        return;
-                    }
-                    if (!player) {
-                        res.status(404).json({error: "player not found!"});
-                        return;
-                    }
-                    // update rating
-                    if (!player.ratings_count)
-                        player.ratings_count = 0;
-
-                    if (!player.avg_rating)
-                        player.avg_rating = 0;
-
-                    player.avg_rating = ((player.avg_rating * player.ratings_count) + rating) / (player.ratings_count + 1);
-
-                    player.ratings_count++;
-                    // save rating at player
-                    player.save(function (err) {
-                        if (err) {
-                            res.json({error: err.message});
-                            return;
-                        }
-                    });
-                });
-
             });
-        }
+        });
+
+    });
+}
 
 let bookingController = {
     createBooking: createBooking,
@@ -451,7 +449,7 @@ let bookingController = {
     acceptBooking2: acceptBooking2,
     playerRateBooking: playerRateBooking,
     handleBooking: handleBooking,
-    rejectBooking:rejectBooking,
-    providerRateBooking :providerRateBooking,
+    rejectBooking: rejectBooking,
+    providerRateBooking: providerRateBooking,
 }
 module.exports = bookingController;

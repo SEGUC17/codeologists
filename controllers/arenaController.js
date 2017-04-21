@@ -171,10 +171,11 @@ function editdefaultschedule(req, res, nxt) {
             return res.status(400).json({ error: 'the arena is not found' });
         }
         if (req.user && arena.service_provider == req.user._id) {
-            var new_sch = new Array(7).fill(new Array(48).fill(0));
+            var new_sch = new Array(7);
+            for (var i = 0; i < 7; i++)
+                new_sch[i] = new Array(48).fill(0);
             if (req.body.schedule) {
                 var ds = req.body.schedule;
-
                 for (var i = 0; i < ds.length; i++) {
                     var sa = ds[i].split(",");
                     var x = parseInt(sa[0]);
