@@ -47,10 +47,10 @@ let playerController = {
 
        if(errors)
        return res.status(400).json({errors,result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate())});
-       
+
         hasher(req.body.old_password).verifyAgainst(result.password, function (err, verified) {
           if (!verified) {
-            res.status(422).json({ error: "wrong password !", result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate()) });
+            res.status(422).json({ errors:[{param : 'old_password',msg:'wrong password !'}], result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate()) });
             return;
           }
           else {
@@ -109,3 +109,4 @@ let playerController = {
 }
 
 module.exports = playerController;
+
