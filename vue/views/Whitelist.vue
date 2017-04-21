@@ -36,7 +36,6 @@
 
 
 
-
 <script>
     export default {
 
@@ -49,7 +48,7 @@
         },
         mounted() {
 
-            axios.get('/profile/blackList',
+            axios.get('/profile/whiteList',
                     querystring.stringify({
 
                     }), {
@@ -60,10 +59,10 @@
                 .then(res => {
                     this.showPlayers(res.data.players)
 
-                })
-                .catch(err => {
+                }).catch(err => {
                     alert("please login")
                 })
+
         },
 
         methods: {
@@ -72,10 +71,9 @@
                     this.addNewPlayer(players[i]);
 
             },
-
             remove(player, index) {
 
-                axios.post('/profile/removeblacklist',
+                axios.post('/profile/removewhitelist',
                         querystring.stringify({
                             "PlayerUsername": player.username
                         }), {
@@ -94,19 +92,20 @@
                         alert(err.response.data.error)
                     });
             },
+
             addNewPlayer(listedPlayer) {
                 var player = {
                     name: listedPlayer.name,
                     username: listedPlayer.username,
                     phone: listedPlayer.phone_number,
-                    photo: listedPlayer.profile_pic
+                    // photo: listedPlayer.profile_pic
                 };
                 this.players.push(player)
                 this.PlayerInfo = ''
             },
             onSubmit: function() {
                 if (isNaN(this.PlayerInfo)) {
-                    axios.post('/profile/blacklist',
+                    axios.post('/profile/whitelist',
                             querystring.stringify({
                                 "PlayerUsername": this.PlayerInfo
                             }), {
@@ -125,7 +124,7 @@
                         });
 
                 } else {
-                    axios.post('/profile/blacklist/phone',
+                    axios.post('/profile/whitelist/phone',
                             querystring.stringify({
                                 "phoneNumber": this.PlayerInfo
                             }), {

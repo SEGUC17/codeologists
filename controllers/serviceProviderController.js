@@ -85,6 +85,36 @@ let serviceProviderController = {
             }
         });
     },
+
+    showblacklist: function(req, res) {
+
+        var serviceProviderUsername = req.user.username;
+
+        ServiceProvider.findOne({ username: serviceProviderUsername }, function(err, serviceProvider) {
+
+            if (err) {
+                return res.json(500, { error: err });
+            }
+            if (serviceProvider == null) {
+                return res.json(403, { error: "Please log in as a Service Provider" });
+            }
+            var blacklist = serviceProvider.blacklist;
+            var players = [];
+
+
+            async.each(blacklist, function(currentPlayer, callback) {
+                Player.findById(currentPlayer, function(err2, player) {
+                    players.push(player);
+                    callback();
+
+                })
+            }, function() {
+                res.json({ players: players })
+            })
+
+        })
+    },
+
     /**
      * adds a player to the black list using username.
      */
@@ -92,7 +122,7 @@ let serviceProviderController = {
 
         var playerUsername = req.body.PlayerUsername;
         var serviceProviderUsername = req.user.username;
-        console.log(playerUsername);
+
         ServiceProvider.findOne({ username: serviceProviderUsername }, function(err, serviceProvider) {
 
             if (err) {
@@ -116,12 +146,18 @@ let serviceProviderController = {
                         return res.json(400, { error: "This player is already black listed" });
                     }
                 }
+                for (var i = 0; i < serviceProvider.whitelist.length; i++) {
+                    if (serviceProvider.whitelist[i].equals(player._id)) {
+                        return res.json(400, { error: "This player is already white listed" });
+                    }
+                }
+
                 serviceProvider.blacklist.push(player);
                 serviceProvider.save(function(err3) {
                     if (err3)
                         return res.json(500, { error: "Error in operation. Try again" });
                 });
-                res.json({ message: "Successfully added to blacklist" });
+                res.json({ listedPlayer: player, message: "Successfully added to Blacklist" });
             });
         });
     },
@@ -157,12 +193,18 @@ let serviceProviderController = {
                         return res.json(400, { error: "This player is already black listed" });
                     }
                 }
+                for (var i = 0; i < serviceProvider.whitelist.length; i++) {
+                    if (serviceProvider.whitelist[i].equals(player._id)) {
+                        return res.json(400, { error: "This player is already white listed" });
+                    }
+                }
+
                 serviceProvider.blacklist.push(player);
                 serviceProvider.save(function(err3) {
                     if (err3)
                         return res.json(500, { error: "Error in operation. Try again" });
                 });
-                res.json({ message: "Successfully added to Blacklist" });
+                res.json({ listedPlayer: player, message: "Successfully added to Blacklist" });
             });
         });
     },
@@ -210,7 +252,34 @@ let serviceProviderController = {
             });
         });
     },
+    showwhitelist: function(req, res) {
 
+        var serviceProviderUsername = req.user.username;
+
+        ServiceProvider.findOne({ username: serviceProviderUsername }, function(err, serviceProvider) {
+
+            if (err) {
+                return res.json(500, { error: err });
+            }
+            if (serviceProvider == null) {
+                return res.json(403, { error: "Please log in as a Service Provider" });
+            }
+            var whitelist = serviceProvider.whitelist;
+            var players = [];
+
+
+            async.each(whitelist, function(currentPlayer, callback) {
+                Player.findById(currentPlayer, function(err2, player) {
+                    players.push(player);
+                    callback();
+
+                })
+            }, function() {
+                res.json({ players: players })
+            })
+
+        })
+    },
     /**
      * adds a player to the black list using username.
      */
@@ -242,12 +311,18 @@ let serviceProviderController = {
                         return res.json(400, { error: "This player is already Whitelisted" });
                     }
                 }
+                for (var i = 0; i < serviceProvider.blacklist.length; i++) {
+                    if (serviceProvider.blacklist[i].equals(player._id)) {
+                        return res.json(400, { error: "This player is already black listed" });
+                    }
+                }
+
                 serviceProvider.whitelist.push(player);
                 serviceProvider.save(function(err3) {
                     if (err3)
                         return res.json(500, { error: "Error in operation. Try again" });
                 });
-                res.json({ message: "Successfully added to Whitelist" });
+                res.json({ listedPlayer: player, message: "Successfully added to Whitelist" });
             });
         });
     },
@@ -283,12 +358,18 @@ let serviceProviderController = {
                         return res.json(400, { error: "This player is already white listed" });
                     }
                 }
+                for (var i = 0; i < serviceProvider.blacklist.length; i++) {
+                    if (serviceProvider.blacklist[i].equals(player._id)) {
+                        return res.json(400, { error: "This player is already black listed" });
+                    }
+                }
+
                 serviceProvider.whitelist.push(player);
                 serviceProvider.save(function(err3) {
                     if (err3)
                         return res.json(500, { error: "Error in operation. Try again" });
                 });
-                res.json({ message: "Successfully added to Whitelist" });
+                res.json({ listedPlayer: player, message: "Successfully added to Whitelist" });
 
             });
         });
@@ -382,7 +463,7 @@ let serviceProviderController = {
 
                 hasher(req.body.old_password).verifyAgainst(result.password, function(err, verified) {
                     if (err) {
-                        console.log("error 1");
+                        // console.log("error 1");
                         res.send(err);
                         return;
                     } else {

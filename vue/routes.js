@@ -28,6 +28,10 @@ let routes = [{
     {
         path: '/blackList',
         component: require('./views/Blacklist')
+    },
+    {
+        path: '/whiteList',
+        component: require('./views/Whitelist')
     }
 ];
 
