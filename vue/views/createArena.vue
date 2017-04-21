@@ -8,6 +8,7 @@
       <input type="text" placeholder="Arena location" v-model = "form.location" required="true"> <br>
       <input type="text" placeholder="Arena type" v-model = "form.type" required="true"> <br>
       <input type="text" placeholder="Arena price" v-model = "form.price" required="true"> <br>
+      <input type="text" placeholder="Rules and regulations" v-model = "form.rules_and_regulations" required="true"> <br>
       <div class="control">
         <button class="button is-primary">Add Arena</button>
       </div>
@@ -25,7 +26,8 @@
           location: '',
           size: '',
           type: '',
-          price:''
+          price:'',
+          rules_and_regulations:''
         })
       }
     },
@@ -40,7 +42,12 @@
 					     alert('arena added');
 				})
 				.catch(err => {
-					alert(err);
+          console.log('hi');
+          console.log(err);
+          if(err.error)
+            alert(err.error);
+          else
+					     alert(err);
 				});
       }
     }

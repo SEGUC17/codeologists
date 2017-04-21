@@ -358,13 +358,13 @@ function setAvailable(req, res) {
     }
 }
 function createArena(req, res) {
-    if(!user)
+    if(!req.user)
     {
-      res.json({error:'This action can not be done'});
+      res.json(400, {error:'Please log in first'});
       return;
     }
     if (req.user && (req.user.type != "ServiceProvider")) {
-        res.json({error: "Not authenticated user"});
+        res.json(400, {error: "You are not authorized to do this action"});
         return;
     }
 
@@ -381,7 +381,7 @@ function createArena(req, res) {
     var avg_rating = 0;
 
     if (!name || !address || !location || !size || !type || !price) {
-        res.json({error: "missing input"});
+        res.json(400, {error: "missing input"});
         return;
     }
 
@@ -486,7 +486,7 @@ function createArena(req, res) {
 
             newArena.save(function (err, doc) {
                 if (err)
-                    res.send(err);
+                    res.json(500, { error: err.message });
                 else
                     res.json(doc);
             });

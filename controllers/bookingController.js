@@ -3,6 +3,7 @@ var arenaController = require('./arenaController');
 var Arena = require('../models/Arena');
 var serviceProvider = require('../models/ServiceProvider');
 var Booking = require('../models/Booking');
+var serviceProviderController = require('./serviceProviderController');
 var createBooking = function (req, res) {
     Player.findOne({ username: req.user.username }, function (err, player) {
         if (req.body.month && req.body.month && req.body.startIndex && req.body.endIndex) {
@@ -76,28 +77,28 @@ function viewBookings(req, res) {
 }
 var cancelBooking = function (req, res) {
     if (req.user.type != 'Player') {
-        res.send("You are not authorized to view this page");
+        res.json(400, {error : "You are not authorized to view this page"});
         return;
     }
     var player = req.user._id;
-    var arena = req.body.arenaID;
+    var arena = req.body.arena;
     var bookingID = req.params.bookingID;
     var status;
     var day, week, start, end;
     var id;
     if (!player || !arena || !bookingID) {
-        res.send("missing parameters");
+        res.json(400, {error: "missing parameters"});
         return;
     }
     Booking.findOne({
         _id: bookingID
     }, function (err, book) {
         if (!book || !(book.player.equals(player))) {
-            res.send("This Action can not be done.");
+            res.json(400, {error: "This Action can not be done."});
             return;
         }
         if (err)
-            res.send(err);
+            res.json(500, {error: err.message});
         else {
             status = book.accepted;
             var obj = serviceProviderController.getScheduleIndices(book.bookMonth, book.bookDay);
@@ -108,7 +109,7 @@ var cancelBooking = function (req, res) {
             id = book._id;
 
             if (status) {
-                Arena.findOne({ _id: arena }, function (err, doc) {
+                Arena.findOne({ name: arena }, function (err, doc) {
                     for (var i = 0; i < 48; i++) {
                         var currDay = doc.schedule[week][day];
                         if (i >= start && i <= end && currDay[i].equals(id))
@@ -117,7 +118,7 @@ var cancelBooking = function (req, res) {
                     doc.markModified('schedule');
                     doc.save(function (err) {
                         if (err)
-                            res.send(err);
+                          res.json(500, {error: err.message});
                     });
                 });
             }
@@ -125,13 +126,38 @@ var cancelBooking = function (req, res) {
             Booking.remove({
                 _id: bookingID
             }, function (err) {
-                if (err) { res.send(err); }
+                if (err) {res.json(500, {error: err.message});
+               }
+               else {
+                 res.json({message: 'success'});
+               }
             });
         }
     });
 
 
 };
+
+var viewPlayerBookings = function (req, res){
+  console.log(req.user);
+  console.log(req.body);
+   if(req.user.type != 'Player')
+   {
+     res.json(400,{error: "You are not authorized to view this page"});
+   }
+   else {
+
+      Booking.find({player : req.user._id},function(err,arenas){
+          if(err){
+              return res.json({error : err});
+          }else{
+              return res.json(arenas);
+          }
+      });
+
+     }
+};
+
 function playerRateBooking(req, res) {
 
           if(!req.body.rating || parseInt(req.body.rating) > 5 || parseInt(req.body.rating) < 1)
@@ -453,5 +479,6 @@ let bookingController = {
     handleBooking: handleBooking,
     rejectBooking:rejectBooking,
     providerRateBooking :providerRateBooking,
+    viewPlayerBookings: viewPlayerBookings,
 }
 module.exports = bookingController;

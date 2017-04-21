@@ -11,23 +11,35 @@
   export default({
     data() {
       return {
-        bookings: [{id: '2', arena: '123'],
-    }
-  },
-    created(){
-
+        bookings: []
+      }
 		},
+    created(){
+      axios.get('/viewPlayerBookings')
+      .then(res => this.bookings=res.data)
+      .catch(err => alert(err));
+    },
 
     methods: {
       cancel(booking){
         if(confirm('Are you sure you want to delete this booking?'))
         {
-          axios.post('/cancelBooking/'+booking.id,querystring.stringify({arenaID: booking.arena}),{headers : { "Content-Type": "application/x-www-form-urlencoded" }})
+          axios.post('/cancelBooking/'+booking._id,querystring.stringify({arena: booking.arena}),{headers : { "Content-Type": "application/x-www-form-urlencoded" }})
               .then(response => {
                 alert('Successfully deleted');
+                axios.get('/viewPlayerBookings')
+                .then(res => this.bookings=res.data)
+                .catch(err => alert(err));
               })
-              .catch(error => {
-                alert('Error occured');
+              .catch(err => {
+                if(err.error)
+                  alert(err.error)
+                else
+                  if(err.message)
+                    alert(err.message);
+                  else {
+                    alert(err);
+                  }
               });
         }
       }

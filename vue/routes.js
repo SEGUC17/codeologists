@@ -39,6 +39,16 @@ let routes=[
 	{
 		path: '/cancelBooking',
 		component: require('./views/delete_booking')
+	},
+
+	{
+		path: '/registerPlayer',
+		component: require('./views/regPlayer')
+	},
+
+	{
+		path: '/registerSP',
+		component: require('./views/regSP')
 	}
 
 ];
