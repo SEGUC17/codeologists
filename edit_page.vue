@@ -35,7 +35,7 @@
        <input type="file" name="profile_pic" class="input" placeholder="Profile picture" v-on:change="onFile" multiple>
      </div>
      <div class="field">
-       <label  class="label">Curren Password</label>
+       <label  class="label">Current Password</label>
        <input type="password" name="password" class="input" placeholder="Current Password" v-model="old_password" @keydown="delete errors['old_password']">
        <span class="help is-danger" v-if="errors.hasOwnProperty('old_password')" v-text="errors['old_password']"></span>
      </div>
@@ -85,7 +85,7 @@
               <input type="radio" id="off" name="mode"  v-on:change="onMode" class="radio" checked><br>
           </div>
           <div class="field">
-            <label  class="label">Curren Password</label>
+            <label  class="label">Current Password</label>
             <input type="password" name="password" class="input" placeholder="Current Password" v-model="old_password" @keydown="delete errors['old_password']">
             <span class="help is-danger" v-if="errors.hasOwnProperty('old_password')" v-text="errors['old_password']"></span>
           </div>
