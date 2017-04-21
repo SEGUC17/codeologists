@@ -2,7 +2,8 @@ var Vue = require('vue');
 var axios = require('axios');
 window.Vue = Vue;
 window.axios = axios;
-window.Event =new Vue();
+window.Event = new Vue();
+window.querystring = require('querystring');
 import vueRouter from 'vue-router';
 import router from './router.js'
 import booking from './components/booking.vue';
@@ -11,11 +12,11 @@ import calender from './components/calender.vue';
 import calenderHeader from './components/calenderHeader.vue';
 import month from './components/month.vue';
 import dayDetails from './views/dayDetails';
-Vue.component('day',day);
-Vue.component('calender',calender);
-Vue.component('calenderHeader',calenderHeader);
-Vue.component('month',month);
-Vue.component('dayDetails',dayDetails);
+Vue.component('day', day);
+Vue.component('calender', calender);
+Vue.component('calenderHeader', calenderHeader);
+Vue.component('month', month);
+Vue.component('dayDetails', dayDetails);
 Vue.use(vueRouter);
 //handle errors
 var viewBookings = new Vue({
@@ -25,20 +26,15 @@ var viewBookings = new Vue({
         Bookings: [],
         myArenas: [],
     },
-    components: {'booking': booking},
+    components: { 'booking': booking },
     created() {
         this.getArenas();
 
     },
     methods: {
         selectArena: function (arenaName) {
-            //get Bookings
-
-
-            axios.get('/arena/' + arenaName + '/viewBookings').then(function (res) {
-                this.Bookings = res.data;
-                window.alert("finished");
-            }).catch(err => this.Bookings = []);
+            //Service provider slects an arena to view pending bookings in that arena
+            axios.get('/arena/' + arenaName + '/viewBookings').then((res) => this.Bookings = res.data).catch(err => this.Bookings = []);//if not logged in redirect to log in page
 
 
 
@@ -54,24 +50,27 @@ var viewBookings = new Vue({
 });
 
 var bookHours = new Vue({
-    el:"#schedlueRoot",
-    components:{day,calender,dayDetails},
-    router:router,
-    methods:{
-        hideDayDetails:function(){
-            this.dayDetailsShown=false;
-        },
-        showDayDetails:function(){
+    el: "#schedlueRoot",
+    components: { day, calender, dayDetails },
+    router: router,
+    methods: {
+        redirect(data) {
             
-            this.dayDetailsShown=true;
+           //if(data.month == (new Date().getMonth()))
+             if(false)   
+                router.replace('/dayDetail/' + data.day);
+            else
+               router.replace('/dayDetail/22');
+           
         }
     },
-    data:{
-        dayDetailsShown:true,
+    data: {
+
+
+
     },
-    created(){
-        Event.$on('showagain',this.showDayDetails);
-        Event.$on('hide',this.hideDayDetails);
+    created() {
+        Event.$on('calendercreated', (data) => this.redirect(data));
     }
 })
 

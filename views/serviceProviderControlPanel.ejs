@@ -4,9 +4,8 @@
 </head>
 <body>
 
-<div id="schedlueRoot">
+<div id="schedlueRoot" v-if="true">
 <calender></calender>
-<router-view   v-show="dayDetailsShown" ></router-view>
 </div>
 <div   id="viewBookingsRoot">
 
@@ -14,7 +13,7 @@
     <button  v-for="arena in myArenas"  @click="selectArena(arena.name)"> {{arena.name}}</button>
 </div>
 
-<booking v-for = "Booking in Bookings" :key="Booking._id"> <template slot="player">{{Booking.playerName}}</template></booking>
+<booking v-for = "Booking in Bookings" :key="Booking._id" :bookingID="Booking._id"> <template slot="player">{{Booking.playerName}}</template></booking>
 </div>
 </body>
 <script src="./js/app.js"></script>

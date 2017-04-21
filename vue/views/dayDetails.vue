@@ -1,6 +1,7 @@
 <template>
 
-<div>
+<div v-if="shown">
+   Reservation day: {{day}}
    <button v-on:click="hideMe">Close Me </button>
    <div>
    <label>Booking Start Time</label>
@@ -25,6 +26,9 @@
   </tr>
    </table>
    <button v-on:click="bookHours" v-if="startTime != null && endTime != null">book NOW ! </button>
+   <div id="error">
+    <label v-if="error">Sorry Could not complete your booking</label>
+   </div>
 </div>
 </template>
 <script>
@@ -32,31 +36,31 @@
         data(){
             return{
                 shown:true,
-                schedule:[-1,0,0,0,-1,0,0,-1,0,-1,-1,0,-1,0,0,0,-1,0,0,0,-1,0,0,0,-1,0,0,0,-1,0,0,0,-1,0,0,0,-1,0,0,0,-1,0,0,0,-1,-1,-1,-1],
+                schedule:{},
                 startTime:null,
-                endTime:null
+                endTime:null,
+                day:null,
+                month:null,
+                error:false,
+                arenaName:null,
             }
         },
         methods:{
             hideMe:function(){
                 this.startTime=null;
                 this.endTime = null;
-                Event.$emit('hide');
-            },
-            getSchedule:function(day,month){
-            
+                this.error = false;
+                this.shown =false;
             },
             findTime(index)
             {
-                var min = (index)*30;
-                var hours=Math.floor(min/60);
-                min=min-60*hours;
-                if(min<10 && hours<10)
-                return '0'+hours+':'+'0'+min;
-                else if(min>=10 && hours<10)
+               
+                var hours = Math.floor(index / 2);
+                var min = '00';
+                if (index % 2 == 1)
+                min = '30';
+               if(hours<10)
                 return '0'+hours+':'+min;
-                else if(min<10 && hours>=10)
-                return  hours+':'+'0'+min;
                 else
                 return hours+':'+min;
             },
@@ -69,6 +73,32 @@
              },
              bookHours(){
                  //TODO:send axios POST request to '/bookHours'
+                 
+                 axios.post('/arena/'+this.arenaName+'/bookHours',querystring.stringify(
+                 {
+                     day:this.day,
+                     month:this.month,
+                     startIndex:this.findIndex(this.startTime),
+                     endIndex:this.findIndex(this.endTime),
+                    
+                 }),
+                 {headers:
+                 {
+                     "Content-Type":"application/x-www-form-urlencoded"
+                 }
+                 }).then(()=>
+                     Event.$emit('bookingsent',{day:this.day,month:this.month})
+                 ).catch(error => this.error=true);
+             },
+             assignValues(data){
+                 console.log("in assignValues ");
+                 this.shown= true;                
+                 if(!data)
+                 return;
+                 this.day = data.day;
+                 this.month = data.month;
+                 this.schedule =data.schedule;
+                 this.arenaName = data.arenaName;
              }
 
         
@@ -108,6 +138,11 @@
                 return this.findTime(index);
             }
         },
+        created()
+        {
+            //Event.$emit('daydetailcreated');
+            Event.$on('showagain',(data) => this.assignValues(data));
+        }
         
         
     }

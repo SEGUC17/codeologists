@@ -2,13 +2,13 @@ var serviceProviderController = require('./serviceProviderController');
 var ServiceProvider = require('../models/ServiceProvider');
 var Arena = require('../models/Arena');
 var Booking = require('../models/Booking');
-
+var bookingController = require('./bookingController');
 //reserves a set of FREE hours to certain user in a certain Arena
-var bookHours = function (month, day, startIndex, endIndex, timestamp, arenaName, playerID, callback) {
+function bookHours(month, day, startIndex, endIndex, timestamp, arenaName, playerID, callback) {
     //create Booking
     var indices = serviceProviderController.getScheduleIndices(month, day);
 
-    Arena.findById(arenaID, function (err, foundArena) {
+    Arena.findOne({ name: arenaName }, function (err, foundArena) {
 
         if (!err && foundArena) {
             if (indices.dayIndex >= 0 && indices.weekIndex >= 0 && indices.dayIndex <= 6 && indices.weekIndex <= 3 && startIndex <= endIndex) {
@@ -26,38 +26,39 @@ var bookHours = function (month, day, startIndex, endIndex, timestamp, arenaName
                                 accepted: arenaCreator.mode
                             }).save(function (errSave, bookingObj) {
                                 if (errSave) {
-                                    callback(errSave);
+                                    callback(errSave, null);
                                 }
                                 else {
-                                    serviceProviderController.handleBooking(bookingObj._id);
-                                    return callback(null);
+                                    bookingController.handleBooking(bookingObj._id);
+                                    return callback(null, bookingObj);
                                 }
                             })
                         }
                         else {
                             if (spErr) {
-                                return callback(spErr);
+                                return callback(spErr, null);
                             }
                             else {
-                                return callback("The Creater of the arena is no longer existant or has been removed ");
+                                return callback("The Creater of the arena is no longer existant or has been removed ", null);
                             }
                         }
                     });
                 }
                 else {
-                    return callback("Time Unavailable");
+                    return callback("Time Unavailable", null);
                 }
             } else {
                 if (err)
-                    return callback(err);
+                    return callback(err, null);
                 else if (!(indices.dayIndex >= 0 && indices.weekIndex >= 0 && indices.dayIndex <= 6 && indices.weekIndex <= 3))
-                    return callback("Day and month ot of bound");
+                    return callback("Day and month ot of bound", null);
                 else
-                    return callback("no such booking");
+                    return callback("no such booking", null);
             }
         }
 
     })
+
 }
 
 //checks to see if the slots between start index and end index in the schedule of  certain DAY is free if so it return true otherwise false
@@ -475,7 +476,7 @@ function createArena(req, res) {
 }
 const getArenas = function (req, res) {
     if (req.user.type == 'ServiceProvider') {
-        Arena.find({ service_provider: req.user._id },'name', function (dbErr, arenaArr) {
+        Arena.find({ service_provider: req.user._id }, 'name', function (dbErr, arenaArr) {
             if (dbErr)
                 res.status(500).json({ error: "Sorry We have Encountered an internal server error" });
             else {
@@ -488,8 +489,8 @@ const getArenas = function (req, res) {
     }
 }
 let arenaController = {
-    getArenas:getArenas,
-    bookHours: bookHours,
+    getArenas: getArenas,
+    bookHours:bookHours,
     checkAvailable: checkAvailable,
     commentOnArena: commentOnArena,
     viewarena: viewarena,
@@ -499,6 +500,8 @@ let arenaController = {
     addimage: addimage,
     setUnavailable: setUnavailable,
     setAvailable: setAvailable,
-    createArena: createArena,
-}
+    createArena: createArena
+};
+
+
 module.exports = arenaController;

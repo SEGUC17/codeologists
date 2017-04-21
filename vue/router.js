@@ -1,11 +1,4 @@
 import VueRouter from 'vue-router';
-const User = {
-  template: `
-    <div class="user">
-      <h2>User {{ $route.params.id }}</h2>
-    </div>
-  `
-}
 let routes = [
     {
         path:'/dayDetail/:dayIndex',
@@ -14,13 +7,15 @@ let routes = [
     }
     ,  
     { 
-        path: '/user/:id', component: User,
+        path: '/dayhaspassederror', 
+        component: require('./components/errorPanel.vue'),
     }
 ];
 
-export default   new VueRouter({
+var router  =  new VueRouter({
     mode:'abstract',        
     base:window.location.href,
     routes:routes
 });
 
+export default router;

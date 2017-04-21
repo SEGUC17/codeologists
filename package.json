@@ -27,6 +27,8 @@
     "passport-local": "^1.0.0",
     "password-hash-and-salt": "^0.1.4",
     "path": "^0.12.7",
+    "querystring": "^0.2.0",
+    "stringify": "^5.1.0",
     "vue": "^2.2.6",
     "vue-router": "^2.4.0"
   },

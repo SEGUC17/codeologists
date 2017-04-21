@@ -104,7 +104,7 @@ router.get('/logout', function (req, res) {
 });
 router.get('/getIndex/:day/:month',serviceProviderController.IndexAPI);
 router.post('/arenas', visitorController.view_all);
-
+    
 router.get('/arena/:arenaName/show',visitorController.view_details_of_arena);
 
 router.get('/getArenas',ensureAuthenticated,arenaController.getArenas);
@@ -162,7 +162,7 @@ router.post('/arena/:arenaName/bookWeekly', ensureAuthenticated, playerControlle
 
 
 //book free hours
-router.post('/arena/:arenaName/bookHours', ensureAuthenticated, bookingController.createBooking);
+router.post('/arena/:arenaName/bookHours', bookingController.createBooking);
 
 
 router.post('/RequestGame/:id', ensureAuthenticated, gameController.requestgame);
