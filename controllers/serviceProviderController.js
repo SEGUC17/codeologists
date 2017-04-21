@@ -334,11 +334,11 @@ let serviceProviderController =
             });
         },
 
-        myArenas : function(req,res){
-            Arena.find({service_provider : req.user._id},function(err,arenas){
-                if(err){
-                    return res.json({error : err});
-                }else{
+        myArenas: function (req, res) {
+            Arena.find({ service_provider: req.user._id }, function (err, arenas) {
+                if (err) {
+                    return res.json({ error: err });
+                } else {
                     return res.json(arenas);
                 }
             });

@@ -22,8 +22,8 @@ var schema = mongoose.Schema({
 	name: {
 		type: String,
 		required: true,
-		unique : true,
-		index:true
+		unique: true,
+		index: true
 	},
 	address: {
 		type: String,
