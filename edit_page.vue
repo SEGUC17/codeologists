@@ -1,59 +1,103 @@
 <template >
 
-   <div v-if="type_player">
-      <br>
-      <form autocomplete="off" method="POST" enctype="multipart/form-data" @submit.prevent="onSubmit_player">
-     <label for="name">name</label><br>
-     <input name = "name" type="text" id="name" v-model="user.name"><br>
-     <label for="new_password">new_password</label><br>
-     <input name = "new_password" type="password"  id="new_password" placeholder="new password" v-model="password"><br>
-     <label for="email">email</label><br>
-     <input name = "email" type="text" id="email" v-model="user.email"><br>
-     <label for="phone_number">phone_number</label><br>
-     <input name = "phone_number" type="text"  id="phone_number" v-model ="user.phone_number"><br>
-     <label for="location">location</label><br>
-     <input name = "location" type="text" id="location" v-model = "user.location"><br>
-     <label for="profile_pic">profile_pic</label><br>
-     <input id ="profile_pic" type="file" class="form-control" name="profile_pic" accept="image/*" v-on:change="onFile" multiple><br>
-     <label for="birthdate">birthdate</label><br>
-     <input name = "birthdate" required  type="date" id="birthdate" v-model="birthdate"><br>
-     <label for="old_password">old_password</label><br>
-     <input name = "old_password" type="password" id="old_password" placeholder="password" v-model="old_password"><br></br>
-     <input type="submit" name="submit" value="update">
-   </form>
+   <div v-if="type_player" class="field is-grouped container">
+    <form autocomplete="off" method="post" action="/signup" @submit.prevent="onSubmit_player">
+     <div class="field">
+       <label  class="label">Name</label>
+       <input type="text" name="name" class="input" placeholder="name" v-model="user.name" @keydown="delete errors['name']">
+       <span class="help is-danger" v-if="errors.hasOwnProperty('name')" v-text="errors['name']"></span>
+     </div>
+     <div class="field">
+       <label  class="label">New Password</label>
+       <input type="password" name="new_password" class="input" placeholder="new Password" v-model="password">
+     </div>
+     <div class="field">
+       <label  class="label">Email</label>
+       <input type="text" name="email" class="input" placeholder="Email" v-model="user.email" @keydown="delete errors['email']">
+        <span class="help is-danger" v-if="errors.hasOwnProperty('email')" v-text="errors['email']"></span>
+     </div>
+     <div class="field">
+       <label  class="label">Location</label>
+       <input type="text" name="location" class="input" placeholder="Location" v-model="user.location" @keydown="delete errors['location']">
+        <span class="help is-danger" v-if="errors.hasOwnProperty('location')" v-text="errors['location']"></span>
+     </div>
+     <div class="field">
+       <label  class="label">Phone number</label>
+       <input type="text" name="phone_number" class="input" placeholder="Phone number" v-model="user.phone_number" @keydown="delete errors['phone_number']">
+        <span class="help is-danger" v-if="errors.hasOwnProperty('phone_number')" v-text="errors['phone_number']"></span>
+     </div>
+     <div class="field">
+       <label  class="label" >Birthdate</label>
+       <input required type="date" name="birthdate" class="input" v-model="birthdate">
+     </div>
+     <div class="field">
+       <label  class="label">Profile picture</label>
+       <input type="file" name="profile_pic" class="input" placeholder="Profile picture" v-on:change="onFile" multiple>
+     </div>
+     <div class="field">
+       <label  class="label">Curren Password</label>
+       <input type="password" name="password" class="input" placeholder="Current Password" v-model="old_password" @keydown="delete errors['old_password']">
+       <span class="help is-danger" v-if="errors.hasOwnProperty('old_password')" v-text="errors['old_password']"></span>
+     </div>
 
+     <div class="field">
+       <button class="button is-primary">Update</button>
+        <span class="help is-success" v-if="success" >Information updated successfully</span>
+     </div>
+   </form>
     </div>
-    <div v-else-if='type_provider'>
+
+    <div v-else-if='type_provider' class="field is-grouped container">
     <form autocomplete="off" class="form" enctype="multipart/form-data" method="POST" @submit.prevent ="onSubmit_serviceProvider">
-          <label for="name">name</label><br>
-          <input name="name" type="text" id="name" v-model ="user.name"><br>
-          <label for="old_password">old_password</label><br>
-          <input name="old_password" type="password" id="old_password" placeholder="old password" v-model="old_password"><br>
-          <label for="new_password">new_password</label><br>
-          <input name="new_password" type="password" id="new_password" v-model="password"><br>
-          <label for="email">email</label><br>
-          <input name="email" type="text" id="email" v-model = "user.email"><br>
-          <label for="phone_number">phone_number</label><br>
-          <input name="phone_number" type="text" id="phone_number" v-model ="user.phone_number"><br>
-          <label for="profile_pic">profile_pic</label><br>
-          <input id="profile_pic" type="file" class="form-control" name="profile_pic" accept="image/*" v-on:change="onFile" multiple><br>
-          <div v-if ="user.mode">
-            <label for="on">AutoAccept_mode_on</label>
+      <div class="field">
+        <label  class="label">Name</label>
+        <input type="text" name="name" class="input" placeholder="name" v-model="user.name" @keydown="delete errors['name']">
+        <span class="help is-danger" v-if="errors.hasOwnProperty('name')" v-text="errors['name']"></span>
+      </div>
+      <div class="field">
+        <label  class="label">New Password</label>
+        <input type="password" name="new_password" class="input" placeholder="new Password" v-model="password">
+      </div>
+      <div class="field">
+        <label  class="label">Email</label>
+        <input type="text" name="email" class="input" placeholder="Email" v-model="user.email" @keydown="delete errors['email']">
+         <span class="help is-danger" v-if="errors.hasOwnProperty('email')" v-text="errors['email']"></span>
+      </div>
+      <div class="field">
+        <label  class="label">Phone number</label>
+        <input type="text" name="phone_number" class="input" placeholder="Phone number" v-model="user.phone_number" @keydown="delete errors['phone_number']">
+         <span class="help is-danger" v-if="errors.hasOwnProperty('phone_number')" v-text="errors['phone_number']"></span>
+      </div>
+      <div class="field">
+        <label  class="label">Profile picture</label>
+        <input type="file" name="profile_pic" class="input" placeholder="Profile picture" v-on:change="onFile" multiple>
+      </div>
+          <div v-if ="user.mode" class="field">
+            <label class="label"for="on">AutoAccept_mode_on</label>
             <input type="radio" id="on" name="mode" v-on:change="onMode" class="radio" checked><br>
-            <label for="off">AutoAccept_mode_off</label>
+            <label class="label"for="off">AutoAccept_mode_off</label>
             <input type="radio" id="off" name="mode" v-on:change="onMode" class="radio"><br>
           </div>
-          <div v-else>
-              <label for="on">AutoAccept_mode_on</label>
+          <div v-else class="field">
+              <label class="label"for="on">AutoAccept_mode_on</label>
               <input type="radio" id="on" name="mode"  v-on:change="onMode" class="radio"><br>
-              <label for="off">AutoAccept_mode_off</label>
+              <label class ="label"for="off">AutoAccept_mode_off</label>
               <input type="radio" id="off" name="mode"  v-on:change="onMode" class="radio" checked><br>
           </div>
+          <div class="field">
+            <label  class="label">Curren Password</label>
+            <input type="password" name="password" class="input" placeholder="Current Password" v-model="old_password" @keydown="delete errors['old_password']">
+            <span class="help is-danger" v-if="errors.hasOwnProperty('old_password')" v-text="errors['old_password']"></span>
+          </div>
 
-
-                <input class="btn-primary form-control" type="submit" value="update">
+          <div class="field">
+            <button class="button is-primary">Update</button>
+             <span class="help is-success" v-if="success" >Information updated successfully</span>
+          </div>
 
     </form>
+  
+
   </div>
 
 </template>
@@ -69,6 +113,12 @@
                     mode:'',
                     type_player :false,
                     type_provider: false,
+                    errors:[],
+                    success: false,
+                    getPath(photo){
+                      if(photo)
+    return 'data:image/*;base64,'+(new Buffer(photo.data.data).toString('base64'));
+}
               };
             },
             created(){
@@ -99,11 +149,22 @@
                          dataForm.append('old_password',this.old_password);
                          dataForm.append('phone_number',this.user.phone_number);
                          dataForm.append('location',this.user.location);
-                         dataForm.append('birthdate',this.user.birthdate);
+                         dataForm.append('birthdate',this.birthdate);
                          dataForm.append('profile_pic',this.files[0]);
                          axios.post('/edit_player_profile',dataForm)
-                         .then(response => {alert('done');this.password ='',this.old_password=''})
-                         .catch(error => {alert(error.response.data.error);this.birthdate = error.response.data.date; this.user = error.response.data.result;})
+                         .then(response => {this.errors=[];this.success = true;this.password ='',this.old_password='';this.birthdate = response.data.date; this.user = response.data.result})
+                         .catch(error => {
+                           this.success = false;
+                           this.birthdate = error.response.data.date;
+                           this.user = error.response.data.result;
+                           var errs = [];
+                           for (var i = 0; i < error.response.data.errors.length; i++) {
+                               var e = error.response.data.errors[i];
+                               var param = e.param;
+                               errs[e.param] = e.msg;
+                           }
+                              this.errors = errs;
+                         })
                        },onFile(event){
                          this.files = event.target.files
                        },onSubmit_serviceProvider(){
@@ -113,12 +174,20 @@
                          dataForm.append('new_password',this.password);
                          dataForm.append('old_password',this.old_password);
                          dataForm.append('phone_number',this.user.phone_number);
-                         dataForm.append('location',this.user.location);
                          dataForm.append('mode',this.mode);
                          dataForm.append('profile_pic',this.files[0]);
                          axios.post('/edit_provider_profile',dataForm)
-                         .then(response => {alert('done'),this.user = response.data.result;this.password ='',this.old_password=''})
-                         .catch(error => {alert(error.response.data.error);this.user = error.response.data.result})
+                         .then(response => {this.errors=[];this.success= true;this.user = response.data.result;this.password ='',this.old_password=''})
+                         .catch(error => {this.user = error.response.data.result;
+                                          this.success = false;
+                                          var errs = [];
+                                          for (var i = 0; i < error.response.data.errors.length; i++) {
+                                              var e = error.response.data.errors[i];
+                                              var param = e.param;
+                                              errs[e.param] = e.msg;
+                                          }
+                                             this.errors = errs;
+                         })
                        },onMode(event){
                          this.mode = event.target.id;
                        }
