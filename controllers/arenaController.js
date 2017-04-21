@@ -368,7 +368,6 @@ function createArena(req, res) {
         return;
     }
 
-
     // initializing the arena
     var rules = req.body.rules_and_regulations;
     var name = req.body.name;
@@ -460,36 +459,49 @@ function createArena(req, res) {
 
     var user = req.user.username;
     var servProv;
-    ServiceProvider.findOne({ username: user }, function (err, doc) {
+    ServiceProvider.findOne({ username: user }, function (err, serv) {
         if (err) {
-            res.send(err);
+            res.json(500, {error: err.message});
         }
         else {
-            servProv = doc._id;
 
-            var newArena = new Arena({
-                service_provider: servProv,
-                rules_and_regulations: rules,
-                name: name,
-                address: address,
-                location: location,
-                avg_rating: avg_rating,
-                size: size,
-                type: type,
-                price: price,
-                photos: photos,
-                ratings_count: ratings_count,
-                default_weekly_schedule: default_schedule,
-                schedule: normal_schedule
-            });
+          servProv = serv._id;
 
+          var newArena = new Arena({
+              service_provider: servProv,
+              rules_and_regulations: rules,
+              name: name,
+              address: address,
+              location: location,
+              avg_rating: avg_rating,
+              size: size,
+              type: type,
+              price: price,
+              photos: photos,
+              ratings_count: ratings_count,
+              default_weekly_schedule: default_schedule,
+              schedule: normal_schedule
+          });
 
-            newArena.save(function (err, doc) {
-                if (err)
-                    res.json(500, { error: err.message });
-                else
-                    res.json(doc);
-            });
+            Arena.findOne({name: newArena.name}, function(err, doc){
+              if(err)
+              {
+                res.json(500, {error: err.message});
+              }
+              else if(doc)
+                 res.json(400, {error: "There exist arena with this name. Please choose another name"});
+                else {
+                  newArena.save(function (err, arena) {
+                      if (err)
+                           res.json(500, { error: err.message });
+                      else
+                      {
+                           res.json(arena);
+                        }
+                  });
+                }
+            })
+
         }
     })
 }

@@ -139,17 +139,15 @@ var cancelBooking = function (req, res) {
 };
 
 var viewPlayerBookings = function (req, res){
-  console.log(req.user);
-  console.log(req.body);
    if(req.user.type != 'Player')
    {
-     res.json(400,{error: "You are not authorized to view this page"});
+    res.json(400, {error:"You are not authorized to view this page"});
    }
    else {
 
       Booking.find({player : req.user._id},function(err,arenas){
           if(err){
-              return res.json({error : err});
+              return res.json({error : err.message});
           }else{
               return res.json(arenas);
           }

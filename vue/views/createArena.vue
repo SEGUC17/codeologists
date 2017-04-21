@@ -42,12 +42,12 @@
 					     alert('arena added');
 				})
 				.catch(err => {
-          console.log('hi');
-          console.log(err);
           if(err.error)
             alert(err.error);
+          if(err.response.data.error)
+            alert(err.response.data.error);
           else
-					     alert(err);
+					     alert(err.message);
 				});
       }
     }
