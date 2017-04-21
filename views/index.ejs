@@ -3,7 +3,10 @@
 
 <head>
 	<title>Main view</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.0/css/bulma.css">
+	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
 </head>
 
 <body>
@@ -18,9 +21,13 @@
 							<ul>
 								<router-link tag="li" to="/" exact><a>Home</a></router-link>
 
-								<router-link tag="li" to="/myArenas"><a>My Arenas</a></router-link>
+								<router-link tag="li" to="/myArenas" v-show="user&type=='Service Provider'"><a>My Arenas</a></router-link>
 
-								<router-link tag="li" to="/login"><a>login</a></router-link>
+								<router-link tag="li" to="/login" v-show="!user"><a>Login</a></router-link>
+
+								<router-link tag="li" to="/signup" v-show="!user"><a>Signup</a></router-link>
+
+								<a v-show="user" @click="logout">Logout</a>
 
 								<router-link tag="li" to="/registerSP"><a>Register sp</a></router-link>
 
