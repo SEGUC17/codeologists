@@ -61,10 +61,6 @@ let playerController = {
                     res.status(500).json({error: err.message});
                 else {
                   result.password = hash;
-                  if (!validateEmail(req.body.email)) {
-                    res.status(422).json({error:"wrong email format"});
-                    return;
-                  }
                   result.email = req.body.email;
                   result.phone_number = req.body.phone_number;
                   if (req.files[0]) {
@@ -86,10 +82,6 @@ let playerController = {
               });
             }
             else {
-              if (!validateEmail(req.body.email)) {
-                res.status(422).json({error:"wrong email format"});
-                return;
-              }
               result.email = req.body.email;
               result.phone_number = req.body.phone_number;
               if (req.files[0]) {
