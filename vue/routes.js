@@ -65,7 +65,18 @@ let routes = [
     {
     	path:'/arenaDetails',
     	component: require('./views/ArenaDetails.vue')
-    }
+    },
+
+    {
+       path: '/search',
+       component: require('./views/Search.vue')
+
+     },
+
+     {
+       path:'/edit_profile',
+       component : require('./views/EditPage.vue')
+     }
 
 ];
 

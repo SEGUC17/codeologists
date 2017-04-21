@@ -10,7 +10,7 @@ function validateEmail(email) {
 
 function compute(req, res, result) {
 	if (result.length == 0) {
-		res.send("no Arena matches your value");
+		res.status(404).json({error:"no Arena matches your value"});
 		return;
 	} else {
 		var tmp = 0;
@@ -23,7 +23,7 @@ function compute(req, res, result) {
 		var end = tmp == count ? result.length : tmp * 10;
 		var active = tmp;  //to indicate the active page rightnow
 
-		res.send(result);
+		res.json({result,count,start,end,active});
 		return;
 	}
 }
@@ -279,7 +279,7 @@ let visitorController = {
 		if (search_type == "price") {
 			Arena.find({ price: search_value }, function (err, doc) {
 				if (err)
-					res.send(err);
+					res.status(500).json({error: err.message});
 				else {
 					compute(req, res, doc);
 				}
@@ -287,7 +287,7 @@ let visitorController = {
 		} else if (search_type == "location") {
 			Arena.find({ location: search_value }, function (err, doc) {
 				if (err)
-					res.send(err);
+					res.status(500).json({error: err.message});
 				else {
 					compute(req, res, doc);
 				}
@@ -295,7 +295,7 @@ let visitorController = {
 		} else {
 			Arena.find({ name: search_value }, function (err, doc) {
 				if (err)
-					res.send(err);
+					res.status(500).json({error: err.message});
 				else {
 					compute(req, res, doc);
 				}
