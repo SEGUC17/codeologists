@@ -3,7 +3,7 @@
    <div v-for="Notification in Notifications">
 <article class="message" >
     <div class="message-header">
-        <p>Notification detail:</p>
+        <p>Notification details:</p>
       </div>
     <h3>Details :{{Notification}}</h3>
   <!--  <form action="/delete" method="POST" @submit.prevent="rej(request)">
