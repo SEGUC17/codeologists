@@ -133,7 +133,7 @@
 
                                             }
                                             this.active = response.data.active;
-                                            console.log(this.active);
+                                         
 
                                           }
                                     )
