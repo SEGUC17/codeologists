@@ -1,21 +1,24 @@
 <template>
 
 <div v-if="shown">
+   
    Reservation day: {{day}}
-   <button v-on:click="hideMe">Close Me </button>
-   <div>
-   <label>Booking Start Time</label>
-   <select v-model="startTime">
-   <option v-for="(freeSlot,index) in freeSlots">{{freeSlot}}</option>
+   <a  v-on:click="hideMe">&#10799; </a>
+   <div class="Content">
+  <span class="tag is-primary" >Booking Start Time</span>
+   <select v-model="startTime"  @change="nullifyEndTime()">
+   <option v-for="(freeSlot,index) in freeSlots" :key="index">{{freeSlot}}</option>
    </select>
    </div>
-   <div>
-   <label>Booking End Time</label>
-   <select v-model="endTime">
-   <option v-if="startTime != null" v-for="n in (findIndex(maxAllowedEndTime) - findIndex(startTime))">{{findTime(n+findIndex(startTime))}}</option>
+   <div v-if="startTime != null">
+   <span class="tag is-primary">Booking End Time</span>
+   <select v-model="endTime" >
+   <option v-if="startTime != null" v-for="n in (findIndex(maxAllowedEndTime) - findIndex(startTime))" :key="n">{{findTime(n+findIndex(startTime))}}</option>
    </select>
    </div> 
-   <table id="unavailable">
+   <div>
+   <span class="tag is-danger">Please Note that the arena is booked/unavailable in the following times</span>
+   <table class="table is-bordered is-striped" id="unavailable">
    <tr>
     <th>Start </th>
     <td v-for="reserved in reservedSlots"> {{reserved.start}}</td>
@@ -25,10 +28,12 @@
     <td v-for="reserved in reservedSlots">{{reserved.end}}</td>
   </tr>
    </table>
-   <button v-on:click="bookHours" v-if="startTime != null && endTime != null">book NOW ! </button>
+   </div>
+   <button v-on:click="bookHours" v-if="startTime != null && endTime != null" class="button is-black">book</button>
    <div id="error">
     <label v-if="error">Sorry Could not complete your booking</label>
    </div>
+  
 </div>
 </template>
 <script>
@@ -43,14 +48,22 @@
                 month:null,
                 error:false,
                 arenaName:null,
+                isActive:[true,false],
             }
         },
         methods:{
+            toggleDropdown(index){
+                	document.getElementById(index).classList.toggle('active');
+		            return false;
+            },
             hideMe:function(){
+                this.shown =false;
                 this.startTime=null;
                 this.endTime = null;
                 this.error = false;
-                this.shown =false;
+            },
+            nullifyEndTime(){
+                this.endTime =null;
             },
             findTime(index)
             {
@@ -72,8 +85,8 @@
                return Math.floor(min/30) + 2 *(hours);   
              },
              bookHours(){
-                 //TODO:send axios POST request to '/bookHours'
                  
+
                  axios.post('/arena/'+this.arenaName+'/bookHours',querystring.stringify(
                  {
                      day:this.day,
@@ -86,9 +99,7 @@
                  {
                      "Content-Type":"application/x-www-form-urlencoded"
                  }
-                 }).then(()=>
-                     Event.$emit('bookingsent',{day:this.day,month:this.month})
-                 ).catch(error => this.error=true);
+                 }).then(()=> this.updateSchedule()).catch(error => this.error=true);
              },
              assignValues(data){
                  this.shown= true;                
@@ -98,6 +109,20 @@
                  this.month = data.month;
                  this.schedule =data.schedule;
                  this.arenaName = data.arenaName;
+             },
+             updateSchedule(){
+                    //update schedule of dayDtails component
+                    Event.$emit('bookingsent',{day:this.day,month:this.month});
+                    for(var i=this.findIndex(this.startTime);i<this.findIndex(this.endTime);i++)
+                    {
+                        this.schedule[i]=-1;
+                    }
+                    this.startTime=null;
+                    this.endTime = null;
+                   
+
+                   
+                 
              }
 
         
@@ -139,20 +164,43 @@
         },
         created()
         {
+            this.hideMe();
             Event.$on('hidedaydetails',() => this.hideMe());
             Event.$on('showagain',(data) => this.assignValues(data));
+            Event.$on('updatedBookings',(eventData) => this.updateSchedule(eventData));
         }
         
         
     }
 </script>
 <style>
-    table, th, td {
-    border: 1px solid ;
-    border-collapse: collapse;
-    }
-    th, td {
-    padding: 15px;
-    }
-
+select {
+   -webkit-appearance: button;
+    -moz-appearance: button;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -webkit-padding-end: 20px;
+    -moz-padding-end: 20px;
+    -webkit-padding-start: 2px;
+    -moz-padding-start: 2px;
+    background-color: #F07575; /* fallback color if gradients are not supported */
+    background-image: url(../images/select-arrow.png), -webkit-linear-gradient(top, #E5E5E5, #F4F4F4); /* For Chrome and Safari */
+    background-image: url(../images/select-arrow.png), -moz-linear-gradient(top, #E5E5E5, #F4F4F4); /* For old Fx (3.6 to 15) */
+    background-image: url(../images/select-arrow.png), -ms-linear-gradient(top, #E5E5E5, #F4F4F4); /* For pre-releases of IE 10*/
+    background-image: url(../images/select-arrow.png), -o-linear-gradient(top, #E5E5E5, #F4F4F4); /* For old Opera (11.1 to 12.0) */ 
+    background-image: url(../images/select-arrow.png), linear-gradient(to bottom, #E5E5E5, #F4F4F4); /* Standard syntax; must be last */
+    background-position: center right;
+    background-repeat: no-repeat;
+    border: 1px solid #AAA;
+    border-radius: 2px;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+    color: #555;
+    font-size: inherit;
+    margin: 0;
+    overflow: hidden;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 </style>

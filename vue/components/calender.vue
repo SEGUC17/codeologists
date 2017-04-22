@@ -24,11 +24,24 @@ export default {
                 
         },
         findHREF:function(index){
-            if(index>=this.cDayIndex && (index-this.cDayIndex<27))
+            if(this.isButtonEnabled(index))
             return "/dayDetail/"+index;
             else
             {   
                 return "/dayDetail/1";
+            }
+        },
+        isButtonEnabled:function(index){
+            return index>=this.cDayIndex && (index-this.cDayIndex+this.daysInPreMonth()<=28);
+        },
+        daysInPreMonth(){
+            var today = new Date();
+            if(this.calMonth == today.getMonth())
+                return 0;
+            else
+            {
+                var nDays = this.getRange(today.getMonth());
+                return (nDays-today.getDate()+1);
             }
         },
         showDayDetails:function(day){
@@ -62,14 +75,15 @@ export default {
         },
         refresh(){
             //TODO get the value of arenaName from $route.params
+            
             var arenaName = "12";
-            axios.get('/arena/'+arenaName+'/show').then(res => this.arena = res.data).catch(error => this.errors = (error.data));
+            axios.get('/arena/'+arenaName+'/show').then((res) => this.updateBookings(res.data)).catch(error => this.errors = (error.data));
         
         },
-        getRange(){
-            if(this.calMonth ==0 || this.calMonth ==2 || this.calMonth ==4 || this.calMonth ==6 || this.calMonth ==7 || this.calMonth ==9 || this.calMonth ==11)
+        getRange(monthIndex){
+            if(monthIndex ==0 || monthIndex ==2 || monthIndex==4 || monthIndex ==6 || monthIndex ==7 || monthIndex ==9 || monthIndex ==11)
                     return 31;
-                else if(this.calMonth != 1)
+                else if(monthIndex != 1)
                     return 30;
                 else if((new Date()).getFullYear()%4 ==0)
                     return 29;
@@ -81,6 +95,15 @@ export default {
             startOfMonth.setDate(1);
             startOfMonth.setMonth(this.calMonth);
             return (startOfMonth.getDay() -1)%7;
+        },
+        updateBookings(newArenaData,eventData){
+           
+            this.arena = newArenaData;
+            if(!eventData)
+            return //handling the refresh call in mounted();
+            var index = this.getScheduleIndex(eventData.day,eventData.month);
+            console.log(this.arena.schedule[index.weekIndex][index.dayIndex]);
+            Event.$emit('updatedBookings',this.arena.schedule[index.weekIndex][index.dayIndex]);
         }
     },
     data()
@@ -95,8 +118,8 @@ export default {
     {
         //TODO get the value of arena name from $route.params
       
-         Event.$emit('calendercreated',{month:this.calMonth,day:this.cDayIndex});
-        this.refresh();
+         
+        this.refresh(); 
     },
     computed :
     {
@@ -151,8 +174,8 @@ export default {
         }
     },
     created(){
-    
-        Event.$on('bookingsent',()=>this.refresh());
+        Event.$emit('calendercreated');
+        Event.$on('bookingsent',() => this.refresh());
        
     },
     props:['monthName']
@@ -164,8 +187,8 @@ export default {
 <div >
 <div class="month">      
   <ul>
-    <li class="prev" v-if="calMonth != ((new Date()).getMonth())"><a v-on:click="showPrev">Show Current Month &#10094;</a></li>
-    <li class="next" v-if="calMonth == ((new Date()).getMonth())"><a v-on:click="showNext">Show Next Month &#10095;</a></li>
+    <li class="prev" v-if="calMonth != ((new Date()).getMonth())"><a v-on:click="showPrev">&#10094; Back  </a></li>
+    <li class="next" v-if="calMonth == ((new Date()).getMonth())"><a v-on:click="showNext">  Next Month &#10095;</a></li>
     <li style="text-align:center">
       <slot name="month" ></slot><br>
       <span style="font-size:18px"><p v-text="year" ></p></span>
@@ -183,7 +206,7 @@ export default {
 </ul>
 <ul class="days">  
 <li v-for="i in getShiftAmount()"><a>-</a></li>
-<router-link tag="li"  v-for="n in getRange()" :to="findHREF(n)" :key='n' :day="n"><button @click="showDayDetails(n)">{{n}}</button></router-link>
+<router-link tag="li"  v-for="n in getRange(calMonth)" :to="findHREF(n)" :key='n' :day="n"><button class="button is-white" @click="showDayDetails(n)" :disabled="! isButtonEnabled(n)">{{n}}</button></router-link>
 </ul>
 </div>
 </div>
@@ -191,12 +214,14 @@ export default {
 <style>
 * {box-sizing:border-box;}
 ul {list-style-type: none;}
-body {font-family: Verdana,sans-serif;}
+a { cursor:hand;}
+body {font-family: Verdana,sans-serif;}  
 
 .month {
     padding: 70px 25px;
-    width: 50%;
-    background: #1abc9c;
+    width: 100%;
+    background: #ff9800;
+
 }
 
 .month ul {
@@ -224,7 +249,7 @@ body {font-family: Verdana,sans-serif;}
 .weekdays {
     margin: 0;
     padding: 10px 0;
-    background-color: #ddd;
+    background-color: #fff;
 }
 
 .weekdays li {
@@ -255,5 +280,8 @@ body {font-family: Verdana,sans-serif;}
     background: #1abc9c;
     color: white !important
 }
+
+
+
 
 </style>

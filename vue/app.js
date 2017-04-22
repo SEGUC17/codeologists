@@ -7,12 +7,10 @@ window.querystring = require('querystring');
 import vueRouter from 'vue-router';
 import router from './router.js'
 import booking from './components/booking.vue';
-import day from './components/day.vue';
 import calender from './components/calender.vue';
-import calenderHeader from './components/calenderHeader.vue';
-import month from './components/month.vue';
 import dayDetails from './views/dayDetails';
 import reserveTime from './views/reserveTime.vue';
+import ElementUI from 'element-ui';
 Vue.component('calender', calender);
 Vue.component('dayDetails', dayDetails);
 Vue.component('reservetime',reserveTime);
@@ -53,18 +51,12 @@ var bookHours = new Vue({
     components: { calender, dayDetails,reserveTime },
     router: router,
     methods: {
-        redirect(data) {
+        redirect() {
             
-           //if(data.month == (new Date().getMonth()))
-             if(false)   
-                router.replace('/dayDetail/' + data.day);
-            else
-               router.replace('/dayDetail/22');
+               router.replace('/dayDetail/-1');
            
         },
-        onshowfirstmonth(){
-                window.alert('hello there');
-            }
+       
     },
     data: {
 
@@ -72,7 +64,7 @@ var bookHours = new Vue({
 
     },
     created() {
-        Event.$on('calendercreated', (data) => this.redirect(data));
+        Event.$on('calendercreated', () => this.redirect());
         //Event.$on('showfirstmonth',() => Event.$emit('goback'));
     }
 })

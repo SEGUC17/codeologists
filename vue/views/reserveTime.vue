@@ -8,7 +8,8 @@
 </div>
 </template>
 <script>
-import calender from '../components/calender';
+   import calender from '../components/calender';  
+   import bulma from 'bulma';
     export default {
         data(){
             return {
