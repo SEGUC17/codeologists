@@ -35,10 +35,10 @@ function ensureAuthenticated(req, res, next) {
     }
 }
 
-router.get('/', function (req, res) {
-    // setting username and type for testing
-    res.render('index');
-});
+// router.get('/', function (req, res) {
+//     // setting username and type for testing
+//     res.json({ out: 'out'});
+// });
 
 router.get('/findUser/:user',function(req,res){
     RegisteredUser.findOne({username : req.params.user},function(err,data){
@@ -149,11 +149,15 @@ router.post('/profile/whitelist/phone', ensureAuthenticated, serviceProviderCont
 
 router.post('/profile/removewhitelist', ensureAuthenticated, serviceProviderController.remove_from_whitelist);
 
+router.get('/arena/:id/getComments', ensureAuthenticated, arenaController.getComments);
+
+router.get('/getNameOfPlayer/:id', ensureAuthenticated, playerController.getPlayer);
+
 router.post('/arena/:id/comment', ensureAuthenticated, arenaController.commentOnArena);
 
-router.post('/ProviderRatesBooking/:id', ensureAuthenticated, bookingController.providerRateBooking);
+router.get('/getUnratedBookings', ensureAuthenticated, bookingController.getUnratedBookings);
 
-router.post('/PlayerRatesBooking/:id', ensureAuthenticated, bookingController.playerRateBooking);
+router.post('/rateBooking/:id', ensureAuthenticated, bookingController.rateBooking);
 
 router.get('/createArena', ensureAuthenticated, function (req, res) {
     res.render('createarena');

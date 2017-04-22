@@ -10,9 +10,9 @@ var Game = require('../models/Game');
 var arenaController = require('./arenaController');
 function date_calc(year, month, day) {
   if (month < 10)  //if month is one digit pad it with zero
-    month = "0" + month;
+  month = "0" + month;
   if (day < 10)    //if day is one digit pad it with zero
-    day = "0" + day;
+  day = "0" + day;
   return year + "-" + month + "-" + day;
 }
 function validateEmail(email) {
@@ -126,6 +126,15 @@ let playerController = {
 
     });
   },
+  
+  getPlayer: function (req, res) {
+    Player.findById(req.params.id, function (err, player) {
+      if(err)
+      return res.status(400).json({error: err.message});
+      return res.json({player: player});
+    })
+  },
+  
   myNotifications:function(req,res){
     var currentuser = req.user.username;
    Player.findOne({ username: currentuser }, function (err,player) {
@@ -142,9 +151,7 @@ let playerController = {
             return;
         }
     });
-  },
-
-
+  }
 }
 
 module.exports = playerController;

@@ -83,13 +83,14 @@ let visitorController = {
 					player.phone_number = req.body.phone_number;
 					player.location = req.body.location;
 
+
 					if (req.body.profile_pic.charAt(0)!='/')
 						player.profile_pic.data = req.body.profile_pic;
 
 					player.birthdate = req.body.birthdate;
 					player.ratings_count = 0;
 
-					// Store hash (incl. algorithm, iterations, and salt) 
+					// Store hash (incl. algorithm, iterations, and salt)
 					player.password = hash;
 
 
@@ -168,7 +169,7 @@ let visitorController = {
 						service.profile_pic.data = req.body.profile_pic;
 					service.mode = req.body.mode ? true : false;
 
-					// Store hash (incl. algorithm, iterations, and salt) 
+					// Store hash (incl. algorithm, iterations, and salt)
 					service.password = hash;
 
 					
