@@ -86,7 +86,22 @@ let routes = [
      {
        path:'/edit_profile',
        component : require('./views/EditPage.vue')
-     }
+     },
+
+     {
+        path: '/blackList',
+        component: require('./views/Blacklist')
+    },
+    
+    {
+        path: '/whiteList',
+        component: require('./views/Whitelist')
+    },
+
+    {
+    	path : '/profile',
+    	component : require('./views/Profile')
+    }
 
 ];
 

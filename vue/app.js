@@ -110,13 +110,17 @@ new Vue({
 	router,
 
     data:{
-        user:false,
-        type:'',
-        showLogin:false
+        showLogin:false,
+        user : false,
+        type : 'visitor',
     },
 
     mounted(){
+        window.user=false;
+        window.type='visitor';
         Event.$on('loggedIn', data => {
+            window.user = data.user;
+            window.type = data.type;
             this.user = data.user;
             this.type = data.type;
             this.showLogin = false;
@@ -126,8 +130,10 @@ new Vue({
     methods:{
         logout(){
             axios.get('/logout').then(res =>{
-                this.user=false;
-                this.type='';
+                window.user=false;
+                window.type='visitor';
+                this.user = false;
+                this.type = 'visitor';
             }).catch(err => {
                 console.log(err);
             });
