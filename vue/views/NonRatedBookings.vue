@@ -1,44 +1,57 @@
 <template>
 
   <div>
-    <!-- <div class="message-header">
-    <p> Player </p>
-    <p> Comment </p>
-    <p>Time Stamp</p>
-  </div> -->
-  <div class="message-header" v-for="(booking, index) in bookings">
-    <p>{{	booking.bookingArena }}</p>
-    <p v-if="">{{ playerNames[index] }}</p>
-    <p>{{ dates[index] }}	 </p>
+    <table class="table">
+      <tr>
+        <th>Arena</th>
+        <th>Player</th>
+        <th>Time</th>
+          <th>Rating</th>
+          <th>&nbsp</th>
+        </tr>
+        <!-- <div > -->
+          <tr v-for="(booking, index) in bookings">
+            <td>{{	booking.bookingArena }}</td>
+            <td>{{ playerNames[index] }}</td>
+            <td>{{ dates[index] }}	 </td>
 
-    <div>
-      <input type="radio" name="star" v-model="rate" value="1"/>
-      <!-- <label for="star-5"></label> -->
-      <input type="radio" name="star" v-model="rate" value="2"/>
-      <!-- <label for="star-4"></label> -->
-      <input type="radio" name="star" v-model="rate" value="3"/>
-      <!-- <label for="star-3"></label> -->
-      <input type="radio" name="star" v-model="rate" value="4"/>
-      <!-- <label for="star-2"></label> -->
-      <input type="radio" name="star" v-model="rate" value="5"/>
-      <!-- <label for="star-1"></label> -->
-      <div class="control">
-        <button @click="editClicked(booking, index)" class="button is-primary">
-          Rate
-        </button>
-      </div>
-    </div>
+            <td>
+              <div class="block">
+                <span class="demonstration"></span>
+                <el-rate
+                v-model="value[index]"
+                :colors="['#99A9BF', '#F7BA2A', '#FF9900']">
+              </el-rate>
+            </div>
+
+          </td>
+          <td>
+            <div class="control">
+              <button @click="editClicked(booking, index)" class="button is-primary">
+                Rate
+              </button>
+            </div>
+          </td>
+        </tr>
+      <!-- </div> -->
+    </table>
   </div>
-</div>
 
 </template>
 
+<style>
+p {
+  indent: {
+    padding-left: 1.8em
+  };
+}
+</style>
 <script>
 export default{
 
   data() {
     return {
-      rate: '1',
+      value: [],
       bookings : [],
       playerNames: [],
       dates: []
@@ -49,48 +62,42 @@ export default{
     axios.get('/getUnratedBookings')
     .then(res => {
       this.bookings = res.data.remBooking;
-      this.playerNames = [];
-      this.dates = [];
-      for (var i = 0; i < this.bookings.length; i++) {
-        var date = new Date(this.bookings[i].date);
-        this.dates.push(date.getFullYear() + "/" + (date.getMonth()+1) + "/" + date.getDate()
-        + " " + date.getHours() + ":" + date.getMinutes());
-        let playerID = this.bookings[i].playerID;
-        axios.get('/getNameOfPlayer/' + playerID)
-        .then(res => {this.playerNames.push(res.data.player.name);})
-        .catch(err => console.log(err));
-      }
+      this.render();
     })
     .catch(err => console.log(err));
   },
 
   methods: {
 
+    render(){
+      this.playerNames = [];
+      this.dates = [];
+      this.value = [];
+      for (var i = 0; i < this.bookings.length; i++) {
+        var date = new Date(this.bookings[i].date);
+        this.dates.push(date.getFullYear() + "/" + (date.getMonth()+1) +
+        "/" + date.getDate() + "(" + date.getHours() + ":" + date.getMinutes()+')');
+        this.value.push(1);
+        let playerID = this.bookings[i].playerID;
+        axios.get('/getNameOfPlayer/' + playerID)
+        .then(res => {this.playerNames.push(res.data.player.name);})
+        .catch(err => console.log(err));
+      }
+    },
+
     editClicked(booking, index){
       axios.post('/rateBooking/'+booking.bookingID, querystring.stringify({
-        "rating" : this.rate,
-        }), {
+        "rating" : this.value[index],
+      }), {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded"
         }
       })
       .then(res => {
-        // this.bookings.splice(index, 1);
-        // this.playerNames.splice(index, 1);
         axios.get('/getUnratedBookings')
         .then(res => {
           this.bookings = res.data.remBooking;
-          this.playerNames = [];
-          this.dates = [];
-          for (var i = 0; i < this.bookings.length; i++) {
-            var date = new Date(this.bookings[i].date);
-            this.dates.push(date.getFullYear() + "/" + (date.getMonth()+1) +
-            "/" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes());
-            let playerID = this.bookings[i].playerID;
-            axios.get('/getNameOfPlayer/' + playerID)
-            .then(res => {this.playerNames.push(res.data.player.name);})
-            .catch(err => console.log(err));
-          }
+          this.render();
         })
         .catch(err => console.log(err));
       })

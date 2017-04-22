@@ -10,9 +10,9 @@ var Game = require('../models/Game');
 var arenaController = require('./arenaController');
 function date_calc(year, month, day) {
   if (month < 10)  //if month is one digit pad it with zero
-    month = "0" + month;
+  month = "0" + month;
   if (day < 10)    //if day is one digit pad it with zero
-    day = "0" + day;
+  day = "0" + day;
   return year + "-" + month + "-" + day;
 }
 function validateEmail(email) {
@@ -44,7 +44,7 @@ let playerController = {
     //retrieve the players's record from DB to be able to fill the fields to be changed
     Player.findOne({ username: req.user.username }, function (err, result) {
       if (err)
-        res.send(err);
+      res.send(err);
       else {
         res.render('edit_player_page', { err, result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate()) });
 
@@ -54,7 +54,7 @@ let playerController = {
   edit_profile_info: function (req, res) { //accepting new info and update the DB record
     Player.findOne({ username: req.user.username }, function (err, result) {
       if (err)
-        res.send(err);
+      res.send(err);
       else {
         if (!req.body.name) {
           res.render('edit_player_page', { err: "name field is empty!...enter new name", result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate()) });
@@ -84,7 +84,7 @@ let playerController = {
             if (req.body.new_password) {
               hasher(req.body.new_password).hash(function (err, hash) {
                 if (err)
-                  res.send(err);
+                res.send(err);
                 else {
                   result.password = hash;
                   if (!validateEmail(req.body.email)) {
