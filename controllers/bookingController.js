@@ -34,11 +34,11 @@ var createBooking = function (req, res) {
 }
 
 function viewBookings(req, res) {
-  Arena.findOne({name:req.params.arenaName}, function (err, foundArena) {
-    if (err) {
-      res.json({ err: err });
-    }
-    else if (!foundArena) {
+    Arena.findOne({ name: req.params.arenaName }, function (err, foundArena) {
+        if (err) {
+            res.json({ err: err });
+        }
+        else if (!foundArena) {
 
       res.json({ err: "Sorry Broken Link, this arena may have been deleted, removed or is no longer existant" });
 
@@ -202,10 +202,9 @@ function getUnratedBookings(req, res) {
           });
         });
       }
-    }
+    };
 
     function rateBooking (req, res) {
-      console.log(req.body.rating);
       if(!req.body.rating || parseInt(req.body.rating) > 5 || parseInt(req.body.rating) < 1)
       {
         res.status(400).json({error: "bad request, enter a proper rating!"});
@@ -220,6 +219,7 @@ function getUnratedBookings(req, res) {
         if (!booking)
         return res.status(404).json({error: "booking not found"});
 
+
         if(req.user.type == 'Player'){
           booking.arena_rating = parseInt(req.body.rating);
 
@@ -233,6 +233,7 @@ function getUnratedBookings(req, res) {
           Arena.findOne({ name: booking.arena }, function (err, arena) {
             var rating = parseInt(req.body.rating);
             if (err) {
+
               res.status(400).json({error: err.message});
               return;
             }
@@ -253,6 +254,7 @@ function getUnratedBookings(req, res) {
             arena.ratings_count++;
             // save rating at arena
             arena.save(function (err) {
+
               if (err) {
                 res.status(400).json({error: err.message});
                 return;
@@ -520,3 +522,4 @@ function getUnratedBookings(req, res) {
           getUnratedBookings: getUnratedBookings
         }
         module.exports = bookingController;
+

@@ -334,65 +334,58 @@ let serviceProviderController =
             });
         },
 
-        myArenas : function(req,res){
-            Arena.find({service_provider : req.user._id},function(err,arenas){
-                if(err){
-                    return res.json({error : err});
-                }else{
+        myArenas: function (req, res) {
+            Arena.find({ service_provider: req.user._id }, function (err, arenas) {
+                if (err) {
+                    return res.json({ error: err });
+                } else {
                     return res.json(arenas);
                 }
             });
         },
 
-        edit_profile_page: function (req, res) { // prepar the edit profile page
+       edit_profile_page: function (req, res) { // prepar the edit profile page
             //retrieve the players's record from DB to be able to fill the fields to be changed
             ServiceProvider.findOne({ username: req.user.username }, function (err, result) {
                 if (err)
-                    res.send(err);
+                    res.status(500).json({error : err.message});
                 else {
-                    res.render('edit_provider_page', { err, result });
+                    res.json({result});
 
                 }
             })
         },
         edit_profile_info: function (req, res) { //accepting new info and update the DB record
-            ServiceProvider.findOne({ username: req.user.username }, function (err, result) {
+            ServiceProvider.findOne({ username: req.user.username}, function (err, result) {
                 if (err)
-                    res.send(err);
+                    res.status(500).json({error: err.message});
                 else {
-                    if (!req.body.name) {
-                        res.render('edit_provider_page', { err: "name field is empty!...enter new name", result });
-                        return;
-                    } if (!req.body.email) {
-                        res.render('edit_provider_page', { err: "email field is empty!...enter new email", result });
-                        return;
-                    } if (!req.body.phone_number) {
-                        res.render('edit_provider_page', { err: "phone number field is empty!...enter new phone number", result });
-                        return;
-                    } if (!req.body.old_password) {
-                        res.render('edit_provider_page', { err: "your password is required to confirm changes", result });
-                        return;
-                    }
+                  req.checkBody('name', 'Name is required.').notEmpty();
+                    req.checkBody('old_password', 'Password is required.').notEmpty();
+                    req.checkBody('email', 'Email wrong format').isEmail();
+                    req.checkBody('email', 'Email is required.').notEmpty();
+                    req.checkBody('phone_number', 'Phone number is required.').notEmpty();
+                    req.checkBody('phone_number','not a number.').isNumeric();
+                    var errors = req.validationErrors();
+
+                  if(errors)
+                  return res.status(400).json({errors,result});
+
 
                     hasher(req.body.old_password).verifyAgainst(result.password, function (err, verified) {
                         if (err) {
-                            console.log("error 1");
-                            res.send(err);
+                            res.status(500).json({error:err.message});
                             return;
                         }
                         else {
                             if (!verified) {
-                                res.send({ err: " wrong pass" });
+                                res.status(422).json({errors:[{param : 'old_password',msg:'wrong password !'}],result });
                                 return;
                             } else {
                                 result.name = req.body.name;
                                 if (req.body.new_password) {
                                     hasher(req.body.new_password).hash(function (err, hash) {
                                         result.password = hash;
-                                        if (!validateEmail(req.body.email)) {
-                                            res.send("wrong email format");
-                                            return;
-                                        }
                                         result.email = req.body.email;
                                         result.phone_number = req.body.phone_number;
                                         if (req.files[0]) {
@@ -404,10 +397,10 @@ let serviceProviderController =
                                             result.mode = false;
                                         result.save(function (err) {
                                             if (err) {
-                                                res.send(err);
+                                                res.status(500).json({error:err.message});
                                                 return;
                                             } else {
-                                                res.render('edit_provider_page', { err: "information updated successfully", result });
+                                                res.json({ message: "information updated successfully", result });
                                                 return;
                                             }
                                         });
@@ -415,10 +408,6 @@ let serviceProviderController =
                                     });
                                 }
                                 else {
-                                    if (!validateEmail(req.body.email)) {
-                                        res.send("wrong email format");
-                                        return;
-                                    }
                                     result.email = req.body.email;
                                     result.phone_number = req.body.phone_number;
                                     if (req.files[0]) {
@@ -430,10 +419,10 @@ let serviceProviderController =
                                         result.mode = false;
                                     result.save(function (err) {
                                         if (err) {
-                                            res.send(err);
+                                            res.status(500).json({error : err.message});
                                             return;
                                         } else {
-                                            res.render('edit_provider_page', { err: "information updated successfully", result });
+                                            res.json({ message: "information updated successfully", result });
                                             return;
                                         }
                                     });
@@ -445,7 +434,7 @@ let serviceProviderController =
                 }
 
             });
-        },
+        }
 
     }
 

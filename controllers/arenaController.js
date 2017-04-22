@@ -171,38 +171,40 @@ function editarenainfo(req, res) {
   });
 };
 function editdefaultschedule(req, res, nxt) {
-  var arenaid = req.params.arenaid;
-  Arena.findOne({ _id: arenaid }, function (err, arena) {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-    if (!arena) {
-      return res.status(400).json({ error: 'the arena is not found' });
-    }
-    if (req.user && arena.service_provider == req.user._id) {
-      var new_sch = new Array(7).fill(new Array(48).fill(0));
-      if (req.body.schedule) {
-        var ds = req.body.schedule;
-
-        for (var i = 0; i < ds.length; i++) {
-          var sa = ds[i].split(",");
-          var x = parseInt(sa[0]);
-          var y = parseInt(sa[1]);
-          new_sch[x][y] = -1;
-        }
-      }
-      arena.default_weekly_schedule = new_sch;
-      arena.save(function (err) {
+    var arenaid = req.params.arenaid;
+    Arena.findOne({ _id: arenaid }, function (err, arena) {
         if (err) {
-          return res.status(500).json({ error: err.message });
+            return res.status(500).json({ error: err.message });
         }
-      });
-      return res.json(arena);
-    } else {
-      return res.status(400).json({ error: 'you are not autherized to view this page' });;
-    }
-  });
+        if (!arena) {
+            return res.status(400).json({ error: 'the arena is not found' });
+        }
+        if (req.user && arena.service_provider == req.user._id) {
+            var new_sch = new Array(7);
+            for (var i = 0; i < 7; i++)
+                new_sch[i] = new Array(48).fill(0);
+            if (req.body.schedule) {
+                var ds = req.body.schedule;
+                for (var i = 0; i < ds.length; i++) {
+                    var sa = ds[i].split(",");
+                    var x = parseInt(sa[0]);
+                    var y = parseInt(sa[1]);
+                    new_sch[x][y] = -1;
+                }
+            }
+            arena.default_weekly_schedule = new_sch;
+            arena.save(function (err) {
+                if (err) {
+                    return res.status(500).json({ error: err.message });
+                }
+            });
+            return res.json(arena);
+        } else {
+            return res.status(400).json({ error: 'you are not autherized to view this page' });;
+        }
+    });
 }
+
 function addimage(req, res, nxt) {
   var newimage = { data: req.files[0].buffer };
   var arenaid = req.params.arenaid;

@@ -29,11 +29,11 @@ var localStrategy = new LocalStrategy(
 passport.use(localStrategy);
 
 passport.serializeUser(function (user, done) {
-	done(null, {username:user.username,type:user.type,_id:user._id});
+	done(null, { username: user.username, type: user.type, _id: user._id });
 });
 
 passport.deserializeUser(function (user, done) {
-	done(null, {username:user.username,type:user.type,_id:user._id});
+	done(null, { username: user.username, type: user.type, _id: user._id });
 });
 
 

@@ -1,24 +1,39 @@
 import VueRouter from 'vue-router';
 
-let routes=[
+let routes = [
 	{
-		path : '/',
-		component : require('./views/Home')
+		path: '/',
+		component: require('./views/Home')
 	},
 
 	{
-		path : '/about',
-		component : require('./views/About')
+		path: '/about',
+		component: require('./views/About')
 	},
 
 	{
-		path : '/myArenas',
-		component : require('./views/MyArenas')
+		path: '/myArenas',
+		component: require('./views/MyArenas')
 	},
 
 	{
-		path : '/login',
-		component : require('./views/Login')
+		path: '/login-signup',
+		components:{
+			default : require('./views/Home'),
+			loginModal : require('./views/LoginSignup')
+		},
+
+		children: [
+        {
+          path: 'login',
+          component: require('./views/Login')
+        },
+        {
+          path: 'signup',
+          component: require('./views/Signup')
+        }
+      ]
+
 	},
 
 	{
@@ -34,14 +49,51 @@ let routes=[
 	{
 		path : '/rating',
 		component : require('./views/NonRatedBookings')
-	}
+	},
+  
+	{
+		path:'/myrequests',
+		component : require('./views/Myrequests')
+
+	},
+  
+	{
+		path:'/games',
+		component: require('./views/Games')
+	},
+  
+	{
+		path:'/notifications',
+		component: require('./views/Notifications')
+	},
+
+	{
+    	path:'/viewArenas',
+    	component: require('./views/Arenas.vue')
+    },
+
+    {
+    	path:'/arenaDetails',
+    	component: require('./views/ArenaDetails.vue')
+    },
+
+    {
+       path: '/search',
+       component: require('./views/Search.vue')
+
+     },
+
+     {
+       path:'/edit_profile',
+       component : require('./views/EditPage.vue')
+     }
 
 ];
 
 
 export default new VueRouter({
-	routes ,
+	routes,
 
-	linkActiveClass : 'is-active'
+	linkActiveClass: 'is-active'
 
 });
