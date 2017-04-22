@@ -164,8 +164,8 @@ export default {
 <div >
 <div class="month">      
   <ul>
-    <li class="prev"><a v-on:click="showPrev">&#10094;</a></li>
-    <li class="next"><a v-on:click="showNext">Show Next Month &#10095;</a></li>
+    <li class="prev" v-if="calMonth != ((new Date()).getMonth())"><a v-on:click="showPrev">Show Current Month &#10094;</a></li>
+    <li class="next" v-if="calMonth == ((new Date()).getMonth())"><a v-on:click="showNext">Show Next Month &#10095;</a></li>
     <li style="text-align:center">
       <slot name="month" ></slot><br>
       <span style="font-size:18px"><p v-text="year" ></p></span>

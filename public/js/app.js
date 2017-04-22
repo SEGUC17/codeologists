@@ -7872,19 +7872,19 @@ if (false) {
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', [_c('div', [_c('div', {
     staticClass: "month"
-  }, [_c('ul', [_c('li', {
+  }, [_c('ul', [(_vm.calMonth != ((new Date()).getMonth())) ? _c('li', {
     staticClass: "prev"
   }, [_c('a', {
     on: {
       "click": _vm.showPrev
     }
-  }, [_vm._v("❮")])]), _vm._v(" "), _c('li', {
+  }, [_vm._v("Show Current Month ❮")])]) : _vm._e(), _vm._v(" "), (_vm.calMonth == ((new Date()).getMonth())) ? _c('li', {
     staticClass: "next"
   }, [_c('a', {
     on: {
       "click": _vm.showNext
     }
-  }, [_vm._v("Show Next Month ❯")])]), _vm._v(" "), _c('li', {
+  }, [_vm._v("Show Next Month ❯")])]) : _vm._e(), _vm._v(" "), _c('li', {
     staticStyle: {
       "text-align": "center"
     }
