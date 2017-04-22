@@ -1,15 +1,33 @@
 <script>
-//import calenderHeader from './calenderHeader.vue';
-import month from './month.vue';
 export default {
     methods:
     {
+        showPrev(){
+            if(this.calMonth != ((new Date()).getMonth()))
+            {
+                Event.$emit('hidedaydetails');
+            }
+            
+            Event.$emit('showfirstmonth');    
+            
+            
+        },
+        showNext(){
+
+            if(this.calMonth == ((new Date()).getMonth()))
+            {
+                Event.$emit('hidedaydetails');
+            }
+            
+
+               Event.$emit('shownextmonth');    
+                
+        },
         findHREF:function(index){
-            if(index>=this.cDayIndex)
+            if(index>=this.cDayIndex && (index-this.cDayIndex<27))
             return "/dayDetail/"+index;
             else
             {   
-                console.log('index :' + index);
                 return "/dayDetail/1";
             }
         },
@@ -20,7 +38,8 @@ export default {
             dateToComp.setHours(0,0,0,0);
             var date = new Date();
             date.setHours(0,0,0,0);
-            if(!((date)>(dateToComp) || !this.arena.schedule) )
+            var weekDay = (date.getDay()+1)%7;
+            if(!((date)>(dateToComp) || !this.arena.schedule || Math.floor((dateToComp-date)/(3600*1000*24))+weekDay>27) ) //or diff in days >27-weekDayIndex
             {
                 
                 Event.$emit('showagain',{schedule:this.arena.schedule[index.weekIndex][index.dayIndex],day:day,month:this.calMonth,arenaName:this.arena.name});
@@ -46,6 +65,22 @@ export default {
             var arenaName = "12";
             axios.get('/arena/'+arenaName+'/show').then(res => this.arena = res.data).catch(error => this.errors = (error.data));
         
+        },
+        getRange(){
+            if(this.calMonth ==0 || this.calMonth ==2 || this.calMonth ==4 || this.calMonth ==6 || this.calMonth ==7 || this.calMonth ==9 || this.calMonth ==11)
+                    return 31;
+                else if(this.calMonth != 1)
+                    return 30;
+                else if((new Date()).getFullYear()%4 ==0)
+                    return 29;
+                else
+                    return 28;
+        },
+        getShiftAmount(){
+            var startOfMonth = new Date();
+            startOfMonth.setDate(1);
+            startOfMonth.setMonth(this.calMonth);
+            return (startOfMonth.getDay() -1)%7;
         }
     },
     data()
@@ -53,7 +88,7 @@ export default {
         return {
             arena:{},
             errors:{},
-            monthName:(new Date()).toLocaleString("en-us", { month: "long" }),
+            
         }
     },
     mounted()
@@ -119,7 +154,8 @@ export default {
     
         Event.$on('bookingsent',()=>this.refresh());
        
-    }
+    },
+    props:['monthName']
     
 }
 </script>
@@ -128,10 +164,10 @@ export default {
 <div >
 <div class="month">      
   <ul>
-    <li class="prev">&#10094;</li>
-    <li class="next">&#10095;</li>
+    <li class="prev"><a v-on:click="showPrev">&#10094;</a></li>
+    <li class="next"><a v-on:click="showNext">Show Next Month &#10095;</a></li>
     <li style="text-align:center">
-      <p name="monthName" v-model="monthName" v-text="monthName"></p><br>
+      <slot name="month" ></slot><br>
       <span style="font-size:18px"><p v-text="year" ></p></span>
     </li>
   </ul>
@@ -146,10 +182,10 @@ export default {
   <li>Su</li>
 </ul>
 <ul class="days">  
-<router-link tag="li"  v-for="n in 31" :to="findHREF(n)" :key='n' :day="n"><button @click="showDayDetails(n)">{{n}}</button></router-link>
+<li v-for="i in getShiftAmount()"><a>-</a></li>
+<router-link tag="li"  v-for="n in getRange()" :to="findHREF(n)" :key='n' :day="n"><button @click="showDayDetails(n)">{{n}}</button></router-link>
 </ul>
 </div>
-<router-view ></router-view>
 </div>
 </template>
 <style>
@@ -159,7 +195,7 @@ body {font-family: Verdana,sans-serif;}
 
 .month {
     padding: 70px 25px;
-    width: 100%;
+    width: 50%;
     background: #1abc9c;
 }
 

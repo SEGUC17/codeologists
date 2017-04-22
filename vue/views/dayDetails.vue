@@ -79,7 +79,7 @@
                      day:this.day,
                      month:this.month,
                      startIndex:this.findIndex(this.startTime),
-                     endIndex:this.findIndex(this.endTime),
+                     endIndex:this.findIndex(this.endTime)-1,
                     
                  }),
                  {headers:
@@ -91,7 +91,6 @@
                  ).catch(error => this.error=true);
              },
              assignValues(data){
-                 console.log("in assignValues ");
                  this.shown= true;                
                  if(!data)
                  return;
@@ -140,7 +139,7 @@
         },
         created()
         {
-            //Event.$emit('daydetailcreated');
+            Event.$on('hidedaydetails',() => this.hideMe());
             Event.$on('showagain',(data) => this.assignValues(data));
         }
         

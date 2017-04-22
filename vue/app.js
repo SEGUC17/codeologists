@@ -12,11 +12,10 @@ import calender from './components/calender.vue';
 import calenderHeader from './components/calenderHeader.vue';
 import month from './components/month.vue';
 import dayDetails from './views/dayDetails';
-Vue.component('day', day);
+import reserveTime from './views/reserveTime.vue';
 Vue.component('calender', calender);
-Vue.component('calenderHeader', calenderHeader);
-Vue.component('month', month);
 Vue.component('dayDetails', dayDetails);
+Vue.component('reservetime',reserveTime);
 Vue.use(vueRouter);
 //handle errors
 var viewBookings = new Vue({
@@ -51,7 +50,7 @@ var viewBookings = new Vue({
 
 var bookHours = new Vue({
     el: "#schedlueRoot",
-    components: { day, calender, dayDetails },
+    components: { calender, dayDetails,reserveTime },
     router: router,
     methods: {
         redirect(data) {
@@ -62,7 +61,10 @@ var bookHours = new Vue({
             else
                router.replace('/dayDetail/22');
            
-        }
+        },
+        onshowfirstmonth(){
+                window.alert('hello there');
+            }
     },
     data: {
 
@@ -71,6 +73,7 @@ var bookHours = new Vue({
     },
     created() {
         Event.$on('calendercreated', (data) => this.redirect(data));
+        //Event.$on('showfirstmonth',() => Event.$emit('goback'));
     }
 })
 
