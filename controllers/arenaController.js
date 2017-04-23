@@ -1,10 +1,13 @@
 var serviceProviderController = require('./serviceProviderController');
+var bookingController = require('./bookingController');
+
 var ServiceProvider = require('../models/ServiceProvider');
 var Arena = require('../models/Arena');
 var Booking = require('../models/Booking');
 
 //reserves a set of FREE hours to certain user in a certain Arena
 var bookHours = function (month, day, startIndex, endIndex, timestamp, arenaName, playerID, callback) {
+
   //create Booking
   var indices = serviceProviderController.getScheduleIndices(month, day);
 
@@ -131,6 +134,23 @@ function editarena(req, res) {
     }
   });
 };
+
+const getArenas = function (req, res) {
+    if (req.user.type == 'ServiceProvider') {
+        Arena.find({ service_provider: req.user._id },'name', function (dbErr, arenaArr) {
+            if (dbErr)
+                res.status(500).json({ error: "Sorry We have Encountered an internal server error" });
+            else {
+                res.json(arenaArr);
+            }
+        })
+    }
+    else {
+        res.status(403).json({ error: "Please Log In as a Service Provider /Arena owner to view the list of pending booking requests" });
+    }
+}
+
+
 function editarenainfo(req, res) {
   console.log(req.body);
   var arenaid = req.params.arenaid;
@@ -503,6 +523,7 @@ function createArena(req, res) {
   })
 }
 let arenaController = {
+
   bookHours: bookHours,
   checkAvailable: checkAvailable,
   commentOnArena: commentOnArena,
@@ -515,5 +536,6 @@ let arenaController = {
   setUnavailable: setUnavailable,
   setAvailable: setAvailable,
   createArena: createArena,
+  getArenas : getArenas
 }
 module.exports = arenaController;

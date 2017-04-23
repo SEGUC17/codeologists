@@ -43,23 +43,38 @@ let serviceProviderController =
 
         getScheduleIndices: getScheduleIndices,
         getTimeFromIndex: getTimeFromIndex,
+
+        getTheMode: function(req,res){
+            var username = req.user.username;
+            if(!req.user){
+                res.json(400,{ error : 'You are not logged in'});
+            }
+            ServiceProvider.findOne({ username: username }, function (err, user) {
+                console.log(user.mode);
+                    if (!err)
+                        res.json(200,{ mode : user.mode});
+                    });
+                },
+
         turnAutoAcceptModeOn: function (req, res) {
             if (req.user.type != 'ServiceProvider') {
-                res.send('You are not authorized to do this action');
+                res.json(403, {error :'You are not authorized to do this action'});
                 return;
             }
             var username = req.user.username;
             ServiceProvider.findOne({ username: username }, function (err, user) {
                 if (!user) {
-                    res.send('Try again after logging in');
-
+                        res.json(403 ,{error :'Try again after logging in'});
+                        return;
                 }
                 else {
                     if (!err) {
                         user.mode = true;
                         user.save(function (err) {
                             if (err)
-                                res.send(err);
+                                res.json(400 ,{error : 'Error while saving'});
+                            else
+                                res.json(200 , {success : 'Mode turned on'});
                         });
                     }
                 }
@@ -68,21 +83,23 @@ let serviceProviderController =
 
         turnAutoAcceptModeOff: function (req, res) {
             if (req.user.type != 'ServiceProvider') {
-                res.send('You are not authorized to do this action');
+                res.json(403, {error :'You are not authorized to do this action'});
                 return;
             }
             var username = req.user.username;
             ServiceProvider.findOne({ username: username }, function (err, user) {
                 if (!user) {
-                    res.send('Try again after logging in');
-
+                   res.json(403 ,{error :'Try again after logging in'});
+                   return;
                 }
                 else {
                     if (!err) {
                         user.mode = false;
                         user.save(function (err) {
                             if (err)
-                                res.send(err);
+                                res.json(400 ,{error : 'Error while saving'});
+                            else
+                                res.json(200 , {success : 'Mode turned off'});
                         });
                     }
                 }

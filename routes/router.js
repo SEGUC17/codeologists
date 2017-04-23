@@ -66,6 +66,12 @@ router.get('/', function (req, res) {
     res.render('index');
 });
 
+
+router.get('/panel', function (req, res) {
+    res.render('serviceProviderControlPanel');
+});
+
+
 router.get('/register', function (req, res) {
     res.json({ success: "choose type" });
 });
@@ -149,9 +155,11 @@ router.post('/profile/whitelist/phone', ensureAuthenticated, serviceProviderCont
 
 router.post('/profile/removewhitelist', ensureAuthenticated, serviceProviderController.remove_from_whitelist);
 
-router.get('/arena/:id/getComments', ensureAuthenticated, arenaController.getComments);
-
 router.get('/getNameOfPlayer/:id', ensureAuthenticated, playerController.getPlayer);
+
+router.post('/getPlayersForBookings', ensureAuthenticated, bookingController.getPlayersForBookings);
+
+router.get('/arena/:id/getComments', ensureAuthenticated, arenaController.getComments);
 
 router.post('/arena/:id/comment', ensureAuthenticated, arenaController.commentOnArena);
 
@@ -167,8 +175,8 @@ router.post('/cancelBooking/:bookingID', ensureAuthenticated, bookingController.
 
 router.post('/turnAcceptModeOn', ensureAuthenticated, serviceProviderController.turnAutoAcceptModeOn);
 router.post('/turnAcceptModeOff', ensureAuthenticated, serviceProviderController.turnAutoAcceptModeOff);
-router.post('/acceptBooking', ensureAuthenticated, bookingController.acceptBooking2);
-router.post('/rejectBooking', ensureAuthenticated, bookingController.rejectBooking);
+router.post('/acceptBooking/:bookingID', ensureAuthenticated, bookingController.acceptBooking2);
+router.post('/rejectBooking/:bookingID', ensureAuthenticated, bookingController.rejectBooking);
 router.post('/createGame', ensureAuthenticated, gameController.createGame);
 
 router.post("/sp/arena/:arena_id", ensureAuthenticated, function (req, res) {
@@ -182,9 +190,11 @@ router.get('/arena/:arenaName/viewBookings', ensureAuthenticated, bookingControl
 
 router.post('/arena/:arenaName/bookWeekly', ensureAuthenticated, playerController.bookWeekly);
 
-
 //book free hours
 router.post('/arena/:arenaName/bookHours', ensureAuthenticated, bookingController.createBooking);
+
+
+router.get('/getArenas',ensureAuthenticated,arenaController.getArenas);
 
 router.get('/myrequests',ensureAuthenticated,gameController.myrequests);
 router.get('/mygame',ensureAuthenticated,gameController.mygame);
@@ -193,5 +203,6 @@ router.post('/AcceptRequest/:id', ensureAuthenticated, gameController.acceptrequ
 router.post('/RejectRequest/:id', ensureAuthenticated, gameController.rejectrequest);
 router.get('/myNotifications',ensureAuthenticated,playerController.myNotifications);
 
+router.get('/getTheMode' , ensureAuthenticated , serviceProviderController.getTheMode);
 
 module.exports = router;

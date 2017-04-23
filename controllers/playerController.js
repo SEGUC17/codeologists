@@ -126,7 +126,7 @@ let playerController = {
 
     });
   },
-  
+
   getPlayer: function (req, res) {
     Player.findById(req.params.id, function (err, player) {
       if(err)
