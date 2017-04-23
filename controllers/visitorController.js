@@ -186,11 +186,11 @@ let visitorController = {
 		var blacklisted = 0;
 
 		Arena.findOne({ name: req.params.arenaName }, function (err, result) {
-			if (err) {
+			if (err || !result) {
 				res.status(404).json({ error: err });
 			}
 			else {
-				if (result.length == 0)
+				if (result.length==0)
 					res.status(403).json({ error: "No Arenas Found in That Location." });
 				else {
 					var id = require('mongodb').ObjectID(result.service_provider);
