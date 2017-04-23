@@ -5,19 +5,19 @@
    Reservation day: {{day}}
    <a  v-on:click="hideMe">&#10799; </a>
    <div class="Content">
-  <span class="tag is-primary" >Booking Start Time</span>
+  <span class="tag is-primary is-medium" >Booking Start Time</span>
    <select v-model="startTime"  @change="nullifyEndTime()">
    <option v-for="(freeSlot,index) in freeSlots" :key="index">{{freeSlot}}</option>
    </select>
    </div>
    <div v-if="startTime != null">
-   <span class="tag is-primary">Booking End Time</span>
+   <span class="tag is-primary is-medium">Booking End Time</span>
    <select v-model="endTime" >
    <option v-if="startTime != null" v-for="n in (findIndex(maxAllowedEndTime) - findIndex(startTime))" :key="n">{{findTime(n+findIndex(startTime))}}</option>
    </select>
    </div> 
    <div>
-   <span class="tag is-danger">Please Note that the arena is booked/unavailable in the following times</span>
+   <span class="tag is-danger is-large">Please Note that the arena is already booked/unavailable in the following times</span>
    <table class="table is-bordered is-striped" id="unavailable">
    <tr>
     <th>Start </th>
@@ -64,6 +64,7 @@
             },
             nullifyEndTime(){
                 this.endTime =null;
+                this.error =false;
             },
             findTime(index)
             {
@@ -119,11 +120,11 @@
                     }
                     this.startTime=null;
                     this.endTime = null;
-                   
-
-                   
-                 
-             }
+                    var a= this.schedule;
+                    this.schedule = null;
+                    this.schedule =a;
+                    console.log("done");
+            }
 
         
         },
