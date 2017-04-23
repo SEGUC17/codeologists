@@ -23,69 +23,6 @@
       </el-card>
       <br><br>
     </div>
-
-
-
-
-<br><br><br><br><br><br>
-
-
-      <div class="tile is-parent" v-for = "booking in bookings">
-          <article class="tile is-child notification">
-            <table>
-              <tr>
-                <td>{{booking.arena}}</td>
-                <td>{{booking.bookDay}}/{{booking.bookMonth}}</td>
-                <td>{{hour(booking.start_index)}}:{{minute(booking.start_index)
-                }}</td>
-                <td>{{hour(booking.end_index)}}:{{minute(booking.end_index)
-                }}</td>
-                <!-- <td><button type="button" @click = 'cancel(booking)' class="button is-danger">Delete</button></td> -->
-                <td><a class="delete button is-danger" @click = 'cancel(booking)' ></a></td>
-              </tr>
-            </table>
-          </article>
-        </div>
-
-
-
-        <br><br><br><br><br><br>
-
-
-
-      <br>
-      <h2>Your current bookings</h2>
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Arena</th>
-            <th>Date</th>
-            <th>From</th>
-            <th>To</th>
-            <th>&nbsp</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>&nbsp</td>
-            <td>&nbsp</td>
-            <td>&nbsp</td>
-            <td>&nbsp</td>
-            <td>&nbsp</td>
-
-          </tr>
-          <tr v-for = "booking in bookings">
-            <td>{{booking.arena}}</td>
-            <td>{{booking.bookDay}}/{{booking.bookMonth}}</td>
-            <td>{{hour(booking.start_index)}}:{{minute(booking.start_index)
-            }}</td>
-            <td>{{hour(booking.end_index)}}:{{minute(booking.end_index)
-            }}</td>
-            <!-- <td><button type="button" @click = 'cancel(booking)' class="button is-danger">Delete</button></td> -->
-            <td><a class="delete button is-danger" @click = 'cancel(booking)' ></a></td>
-          </tr>
-        </tbody>
-      </table>
     </div>
 </template>
 
@@ -135,7 +72,7 @@
       },
 
       cancel(booking){
-        if(confirm('Are you sure you want to delete this booking?'))
+        if(confirm('Are you sure you want to cancel this booking?'))
         {
           axios.post('/cancelBooking/'+booking._id,querystring.stringify({arena: booking.arena}),{headers : { "Content-Type": "application/x-www-form-urlencoded" }})
               .then(response => {
