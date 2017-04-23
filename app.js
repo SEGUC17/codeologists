@@ -15,16 +15,14 @@ var Booking = require('./models/Booking');
 var Arena = require('./models/Arena');
 var logger = require('morgan');
 var validator = require('express-validator');
-
-schedule.scheduleJob({ hour: 00, minute: 00, dayOfWeek: 5 }, systemController.updateSchedule);
-schedule.scheduleJob({ hour: 07, minute: 00, dayOfWeek: 5 }, systemController.collectGarbage);
+var serviceProviderController =  require('./controllers/serviceProviderController');
+schedule.scheduleJob({ hour: 07, minute: 00, dayOfWeek: 6 }, systemController.updateSchedule);
 
 //database connection url
 var db_url = "mongodb://localhost:27017/db";
 mongoose.Promise = Promise;
 
 app.use(logger('dev'));
-
 // config app
 app.set('view engine', 'ejs');
 app.set('views', path.resolve(__dirname, 'views'));
@@ -44,6 +42,7 @@ app.use(flash());
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(logger('short'));
 app.use(require('./routes/router.js'));
 
 

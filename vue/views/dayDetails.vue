@@ -1,20 +1,24 @@
 <template>
 
-<div>
-   <button v-on:click="hideMe">Close Me </button>
-   <div>
-   <label>Booking Start Time</label>
-   <select v-model="startTime">
-   <option v-for="(freeSlot,index) in freeSlots">{{freeSlot}}</option>
+<div v-if="shown">
+   
+   Reservation day: {{day}}
+   <a  v-on:click="hideMe">&#10799; </a>
+   <div class="Content">
+  <span class="tag is-primary is-medium" >Booking Start Time</span>
+   <select v-model="startTime"  @change="nullifyEndTime()">
+   <option v-for="(freeSlot,index) in freeSlots" :key="index">{{freeSlot}}</option>
    </select>
    </div>
-   <div>
-   <label>Booking End Time</label>
-   <select v-model="endTime">
-   <option v-if="startTime != null" v-for="n in (findIndex(maxAllowedEndTime) - findIndex(startTime))">{{findTime(n+findIndex(startTime))}}</option>
+   <div v-if="startTime != null">
+   <span class="tag is-primary is-medium">Booking End Time</span>
+   <select v-model="endTime" >
+   <option v-if="startTime != null" v-for="n in (findIndex(maxAllowedEndTime) - findIndex(startTime))" :key="n">{{findTime(n+findIndex(startTime))}}</option>
    </select>
    </div> 
-   <table id="unavailable">
+   <div>
+   <span class="tag is-danger is-large">Please Note that the arena is already booked/unavailable in the following times</span>
+   <table class="table is-bordered is-striped" id="unavailable">
    <tr>
     <th>Start </th>
     <td v-for="reserved in reservedSlots"> {{reserved.start}}</td>
@@ -24,7 +28,12 @@
     <td v-for="reserved in reservedSlots">{{reserved.end}}</td>
   </tr>
    </table>
-   <button v-on:click="bookHours" v-if="startTime != null && endTime != null">book NOW ! </button>
+   </div>
+   <button v-on:click="bookHours" v-if="startTime != null && endTime != null" class="button is-black">book</button>
+   <div id="error">
+    <label v-if="error">Sorry Could not complete your booking</label>
+   </div>
+  
 </div>
 </template>
 <script>
@@ -32,31 +41,35 @@
         data(){
             return{
                 shown:true,
-                schedule:[-1,0,0,0,-1,0,0,-1,0,-1,-1,0,-1,0,0,0,-1,0,0,0,-1,0,0,0,-1,0,0,0,-1,0,0,0,-1,0,0,0,-1,0,0,0,-1,0,0,0,-1,-1,-1,-1],
+                schedule:null,
                 startTime:null,
-                endTime:null
+                endTime:null,
+                day:null,
+                month:null,
+                error:false,
+                arenaName:null,
             }
         },
         methods:{
             hideMe:function(){
+                this.shown =false;
                 this.startTime=null;
                 this.endTime = null;
-                Event.$emit('hide');
+                this.error = false;
             },
-            getSchedule:function(day,month){
-            
+            nullifyEndTime(){
+                this.endTime =null;
+                this.error =false;
             },
             findTime(index)
             {
-                var min = (index)*30;
-                var hours=Math.floor(min/60);
-                min=min-60*hours;
-                if(min<10 && hours<10)
-                return '0'+hours+':'+'0'+min;
-                else if(min>=10 && hours<10)
+               
+                var hours = Math.floor(index / 2);
+                var min = '00';
+                if (index % 2 == 1)
+                min = '30';
+               if(hours<10)
                 return '0'+hours+':'+min;
-                else if(min<10 && hours>=10)
-                return  hours+':'+'0'+min;
                 else
                 return hours+':'+min;
             },
@@ -68,14 +81,47 @@
                return Math.floor(min/30) + 2 *(hours);   
              },
              bookHours(){
-                 //TODO:send axios POST request to '/bookHours'
-             }
+                 
+
+                 axios.post('/arena/'+this.arenaName+'/bookHours',querystring.stringify(
+                 {
+                     day:this.day,
+                     month:this.month,
+                     startIndex:this.findIndex(this.startTime),
+                     endIndex:this.findIndex(this.endTime)-1,
+                    
+                 }),
+                 {headers:
+                 {
+                     "Content-Type":"application/x-www-form-urlencoded"
+                 }
+                 }).then((data)=> this.updateSchedule(data)).catch(error => this.error=true);
+             },
+             assignValues(data){
+                 this.shown= true;                
+                 if(!data)
+                 return;
+                 this.schedule = data.schedule;
+                 this.day = data.day;
+                 this.month = data.month;
+                 this.arenaName = data.arenaName;
+             },
+             updateSchedule(data){
+                    //update schedule of dayDtails component
+                    this.startTime=null;
+                    this.endTime=null;
+                    this.schedule = data.data;
+                   
+                    Event.$emit('bookingsent',{day:this.day,month:this.month,schedule:this.schedule});
+            },
 
         
         },
         computed:{
             freeSlots(){
                 var freeSlotsArray = [];
+                if(!this.schedule)
+                return freeSlotsArray;
                 for(var i=0;i<this.schedule.length;i++)
                 {
                     if(this.schedule[i]==0)
@@ -85,6 +131,8 @@
             },
             reservedSlots(){
              var bookedBlocks = [];
+             if(!this.schedule)
+             return bookedBlocks;
                 for(var i=0;i<this.schedule.length;i++)
                 {
                     if(this.schedule[i]!=0)
@@ -108,17 +156,45 @@
                 return this.findTime(index);
             }
         },
+        created()
+        {
+            this.hideMe();
+            Event.$on('hidedaydetails',() => this.hideMe());
+            Event.$on('showagain',(data) => this.assignValues(data));
+            
+        }
         
         
     }
 </script>
 <style>
-    table, th, td {
-    border: 1px solid ;
-    border-collapse: collapse;
-    }
-    th, td {
-    padding: 15px;
-    }
-
+select {
+   -webkit-appearance: button;
+    -moz-appearance: button;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -webkit-padding-end: 20px;
+    -moz-padding-end: 20px;
+    -webkit-padding-start: 2px;
+    -moz-padding-start: 2px;
+    background-color: #F07575; /* fallback color if gradients are not supported */
+    background-image: url(../images/select-arrow.png), -webkit-linear-gradient(top, #E5E5E5, #F4F4F4); /* For Chrome and Safari */
+    background-image: url(../images/select-arrow.png), -moz-linear-gradient(top, #E5E5E5, #F4F4F4); /* For old Fx (3.6 to 15) */
+    background-image: url(../images/select-arrow.png), -ms-linear-gradient(top, #E5E5E5, #F4F4F4); /* For pre-releases of IE 10*/
+    background-image: url(../images/select-arrow.png), -o-linear-gradient(top, #E5E5E5, #F4F4F4); /* For old Opera (11.1 to 12.0) */ 
+    background-image: url(../images/select-arrow.png), linear-gradient(to bottom, #E5E5E5, #F4F4F4); /* Standard syntax; must be last */
+    background-position: center right;
+    background-repeat: no-repeat;
+    border: 1px solid #AAA;
+    border-radius: 2px;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+    color: #555;
+    font-size: inherit;
+    margin: 0;
+    overflow: hidden;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 </style>

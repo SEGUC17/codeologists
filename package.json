@@ -34,6 +34,10 @@
     "querystring": "^0.2.0",
     "vue": "^2.2.6",
     "vue-bulma-rating": "^1.0.1",
-    "vue-router": "^2.4.0"
+    "vue-router": "^2.4.0",
+    "stringify": "^5.1.0"
+    },
+  "devDependencies": {
+    "laravel-mix": "^0.10.0"
   }
 }

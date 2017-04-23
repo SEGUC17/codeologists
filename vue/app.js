@@ -1,6 +1,14 @@
+<<<<<<< HEAD
 import './bootstrap';
 
 import router from './routes';
+
+import calender from './components/calender.vue';
+import dayDetails from './views/dayDetails';
+import reserveTime from './views/reserveTime.vue';
+Vue.component('calender', calender);
+Vue.component('dayDetails', dayDetails);
+Vue.component('reservetime',reserveTime);
 
 window.Event = new Vue();
 
@@ -137,9 +145,17 @@ new Vue({
             }).catch(err => {
                 console.log(err);
             });
-        }
-    }
+        },
+        redirect() {
+            
+               router.replace('/dayDetail/-1');
+           
+        },
+    },
+    created(){
+        Event.$on('calendercreated', () => this.redirect());
+    },
+    components: {reserveTime},
 
 });
-
 

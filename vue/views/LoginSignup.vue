@@ -1,13 +1,13 @@
 <template>
-	<div class="box">
-		<div class="tabs is-centered is-boxed is-medium">
-			<ul>		
-				<li  @click="login=true" :class="{'is-active' : login}"><router-link to="/login-signup/login"><span>Login</span></router-link></li>
-				<li @click="login=false" :class="{'is-active' : !login}"><router-link to="/login-signup/signup"><span>Signup</span></router-link></li>
-			</ul>
-		</div>
+
+		<div>
+
+		<router-link to="/login-signup/login"><a>login</a></router-link>
+		<router-link to="/login-signup/signup"><a>signup</a></router-link>
+
 		<router-view></router-view>
-	</div>
+
+		</div>
 
 </template>
 
@@ -21,8 +21,7 @@
 					username:'',
 					password:''
 				}),
-				error:false,
-				login:true
+				error:false
 			}
 		},
 		methods : {
