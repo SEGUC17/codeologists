@@ -14,8 +14,6 @@
           
         </div>
         <br>
-        <h1>Auto Accept Mode</h1>
-        <br>
         <div class="w3-container">
         	<p><h2>{{profileUser.username}}</h2></p>
           <p><i class="fa fa-briefcase fa-fw w3-margin-right w3-large w3-text-teal"></i>{{profileUser.type}}</p>
@@ -29,10 +27,7 @@
 
           <br>
 
-          <router-link tag="li" to="/changeMode"><a>Turn On/Off</a></router-link>
-
-
-
+          <router-link v-if="profileUser.type=='ServiceProvider'" tag="li" to="/changeMode"><a>Turn On/Off</a></router-link>
 
         </div>
       </div>
@@ -73,7 +68,7 @@
 
       <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="profileUser.type=='Player'">
         <h2 class="w3-text-grey w3-padding-16">My Bookings</h2>
-        <router-link tag="li" to="/cancelBooking"><a>cancel booking</a></router-link>
+        <bookings></bookings>
       </div>
 
       <div class="w3-container w3-card-2 w3-white w3-margin-bottom">
@@ -111,6 +106,7 @@
 <script >
 
   import rating from './NonRatedBookings.vue';
+  import bookings from './delete_booking';
 
 	export default {
 		data() {
@@ -140,7 +136,8 @@
 		},
 
     components : {
-      rating
+      rating,
+      bookings
     }
 	}
 	
