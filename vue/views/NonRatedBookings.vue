@@ -4,7 +4,7 @@
     <table class="table">
       <tr>
         <th>Arena</th>
-        <th>Player</th>
+        <th v-if="type==='ServiceProvider'">Player</th>
         <th>Time</th>
           <th>Rating</th>
           <th>&nbsp</th>
@@ -12,7 +12,7 @@
         <!-- <div > -->
           <tr v-for="(booking, index) in bookings">
             <td>{{	booking.bookingArena }}</td>
-            <td>{{ playerNames[index] }}</td>
+            <td v-if="type==='ServiceProvider'">{{ playerNames[index] }}</td>
             <td>{{ dates[index] }}	 </td>
 
             <td>
@@ -67,6 +67,10 @@ export default{
     .catch(err => console.log(err));
   },
 
+  computed : {
+      type: function () { return window.type; }
+    },
+
   methods: {
 
     render(){
@@ -80,7 +84,9 @@ export default{
         this.value.push(1);
         let playerID = this.bookings[i].playerID;
         axios.get('/getNameOfPlayer/' + playerID)
-        .then(res => {this.playerNames.push(res.data.player.name);})
+        .then(res => {
+          this.playerNames.push(res.data.player.name);
+        })
         .catch(err => console.log(err));
       }
     },

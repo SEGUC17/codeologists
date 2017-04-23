@@ -55,6 +55,7 @@
 
       <div class="w3-container w3-card-2 w3-white w3-margin-bottom">
         <h2 class="w3-text-grey w3-padding-16">Pending Ratings</h2>
+        <rating></rating>
         
       </div>
 
@@ -70,6 +71,8 @@
 </template>
 
 <script >
+
+  import rating from './NonRatedBookings.vue';
 
 	export default {
 		data() {
@@ -94,9 +97,13 @@
 
 		methods: {
 			getPath(photo) {
-				return 'data:image/*;base64,' + (new Buffer(photo.data.data).toString('base64'));
+        return 'data:image/*;base64,' + (new Buffer(photo.data.data).toString('base64'));
 			}
-		}
+		},
+
+    components : {
+      rating
+    }
 	}
 	
 
