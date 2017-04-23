@@ -82,6 +82,16 @@ let routes = [
 	},
 
 	{
+		path: '/createArena',
+		component: require('./views/createArena')
+	},
+
+	{
+		path: '/cancelBooking',
+		component: require('./views/delete_booking')
+	},
+
+  {
     	path:'/viewArenas',
     	component: require('./views/Arenas.vue')
     },
@@ -116,7 +126,6 @@ let routes = [
     	path : '/profile',
     	component : require('./views/Profile')
     }
-
 
 ];
 

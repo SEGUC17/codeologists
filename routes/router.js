@@ -172,6 +172,7 @@ router.get('/createArena', ensureAuthenticated, function (req, res) {
 });
 router.post('/createArena', ensureAuthenticated, upload.any(), arenaController.createArena);
 router.post('/cancelBooking/:bookingID', ensureAuthenticated, bookingController.cancelBooking);
+router.get('/viewPlayerBookings',ensureAuthenticated, bookingController.viewPlayerBookings);
 
 router.post('/turnAcceptModeOn', ensureAuthenticated, serviceProviderController.turnAutoAcceptModeOn);
 router.post('/turnAcceptModeOff', ensureAuthenticated, serviceProviderController.turnAutoAcceptModeOff);
