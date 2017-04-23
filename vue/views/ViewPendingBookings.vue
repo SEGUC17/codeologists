@@ -1,6 +1,9 @@
 <template>
-    <div id="root">
-        <button v-for="arena in arenas" @click="selectArena(arena.name)">{{arena.name}}</button>
+    <div class="w3-container">
+        <button class="button is-primary w3-margin-right" v-for="arena in arenas" @click="selectArena(arena.name)">{{arena.name}}</button>
+
+        <br>
+        <br>
 
         <table class="table is-striped">
           <thead>

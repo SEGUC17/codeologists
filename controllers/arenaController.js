@@ -8,8 +8,8 @@ var bookingController = require('./bookingController');
 //reserves a set of FREE hours to certain user in a certain Arena
 function bookHours(month, day, startIndex, endIndex, timestamp, arenaName, playerID, callback) {
     //create Booking
-    var indices = serviceProviderController.getScheduleIndices(month, day);
-
+    var indices2 = serviceProviderController.getScheduleIndices(month, day);
+    var indices={dayIndex : parseInt(indices2.dayIndex,10) , monthIndex : parseInt(indices2.monthIndex,10)}
     Arena.findOne({ name: arenaName }, function (err, foundArena) {
 
         if (!err && foundArena) {
@@ -59,6 +59,8 @@ function bookHours(month, day, startIndex, endIndex, timestamp, arenaName, playe
                 else
                     return callback("no such booking", null);
             }
+        }else{
+          console.log(err);
         }
 
     })
@@ -138,7 +140,7 @@ function editarena(req, res) {
 
 const getArenas = function (req, res) {
     if (req.user.type == 'ServiceProvider') {
-        Arena.find({ service_provider: req.user._id },'name', function (dbErr, arenaArr) {
+        Arena.find({ service_provider: req.user._id }, 'name', function (dbErr, arenaArr) {
             if (dbErr)
                 res.status(500).json({ error: "Sorry We have Encountered an internal server error" });
             else {
@@ -543,20 +545,6 @@ function createArena(req, res) {
     })
 }
 
-const getArenas = function (req, res) {
-    if (req.user.type == 'ServiceProvider') {
-        Arena.find({ service_provider: req.user._id }, 'name', function (dbErr, arenaArr) {
-            if (dbErr)
-                res.status(500).json({ error: "Sorry We have Encountered an internal server error" });
-            else {
-                res.json(arenaArr);
-            }
-        })
-    }
-    else {
-        res.status(403).json({ error: "Please Log In as a Service Provider /Arena owner to view the list of pending booking requests" });
-    }
-}
 function getArenaSchedule(req, res) {
     var arenaName = req.params.arenaName;
     Arena.findOne({ name: arenaName }, 'schedule', function (err, foundArena) {
@@ -624,7 +612,8 @@ let arenaController = {
     addimage: addimage,
     setUnavailable: setUnavailable,
     setAvailable: setAvailable,
-    createArena: createArena
+    createArena: createArena,
+    getComments : getComments
 };
 
 

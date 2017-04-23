@@ -5,14 +5,14 @@
     <div class="column is-half is-offset-one-quarter">
 
       <input v-model="PlayerInfo" v-on:keyup.enter="onSubmit" placeholder="add a player">
-
+        
         <div v-for="(player, index) in players" v-bind:key="player" >
-
+            <br>
           <article class="media" >
 
             <figure class="media-left">
               <p class="image is-64x64">
-                <img :src="players[index].photo" alt="profile img" />
+                <img :src="getPath(players[index].photo)" alt="profile img" />
               </p>
             </figure>
           <div class="media-content">
@@ -36,6 +36,7 @@
 
 
 
+
 <script>
     export default {
         data() {
@@ -54,11 +55,17 @@
                     })
                 .then(res => {
                     this.showPlayers(res.data.players)
-                }).catch(err => {
+                })
+                .catch(err => {
                     alert("please login")
                 })
         },
         methods: {
+
+            getPath(photo) {
+                return 'data:image/*;base64,' + (new Buffer(photo.data.data).toString('base64'));
+              },
+
             showPlayers(players) {
                 for (var i = 0; i < players.length; i++)
                     this.addNewPlayer(players[i]);
@@ -87,7 +94,7 @@
                     name: listedPlayer.name,
                     username: listedPlayer.username,
                     phone: listedPlayer.phone_number,
-                    // photo: listedPlayer.profile_pic
+                    photo: listedPlayer.profile_pic
                 };
                 this.players.push(player)
                 this.PlayerInfo = ''

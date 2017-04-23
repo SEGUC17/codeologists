@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import './bootstrap';
 
 import router from './routes';

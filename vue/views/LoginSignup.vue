@@ -1,19 +1,18 @@
 <template>
-
-		<div>
-
-		<router-link to="/login-signup/login"><a>login</a></router-link>
-		<router-link to="/login-signup/signup"><a>signup</a></router-link>
-
-		<router-view></router-view>
-
+	<div class="box">
+		<div class="tabs is-centered is-boxed is-medium">
+			<ul>		
+				<li  @click="login=true" :class="{'is-active' : login}"><router-link to="/login-signup/login"><span>Login</span></router-link></li>
+				<li @click="login=false" :class="{'is-active' : !login}"><router-link to="/login-signup/signup"><span>Signup</span></router-link></li>
+			</ul>
 		</div>
+		<router-view></router-view>
+	</div>
 
 </template>
 
 
 <script>
-
 	export default {
 		data(){
 			return{
@@ -21,7 +20,8 @@
 					username:'',
 					password:''
 				}),
-				error:false
+				error:false,
+				login:true
 			}
 		},
 		methods : {
@@ -38,6 +38,5 @@
 				});
 			}
 		}
-
 	}
 </script>

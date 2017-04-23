@@ -34,6 +34,10 @@ function ensureAuthenticated(req, res, next) {
     }
 }
 
+router.get('/',function(req,res){
+    return res.render('index');
+});
+
 router.get('/findUser/:user',function(req,res){
     RegisteredUser.findOne({username : req.params.user},function(err,data){
         if(err){
@@ -56,10 +60,6 @@ router.post('/edit_player_profile', ensureAuthenticated, upload.array('profile_p
 router.post('/edit_provider_profile', ensureAuthenticated, upload.array('profile_pic'), serviceProviderController.edit_profile_info);
 router.post('/search', visitorController.filter);
 
-router.get('/', function (req, res) {
-    console.log('dgdf');
-    res.render('serviceProviderControlPanel');
-});
 
 
 router.get('/panel', function (req, res) {
@@ -191,7 +191,7 @@ router.get('/arena/:arenaName/viewBookings', ensureAuthenticated, bookingControl
 router.post('/arena/:arenaName/bookWeekly', ensureAuthenticated, playerController.bookWeekly);
 
 //book free hours
-router.post('/arena/:arenaName/bookHours', bookingController.createBooking);
+router.post('/arena/:arenaName/bookHours',ensureAuthenticated, bookingController.createBooking);
 
 
 router.get('/getArenas',ensureAuthenticated,arenaController.getArenas);
