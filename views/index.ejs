@@ -22,7 +22,7 @@
 				<div class="container">
 					<div class="nav-left">
 						<a class="nav-item">
-							<img src="images/bulma-type-white.png" alt="Logo">
+							<img src="logo.png" alt="Logo">
 						</a>
 					</div>
 					<span class="nav-toggle">
@@ -32,30 +32,46 @@
 					</span>
 					<div class="nav-right nav-menu">
 
-						<router-link class="nav-item is-active" tag="li" to="/" exact><a>Home</a></router-link>
+						<router-link class="nav-item is-active" to="/" exact><a>Home</a></router-link>
 
-						<router-link class="nav-item" to="/myArenas" v-show="type=='ServiceProvider'"><a>My Arenas</a></router-link>
+						<router-link class="nav-item" to="/myArenas" v-if="type=='ServiceProvider'"><a>My Arenas</a></router-link>
+						
 
+						<!-- player profile -->
 						<router-link class="nav-item" to="/myrequests"><a>My requests</a></router-link>
-						<router-link class="nav-item" to="/games"><a>Available Games</a></router-link>
+
+						<!-- player profile -->
 						<router-link class="nav-item" to="/notifications"><a>Notifications</a></router-link>
+
+						<router-link v-if="user" class="nav-item" to="/games"><a>Available Games</a></router-link>
+
+						<router-link class="nav-item" to="/Search">Search</router-link>
+						<router-link v-if="user" class="nav-item" to="/profile">{{user}}</router-link>
 
 
 						<!-- Hossam
 
-							<router-link to="/search" exact>Search</router-link>
+
+							//player/SP profiles
         					<router-link to="/edit_profile" exact>edit</router-link>
-
-
 
 
 						 -->
 
+	
+						 		<!-- SP profile -->
+						 	<router-link class="nav-item" tag="li" to="/blackList"><a>Black List</a></router-link>
+
+                            <router-link class="nav-item" tag="li" to="/whiteList"><a>White List</a></router-link>
+							<a v-if="user" class="button is-info is-inverted" @click="logout">
+	              					<span class="icon">
+	                					<i class="fa fa-github"></i>
+	              					</span>
+									<span >Logout</span>
+								</a>
 
 
-								<a class="nav-item" v-show="user" @click="logout">Logout</a>
-						
-						<router-link class="nav-item" to="/login-signup/login" v-show="!user">
+						<router-link v-if="!user" class="nav-item" to="/login-signup/login">
             				<a class="button is-info is-inverted" @click="showLogin=true">
               					<span class="icon">
                 					<i class="fa fa-github"></i>
