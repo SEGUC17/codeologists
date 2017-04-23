@@ -10,9 +10,9 @@ var Game = require('../models/Game');
 var arenaController = require('./arenaController');
 function date_calc(year, month, day) {
   if (month < 10)  //if month is one digit pad it with zero
-    month = "0" + month;
+  month = "0" + month;
   if (day < 10)    //if day is one digit pad it with zero
-    day = "0" + day;
+  day = "0" + day;
   return year + "-" + month + "-" + day;
 }
 function validateEmail(email) {
@@ -44,9 +44,9 @@ let playerController = {
     //retrieve the players's record from DB to be able to fill the fields to be changed
     Player.findOne({ username: req.user.username }, function (err, result) {
       if (err)
-        res.send(err);
+        res.status(500).json({error: err.message});
       else {
-        res.render('edit_player_page', { err, result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate()) });
+        res.json({result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate()) });
 
       }
     })
@@ -54,29 +54,23 @@ let playerController = {
   edit_profile_info: function (req, res) { //accepting new info and update the DB record
     Player.findOne({ username: req.user.username }, function (err, result) {
       if (err)
-        res.send(err);
+          res.status(500).json({error: err.message});
       else {
-        if (!req.body.name) {
-          res.render('edit_player_page', { err: "name field is empty!...enter new name", result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate()) });
-          return;
-        } if (!req.body.email) {
-          res.render('edit_player_page', { err: "email field is empty!...enter new email", result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate()) });
-          return;
-        } if (!req.body.phone_number) {
-          res.render('edit_player_page', { err: "phone number field is empty!...enter new phone number", result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate()) });
-          return;
-        } if (!req.body.location) {
-          res.render('edit_player_page', { err: "location field is empty!...enter new location", result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate()) });
-          return;
-        } if (!req.body.old_password) {
-          res.render('edit_player_page', { err: "your password is required to confirm changes", result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate()) });
-          return;
-        }
+       req.checkBody('name', 'Name is required.').notEmpty();
+         req.checkBody('old_password', 'Password is required.').notEmpty();
+         req.checkBody('email', 'Email wrong format').isEmail();
+         req.checkBody('email', 'Email is required.').notEmpty();
+         req.checkBody('location', 'Location is required.').notEmpty();
+         req.checkBody('phone_number', 'Phone number is required.').notEmpty();
 
+         var errors = req.validationErrors();
+
+       if(errors)
+       return res.status(400).json({errors,result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate())});
 
         hasher(req.body.old_password).verifyAgainst(result.password, function (err, verified) {
           if (!verified) {
-            res.render('edit_player_page', { err: "wrong password !", result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate()) });
+            res.status(422).json({ errors:[{param : 'old_password',msg:'wrong password !'}], result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate()) });
             return;
           }
           else {
@@ -84,13 +78,9 @@ let playerController = {
             if (req.body.new_password) {
               hasher(req.body.new_password).hash(function (err, hash) {
                 if (err)
-                  res.send(err);
+                    res.status(500).json({error: err.message});
                 else {
                   result.password = hash;
-                  if (!validateEmail(req.body.email)) {
-                    res.send("wrong email format");
-                    return;
-                  }
                   result.email = req.body.email;
                   result.phone_number = req.body.phone_number;
                   if (req.files[0]) {
@@ -100,10 +90,10 @@ let playerController = {
                   result.birthdate = req.body.birthdate;
                   result.save(function (err) {
                     if (err) {
-                      res.send(err);
+                        res.status(500).json({error: err.message});
                       return;
                     } else {
-                      res.render('edit_player_page', { err: "information updated successfully", result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate()) });
+                      res.json({ message: "information updated successfully", result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate()) });
                       return;
                     }
 
@@ -112,10 +102,6 @@ let playerController = {
               });
             }
             else {
-              if (!validateEmail(req.body.email)) {
-                res.send("wrong email format");
-                return;
-              }
               result.email = req.body.email;
               result.phone_number = req.body.phone_number;
               if (req.files[0]) {
@@ -125,10 +111,10 @@ let playerController = {
               result.birthdate = req.body.birthdate;
               result.save(function (err) {
                 if (err) {
-                  res.send(err);
+                    res.status(500).json({error: err.message});
                   return;
                 } else {
-                  res.render('edit_player_page', { err: "information updated successfully", result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate()) });
+                  res.json({ message: "information updated successfully", result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate()) });
                   return;
                 }
 
@@ -140,12 +126,31 @@ let playerController = {
 
     });
   },
+
   getPlayer: function (req, res) {
     Player.findById(req.params.id, function (err, player) {
       if(err)
       return res.status(400).json({error: err.message});
       return res.json({player: player});
     })
+  },
+  
+  myNotifications:function(req,res){
+    var currentuser = req.user.username;
+   Player.findOne({ username: currentuser }, function (err,player) {
+        if (err) {
+        res.status(400).json({ error: err });
+        return;
+        } else {
+            // if(player==null){
+            //     res.json([]);
+            //     return;
+            // }
+            // console.log(player);
+            res.json(player.notifications);
+            return;
+        }
+    });
   }
 }
 
