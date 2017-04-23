@@ -1,6 +1,5 @@
 <template>
 <div>
-<router-link to="/Search" tag="button">Search</router-link>
 
 <h1 v-if="arenas[0]">Arenas in {{arenas[0].location}}</h1>
 

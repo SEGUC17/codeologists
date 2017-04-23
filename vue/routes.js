@@ -40,6 +40,16 @@ let routes = [
 		path : '/editArena',
 		component : require('./views/EditArena')
 	},
+
+	{
+		path : '/comment',
+		component : require('./views/commentOnArena')
+	},
+
+	{
+		path : '/rating',
+		component : require('./views/NonRatedBookings')
+	},
   
 	{
 		path:'/myrequests',
@@ -76,7 +86,22 @@ let routes = [
      {
        path:'/edit_profile',
        component : require('./views/EditPage.vue')
-     }
+     },
+
+     {
+        path: '/blackList',
+        component: require('./views/Blacklist')
+    },
+    
+    {
+        path: '/whiteList',
+        component: require('./views/Whitelist')
+    },
+
+    {
+    	path : '/profile',
+    	component : require('./views/Profile')
+    }
 
 ];
 

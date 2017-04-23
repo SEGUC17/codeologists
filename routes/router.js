@@ -12,6 +12,7 @@ var gameController = require('../controllers/gameController');
 var serviceProviderController = require('../controllers/serviceProviderController');
 var visitorController = require('../controllers/visitorController');
 var Player = require('../models/Player');
+var RegisteredUser = require('../models/RegisteredUser');
 
 var passport = require('./passportConfig');
 var router = express.Router();
@@ -34,9 +35,19 @@ function ensureAuthenticated(req, res, next) {
     }
 }
 
-router.get('/', function (req, res) {
-    // setting username and type for testing
-    res.render('index');
+// router.get('/', function (req, res) {
+//     // setting username and type for testing
+//     res.json({ out: 'out'});
+// });
+
+router.get('/findUser/:user',function(req,res){
+    RegisteredUser.findOne({username : req.params.user},function(err,data){
+        if(err){
+            return res.status(500).json(err);
+        }else{
+            res.json(data);
+        }
+    });
 });
 
 
@@ -87,7 +98,7 @@ router.get('/login', function (req, res) {
 });
 
 router.post('/login', passport.authenticate('local'), function (req, res) {
-    res.json({success:"User authenticated successfully",user:req.user.name, type:req.user.type});
+    res.json({success:"User authenticated successfully",user:req.user.name, type:req.user.type, pp:req.user.profile_pic, email:req.user.email, phone:req.user.phone_number,location:req.user.location});
 });
 
 router.get('/logout', function (req, res) {
@@ -115,11 +126,15 @@ router.post('/editdefaultschedule/:arenaid', ensureAuthenticated, arenaControlle
 
 router.post('/addarenaimage/:arenaid', ensureAuthenticated, upload.any(), arenaController.addimage);
 
+router.get('/profile/blackList', ensureAuthenticated, serviceProviderController.showblacklist);
+
 router.post('/profile/blacklist', ensureAuthenticated, serviceProviderController.add_to_blacklist);
 
 router.post('/profile/blacklist/phone', ensureAuthenticated, serviceProviderController.add_to_blacklist_phone);
 
 router.post('/profile/removeblacklist', ensureAuthenticated, serviceProviderController.remove_from_blacklist);
+
+router.get('/profile/whitelist', ensureAuthenticated, serviceProviderController.showwhitelist);
 
 router.post('/profile/whitelist', ensureAuthenticated, serviceProviderController.add_to_whitelist);
 
@@ -127,11 +142,15 @@ router.post('/profile/whitelist/phone', ensureAuthenticated, serviceProviderCont
 
 router.post('/profile/removewhitelist', ensureAuthenticated, serviceProviderController.remove_from_whitelist);
 
+router.get('/arena/:id/getComments', ensureAuthenticated, arenaController.getComments);
+
+router.get('/getNameOfPlayer/:id', ensureAuthenticated, playerController.getPlayer);
+
 router.post('/arena/:id/comment', ensureAuthenticated, arenaController.commentOnArena);
 
-router.post('/ProviderRatesBooking/:id', ensureAuthenticated, bookingController.providerRateBooking);
+router.get('/getUnratedBookings', ensureAuthenticated, bookingController.getUnratedBookings);
 
-router.post('/PlayerRatesBooking/:id', ensureAuthenticated, bookingController.playerRateBooking);
+router.post('/rateBooking/:id', ensureAuthenticated, bookingController.rateBooking);
 
 router.get('/createArena', ensureAuthenticated, function (req, res) {
     res.render('createarena');

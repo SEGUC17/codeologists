@@ -3,11 +3,6 @@ var LocalStrategy = require('passport-local').Strategy;
 var User = require('../models/RegisteredUser');
 var hasher = require('password-hash-and-salt');
 
-
-
-
-
-
 var localStrategy = new LocalStrategy(
 	function (username, password, done) {
 		User.findOne({ username: username }, function (err, user) {
