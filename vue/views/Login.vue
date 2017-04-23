@@ -37,8 +37,6 @@
 				this.loading='button is-primary is-loading w3-xlarge';
 				this.form.submit('post','/login')
 				.then(res => {
-					this.loading='button is-primary w3-xlarge';
-					console.log(res);
 					Event.$emit('loggedIn',{user:res.user,type:res.type});
 					this.$router.push('/');
 				})

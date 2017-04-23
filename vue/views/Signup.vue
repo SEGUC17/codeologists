@@ -2,7 +2,7 @@
 
 
 
-	<div>
+	<div class="box">
 		
 		<!--Start of edit arena info form-->
 
@@ -69,11 +69,14 @@
 			<div class="field">
 				<a :class="loading" @click="signup">Sign Up!</a>
 			</div>
+			
 		</form>
 
 	</div>
 
 </template>
+
+
 
 <script>
 
@@ -89,20 +92,31 @@
 					email : '',
 					phone_number : '',
 					birthdate : '',
-					mode:'',
+					mode:'checked',
 					profile_pic:'/default-user-image.png'
 				}),
 				loading:'button is-primary w3-xlarge'
+				loginData:{
+					username:'',
+					password:''
+				}
 			}
 		},
 
 		methods : {
 			signup(){
 				this.loading='button is-primary w3-xlarge is-loading';
+				this.loginData = {username:this.form.username,password:this.form.password};
 				this.form.submit('post','/signup')
 				.then(res => {
-
-					this.$router.push('/');;
+					axios.post('/login', querystring.stringify(this.loginData), { headers: { "Content-Type": "application/x-www-form-urlencoded" } })
+	                .then(response => {
+	                	
+	                    this.$router.push('/');
+	                })
+	                .catch(error => {
+	                    console.log(error);
+	                });
 				})
 				.catch(err => {
 					this.loading='button is-primary w3-xlarge';
