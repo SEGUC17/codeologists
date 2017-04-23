@@ -74,6 +74,9 @@ function checkAvailable(endIndex, schedule, startIndex) {
 function getComments(req, res) {
   Arena.findOne({ _id: req.params.id }, function (err, arena) {
     if(err){
+      console.log(req.params.id);
+
+      console.log(err);
       res.status(400).json({ error: err.message });
       return;
     }
@@ -100,7 +103,7 @@ function commentOnArena(req, res) {
           return;
         }
       });
-      res.json({comment: comment});
+      res.json(arena.comments);
     });
   }
   else {
