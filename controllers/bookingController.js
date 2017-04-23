@@ -1,8 +1,10 @@
 var Player = require('../models/Player');
 var arenaController = require('./arenaController');
+var serviceProviderController = require('./serviceProviderController');
 var Arena = require('../models/Arena');
 var serviceProvider = require('../models/ServiceProvider');
 var Booking = require('../models/Booking');
+
 var async = require("async");
 
 var createBooking = function (req, res) {
@@ -76,64 +78,114 @@ function viewBookings(req, res) {
     }
   });
 }
-var cancelBooking = function (req, res) {
-  if (req.user.type != 'Player') {
-    res.send("You are not authorized to view this page");
-    return;
-  }
-  var player = req.user._id;
-  var arena = req.body.arenaID;
-  var bookingID = req.params.bookingID;
-  var status;
-  var day, week, start, end;
-  var id;
-  if (!player || !arena || !bookingID) {
-    res.send("missing parameters");
-    return;
-  }
-  Booking.findOne({
-    _id: bookingID
-  }, function (err, book) {
-    if (!book || !(book.player.equals(player))) {
-      res.send("This Action can not be done.");
-      return;
-    }
-    if (err)
-    res.send(err);
-    else {
-      status = book.accepted;
-      var obj = serviceProviderController.getScheduleIndices(book.bookMonth, book.bookDay);
-      day = obj.dayIndex;
-      week = obj.weekIndex;
-      start = book.start_index;
-      end = book.end_index;
-      id = book._id;
 
-      if (status) {
-        Arena.findOne({ _id: arena }, function (err, doc) {
-          for (var i = 0; i < 48; i++) {
-            var currDay = doc.schedule[week][day];
-            if (i >= start && i <= end && currDay[i].equals(id))
-            doc.schedule[week][day][i] = 0;
-          }
-          doc.markModified('schedule');
-          doc.save(function (err) {
-            if (err)
-            res.send(err);
-          });
+function getPlayersForBookings(req){
+    var bookings = req;
+    var acc = [];
+    async.concatSeries(bookings, function(item, callback) {
+        Player.findOne({_id : item.player} , function(err , pla)
+        {
+            if(!err){
+                return [pla.name];
+            }
         });
-      }
+        callback();
+    }, 
+    function(err , res) {
+        return res;
+    });
+ 
+}
 
-      Booking.remove({
-        _id: bookingID
-      }, function (err) {
-        if (err) { res.send(err); }
-      });
+
+
+var cancelBooking = function (req, res) {
+    if (req.user.type != 'Player') {
+        res.json(400, {error : "You are not authorized to view this page"});
+        return;
     }
-  });
+    var player = req.user._id;
+    var arena = req.body.arena;
+    var bookingID = req.params.bookingID;
+    var status;
+    var day, week, start, end;
+    var id;
+    if (!player || !arena || !bookingID) {
+        res.json(400, {error: "missing parameters"});
+        return;
+    }
+    Booking.findOne({
+        _id: bookingID
+    }, function (err, book) {
+        if (!book || !(book.player.equals(player))) {
+            res.json(400, {error: "This Action can not be done."});
+            return;
+        }
+        if (err)
+            res.json(500, {error: err.message});
+        else {
+            status = book.accepted;
+            var obj = serviceProviderController.getScheduleIndices(book.bookMonth, book.bookDay);
+            day = obj.dayIndex;
+            week = obj.weekIndex;
+            start = book.start_index;
+            end = book.end_index;
+            id = book._id;
+
+            if (status) {
+                Arena.findOne({ name: arena }, function (err, doc) {
+                    for (var i = 0; i < 48; i++) {
+                     console.log(week);
+                     console.log(day);
+                     console.log(doc.schedule[week]);
+
+
+                        var currDay = doc.schedule[week][day];
+                        if (i >= start && i <= end && currDay[i] == id)
+                            doc.schedule[week][day][i] = 0;
+                    }
+                    doc.markModified('schedule');
+                    doc.save(function (err) {
+                        if (err)
+                          res.json(500, {error: err.message});
+                    });
+
+                });
+            }
+
+             Booking.remove({
+                _id: bookingID
+            }, function (err) {
+                if (err) {res.json(500, {error: err.message});
+               }
+               else {
+                 res.json({message: 'success'});
+               }
+            });
+        }
+    });
 
 
 };
+
+var viewPlayerBookings = function (req, res){
+   if(req.user.type != 'Player')
+   {
+    res.json(400, {error:"You are not authorized to view this page"});
+   }
+   else {
+
+      Booking.find({player : req.user._id},function(err,arenas){
+          if(err){
+              return res.json({error : err.message});
+          }else{
+              return res.json(arenas);
+          }
+      });
+
+     }
+};
+
 
 function getTimeFromIndex(index) {
   var hour = Math.floor(index / 2);
@@ -306,6 +358,8 @@ function getUnratedBookings(req, res) {
       });
     }
 
+
+    //to be replaced by mohammed's code
     function acceptBooking(booking) {
       Arena.findOne({ _id: booking.arena }, function (err, arenaa) {
         var schedule = arenaa.schedule;
@@ -362,92 +416,100 @@ function getUnratedBookings(req, res) {
         })
       }
 
-
       function acceptBooking2(req, res) {
-        if (req.user.type != 'ServiceProvider') {
-          res.send('You are not authorized to do this');
-          return;
-        }
-        Booking.findById(req.body.bookingId, function (err, bookingObj) {
-          if (err || !bookingObj)
-          res.send("no such booking or bad request");
-          else {
+    if (req.user.type != 'ServiceProvider') {
+        res.json(403,{error:'You are not authorized to do this'});
+        return;
+    }
+    Booking.findById(req.params.bookingID, function (err, bookingObj) {
+        if (err || !bookingObj)
+            res.json(400, {error :"no such booking or bad request"});
+        else {
             var booking = bookingObj;
-            Arena.findOne({ _id: booking.arena }, function (err, arenaa) {
-              if (!arenaa.service_provider.equals(req.user._id)) {
-                res.send('You are not authorized to do this');
-                return;
-              }
-              var schedule = arenaa.schedule;
-              var indices = getScheduleIndices(booking.bookMonth, booking.bookDay);
-              var dayIndex = indices.dayIndex;
-              var weekIndex = indices.weekIndex;
-              var start = booking.start_index;
-              var end = booking.end_index;
-              var ok = true;
-              for (var i = start; i <= end; i++) {
-                if (schedule[weekIndex][dayIndex][i] != 0) {
-                  ok = false;
-                  break;
+            Arena.findOne({ name : booking.arena }, function (err, arenaa) {
+                if (!arenaa.service_provider.equals(req.user._id)) {
+                    res.json(403,{error : 'You are not authorized to do this'});
+                    return;
                 }
-              }
-              if (!ok) {
-                res.send('This is not a free time');
-              }
-              else {
-                Booking.find({ arena: arenaa._id, bookDay: booking.bookDay, bookMonth: booking.bookMonth }
-                  , function (err, allBookings) {
-                    if (!err && allBookings) {
-                      async.each(allBookings, function (currentBooking, callback) {
-                        if (!(currentBooking.accepted) && !(currentBooking._id.equals(booking._id))) {
-                          var start1 = currentBooking.start_index;
-                          var end1 = currentBooking.end_index;
-                          if ((start1 >= start && start1 <= end) || (end1 >= start && end1 <= end)) {
-                            Arena.findOne({ _id: currentBooking.arena }, function (err, arenaa) {
-                              if (!err && arenaa) {
-                                var notification = 'Unfortunately,your booking on day ' + (currentBooking.bookDay) + ' on month ' +
-                                (currentBooking.bookMonth) + ' for ' + (arenaa.name) + ' from '
-                                + getTimeFromIndex(start1) + ' to ' + getTimeFromIndex(end1) + ' has been rejected';
-                                Player.findOne({ _id: currentBooking.player }, function (err, playerr) {
-                                  if (!err && playerr) {
-                                    playerr.notifications.push(notification);
-                                    playerr.save();
-                                    Booking.remove({ _id: currentBooking._id }, function (err, result) {
-
-                                    });
-                                  }
-                                });
-                              }
-                            });
-                          }
-                        }
-                      }, function (err) {
-                        res.send('there are conflicting bookings');
-                      })
+                var schedule = arenaa.schedule;
+                var indices = serviceProviderController.getScheduleIndices(booking.bookMonth, booking.bookDay);
+                var dayIndex = indices.dayIndex;
+                var weekIndex = indices.weekIndex;
+                var start = booking.start_index;
+                var end = booking.end_index;
+                var ok = true;
+                for (var i = start; i <= end; i++) {
+                    if (schedule[weekIndex][dayIndex][i] != 0) {
+                        ok = false;
+                        break;
                     }
-                    for (var i = start; i <= end; i++) {
-                      arenaa.schedule[weekIndex][dayIndex][i] = booking._id;
-                    }
-
-                    bookingObj.accepted = true;
-                    bookingObj.save(function (err) {
-                      if (err)
-                      res.send(err);
-                    })
-
-                    arenaa.markModified('schedule');
-                    arenaa.save(function (err) {
-                      if (err)
-                      res.send('error while saving');
-                      else
-                      res.send('done');
-                    })
-                  });
                 }
-              })
-            }
-          })
+                if (!ok) {
+                    res.json(400,{error:'This is not a free time'});
+                }
+                else {
+                    Booking.find({ arena: arenaa.name, bookDay: booking.bookDay, bookMonth: booking.bookMonth }
+                        , function (err, allBookings) {
+                            if (!err && allBookings) {
+                                async.each(allBookings, function (currentBooking, callback) {
+                                    if (!(currentBooking.accepted) && !(currentBooking._id.equals(booking._id))) 
+                                    {
+                                        var start1 = currentBooking.start_index;
+                                        var end1 = currentBooking.end_index;
+                                        if ((start1 >= start && start1 <= end) || (end1 >= start && end1 <= end)) 
+                                        {
+                                            Arena.findOne({ name: currentBooking.arena }, function (err, arenaa) 
+                                            {
+                                                if (!err && arenaa) 
+                                                {
+                                                    var notification = 'Unfortunately,your booking on day ' + (currentBooking.bookDay) + ' on month ' +
+                                                        (currentBooking.bookMonth) + ' for ' + (arenaa.name) + ' from '
+                                                        + serviceProviderController.getTimeFromIndex(start1) + ' to ' 
+                                                        + serviceProviderController.getTimeFromIndex(end1) + ' has been rejected';
+                                                    Player.findOne({ _id: currentBooking.player }, function (err, playerr) 
+                                                    {
+                                                        if (!err && playerr) 
+                                                        {
+                                                            playerr.notifications.push(notification);
+                                                            playerr.save();
+                                                            Booking.remove({ _id: currentBooking._id }, function (err, result) 
+                                                            {
+                                                            });
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    }
+                                }, function (err) {
+                                    res.json(400,{error :'there are conflicting bookings'});
+                                })
+                            }
+                            for (var i = start; i <= end; i++) {
+                                arenaa.schedule[weekIndex][dayIndex][i] = booking._id;
+                            }
+ 
+                            bookingObj.accepted = true;
+                            bookingObj.save(function (err) {
+                                if (err)
+                                    res.json(400,{error : 'error while booking'});
+                            })
+ 
+                            arenaa.markModified('schedule');
+                            arenaa.save(function (err) {
+                                if (err)
+                                    res.json(400,{error : 'error while saving'});
+                                else
+                                    res.json(200,{success:'done'});
+                            })
+                        });
+                }
+            })
         }
+    })
+}
+
+
         function handleBooking(id) {
           Booking.findOne({ _id: id }, function (err, booking2) {
             if (err || !booking2)
@@ -468,47 +530,54 @@ function getUnratedBookings(req, res) {
             });
           });
         }
-        function rejectBooking(req, res) {
-          if (!(req.body.bookingId))
-          res.send('Missing field');
-          if (req.user.type != 'ServiceProvider') {
-            res.send('You are not authorized to do this');
-            return;
-          }
-          var bookingID = req.body.bookingId;
-          Booking.findOne({ _id: bookingID }, function (err, curBooking) {
-            if (err || !curBooking) {
-              res.send('Not a valid Booking');
-              return;
-            }
-            Arena.findOne({ _id: curBooking.arena }, function (err, arenaa) {
 
-              var arenaName = arenaa.name;
-              if (err || !arenaa) {
-                res.send('Not a valid Booking');
-              }
-              else {
-                var indices = getScheduleIndices(curBooking.bookMonth, curBooking.bookDay);
+
+        function rejectBooking(req, res) {
+    if (!(req.params.bookingID)){
+        res.json (400 ,{error :'Missing field'});
+        return;
+    }
+    if (req.user.type != 'ServiceProvider') {
+        res.json(403 ,{error :'You are not authorized to do this'});
+        return;
+    }
+    var bookingID = req.params.bookingID;
+    Booking.findOne({ _id: bookingID }, function (err, curBooking) {
+        if (err || !curBooking) {
+            res.json(400,{error :'Not a valid Booking'});
+            return;
+        }
+        Arena.findOne({ name: curBooking.arena }, function (err, arenaa) {
+ 
+            var arenaName = arenaa.name;
+            if (err || !arenaa) {
+                res.json(400 ,{error :'Not a valid Booking'});
+            }
+            else {
+                var indices = serviceProviderController.getScheduleIndices(curBooking.bookMonth, curBooking.bookDay);
                 var dayIndex = indices.dayIndex;
                 var weekIndex = indices.weekIndex;
                 var start = curBooking.start_index;
                 var end = curBooking.end_index;
                 var notification = 'Unfortunately,your booking on day ' + (curBooking.bookDay) + ' on month ' +
-                (curBooking.bookMonth) + ' for ' + (arenaa.name) + ' from '
-                + getTimeFromIndex(start) + ' to ' + getTimeFromIndex(end) + ' has been rejected';
-
+                    (curBooking.bookMonth) + ' for ' + (arenaa.name) + ' from '
+                    + serviceProviderController.getTimeFromIndex(start) + ' to ' + 
+                    serviceProviderController.getTimeFromIndex(end) + ' has been rejected';
+ 
                 Player.findOne({ _id: curBooking.player }, function (err, playerr) {
-                  playerr.notifications.push(notification);
-                  playerr.save();
-                  Booking.remove({ _id: curBooking._id }, function (err, result) {
-                    if (err)
-                    res.send(err);
-                  });
+                    playerr.notifications.push(notification);
+                    playerr.save();
+                    Booking.remove({ _id: curBooking._id }, function (err, result) {
+                        if (err)
+                            res.json(400 ,{error : "This booking can not be rejected"});
+                        else
+                            res.json(200 ,{success : "The booking has been rejected successfully"});
+                    });
                 });
-              }
-            });
-          });
-        }
+            }
+        });
+    });
+}
 
         let bookingController = {
           createBooking: createBooking,
@@ -519,7 +588,9 @@ function getUnratedBookings(req, res) {
           handleBooking: handleBooking,
           rejectBooking:rejectBooking,
           rateBooking :rateBooking,
-          getUnratedBookings: getUnratedBookings
+          getUnratedBookings: getUnratedBookings,
+          viewPlayerBookings: viewPlayerBookings,
+          getPlayersForBookings : getPlayersForBookings
         }
-        module.exports = bookingController;
 
+        module.exports = bookingController;

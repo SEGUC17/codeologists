@@ -1,17 +1,20 @@
+
 var Game = require('../models/Game');
 var Player=require('../models/Player');
 var createGame = function (req, res) {
 
-    if (!(req.body.size) || !(req.body.location) || !(req.body.start_date) ||
-        !(req.body.end_date) || !(req.user.username)) {
-        res.send('Missing fields');
-        return;
+    req.checkBody('start_date', 'Start Date is required.').notEmpty();
+    req.checkBody('end_date', 'End Date is required.').notEmpty();
+    req.checkBody('location', 'Location is required.').notEmpty();
+    req.checkBody('size', 'Arena size is required.').notEmpty();
+    var errors = req.validationErrors();
+    if (errors) {
+        return res.status(400).json(errors);
     }
 
     var creator2 = req.user.username;
     var size2 = req.body.size;
     var location2 = req.body.location;
-    //var arenas2 = req.body.arenas;
     var start_date2 = req.body.start_date;
     var end_date2 = req.body.end_date;
     let added = new Game
@@ -19,15 +22,18 @@ var createGame = function (req, res) {
             creator: creator2,
             size: size2,
             location: location2,
-            //suggested_arenas: arenas2,
             start_date: start_date2,
             end_date: end_date2
         });
     added.save(function (err, added) {
-        if (err)
-            res.send(err);
-        else
-            res.send('Success');
+        if (err){
+            res.json(400 , {error : "Error while creating the game"});
+            return;
+        }
+        else{
+            res.json(200 , {success :'Game created successfully'});
+            return;
+        }
     })
 
 }

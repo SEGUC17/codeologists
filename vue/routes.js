@@ -40,6 +40,20 @@ let routes = [
 		path : '/editArena',
 		component : require('./views/EditArena')
 	},
+  
+	{
+		path : '/createGame',
+		component : require('./views/CreateGame')
+	},
+	{
+		path : '/changeMode',
+		component : require('./views/changeMode')
+	},
+	
+	{
+		path : '/ViewPendingBookings',
+		component : require('./views/ViewPendingBookings')
+	},
 
 	{
 		path : '/comment',
@@ -68,6 +82,16 @@ let routes = [
 	},
 
 	{
+		path: '/createArena',
+		component: require('./views/createArena')
+	},
+
+	{
+		path: '/cancelBooking',
+		component: require('./views/delete_booking')
+	},
+
+  {
     	path:'/viewArenas',
     	component: require('./views/Arenas.vue')
     },

@@ -1,6 +1,5 @@
 <template>
 <div>
-
 <h1 v-if="arenas[0]">Arenas in {{arenas[0].location}}</h1>
 
 <section v-if="arenas[0]" v-for="arena in arenas">

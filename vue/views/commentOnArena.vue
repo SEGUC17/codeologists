@@ -1,9 +1,9 @@
 <template>
 
-  <div>
-    <h4 class="w3-margin-left"> Comments </h4>
+  <div class="w3-container">
+    <h4 :load="refresh()" class="w3-margin-left"> Comments </h4>
     <div>
-      <div v-for="(comment,index) in comments">
+      <div v-for="comment in initialcomments">
 
         <div class="box w3-twothird w3-margin-left w3-display-container">
           <article class="media">
@@ -11,7 +11,7 @@
               <div class="content">
                 <p>
                   <strong>{{	comment.player }}</strong>
-                  <small class="w3-display-topright w3-padding-16 w3-margin-right ">{{	calcDate(comments[index].time_stamp) }}</small>
+                  <small class="w3-display-topright w3-padding-16 w3-margin-right ">{{	calcDate(comment.time_stamp) }}</small>
                   <br>
                   {{	comment.Content }}
                 </p>
@@ -45,6 +45,7 @@
         <button class="button is-primary"> Post </button>
       </div>
     </form>
+
   </div>
 
 </template>
@@ -55,16 +56,18 @@ export default{
   data() {
     return {
       comment: '',
-      comments : [],
-      id:'58e64eef165cf62ff5b25b0f'
+      comments : this.initialcomments,
+
     }
   },
-
+  mounted(){
+    //this.refresh();
+  },
+  props: ['initialMina','initialcomments'],
 
   created(){
-    axios.get('/arena/'+this.id+'/getComments')
-    .then(res => this.comments = res.data.comments)
-    .catch(err => console.log(err));
+    console.log(this.initialcomments);
+    
   },
 
   methods: {
@@ -74,9 +77,10 @@ export default{
       return comp.getFullYear() + "/" + (comp.getMonth()+1) +
       "/" + comp.getDate() + "(" + comp.getHours() + ":" + comp.getMinutes()+')';
     },
-
+    refresh(){
+          },
     saveChanges(){
-      axios.post('/arena/'+this.id+'/comment', querystring.stringify({
+      axios.post('/arena/'+this.initialMina+'/comment', querystring.stringify({
         "comment" : this.comment
       }), {
         headers: {
@@ -84,11 +88,18 @@ export default{
         }
       })
       .then(res => {
-        this.comments.push(res.data.comment)
+        this.comments=res.data;
+        this.comment='';
+        this.initialcomments=res.data;
       })
       .catch(err => {
         alert(err);
       });
+    }
+  },
+  computed:{
+    mina(){
+      return this.initialMina;
     }
   }
 }

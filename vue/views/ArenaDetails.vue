@@ -57,10 +57,26 @@
 </table> -->
 
 
+		<!-- Tawfik comments -->
+		<comments :initialMina="this.arenaId" :initialcomments="this.arena.comments"></comments>
+		<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+
 </div>
+
+
 </template>
 
 <script>
+
+	import comments from './commentOnArena.vue';
 	var querystring = require('querystring');
 	export default{
 
@@ -72,7 +88,8 @@
 
 				day_counter:["1", "2", "3", "4", "5", "6", "7"],
 				week_counter:["1", "2", "3", "4"],
-				photos:{}
+				photos:{},
+				arenaId:''
 			};
 		},
 
@@ -82,7 +99,7 @@
 
 				this.arena = arena;
 				this.photos = arena.photos;
-
+				this.arenaId=arena._id;		
 				/*axios.post('/arenaDetails', querystring.stringify({
                    "name" : this.name
  					   }), {
@@ -95,6 +112,11 @@
 
 			});
 
+			
+		},
+
+		components : {
+			comments
 		},
 
 		methods:{
@@ -104,7 +126,11 @@
 			dispalyImage(element) {
 				document.getElementById("img01").src = element;
 				document.getElementById("modal01").style.display = "block";
-			}
+			},
+			
+		},
+		computed:{
+			
 		}
 	}
 </script>
