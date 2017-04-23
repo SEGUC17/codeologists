@@ -14,6 +14,8 @@
           
         </div>
         <br>
+        <h1>Auto Accept Mode</h1>
+        <br>
         <div class="w3-container">
         	<p><h2>{{profileUser.username}}</h2></p>
           <p><i class="fa fa-briefcase fa-fw w3-margin-right w3-large w3-text-teal"></i>{{profileUser.type}}</p>
@@ -22,25 +24,16 @@
           <p><i class="fa fa-phone fa-fw w3-margin-right w3-large w3-text-teal"></i>{{profileUser.phone_number}}</p>
 
           <br>
-
-          <router-link to="/edit_profile" exact>edit</router-link>
-
-          <br>
-
-          <router-link v-if="profileUser.type=='ServiceProvider'" tag="li" to="/changeMode"><a>Turn On/Off</a></router-link>
-
         </div>
       </div>
 
-      <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="profileUser.type=='ServiceProvider'">
+      <div class="w3-container w3-card-2 w3-white w3-margin-bottom">
         <h2 class="w3-text-grey w3-padding-16">Black List</h2>
-        <router-link class="nav-item" tag="li" to="/blackList"><a>Black List</a></router-link>
         
       </div>
 
-      <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="profileUser.type=='ServiceProvider'">
+      <div class="w3-container w3-card-2 w3-white w3-margin-bottom">
         <h2 class="w3-text-grey w3-padding-16">White List</h2>
-        <router-link class="nav-item" tag="li" to="/whiteList"><a>White List</a></router-link>
         
       </div>
 
@@ -50,25 +43,14 @@
     <!-- Right Column -->
     <div class="w3-twothird">
     
-      <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="profileUser.type=='ServiceProvider'">
+      <div class="w3-container w3-card-2 w3-white w3-margin-bottom">
         <h2 class="w3-text-grey w3-padding-16">My Arenas</h2>
-        <router-link tag="li" to="/createArena"><a>create arena</a></router-link>
-
-        <router-link class="nav-item" to="/myArenas">
-          <a>My Arenas</a>
-          </router-link>
         
       </div>
 
-      <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="profileUser.type=='ServiceProvider'">
+      <div class="w3-container w3-card-2 w3-white w3-margin-bottom">
         <h2 class="w3-text-grey w3-padding-16">Booking Requests</h2>
-        <router-link tag="li" to="/ViewPendingBookings"><a>View Bookings</a></router-link>
         
-      </div>
-
-      <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="profileUser.type=='Player'">
-        <h2 class="w3-text-grey w3-padding-16">My Bookings</h2>
-        <bookings></bookings>
       </div>
 
       <div class="w3-container w3-card-2 w3-white w3-margin-bottom">
@@ -76,21 +58,6 @@
         <rating></rating>
         
       </div>
-
-      <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="profileUser.type=='Player'">
-        <h2 class="w3-text-grey w3-padding-16">Game Requests</h2>
-        <router-link class="nav-item" to="/myrequests"><a>My requests</a></router-link>
-        
-      </div>
-
-      <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="profileUser.type=='Player'">
-        <h2 class="w3-text-grey w3-padding-16">Notifications</h2>
-        <router-link class="nav-item" to="/notifications"><a>Notifications</a></router-link>
-        
-      </div>
-
-
-      
 
     <!-- End Right Column -->
     </div>
@@ -106,7 +73,6 @@
 <script >
 
   import rating from './NonRatedBookings.vue';
-  import bookings from './delete_booking';
 
 	export default {
 		data() {
@@ -136,8 +102,7 @@
 		},
 
     components : {
-      rating,
-      bookings
+      rating
     }
 	}
 	

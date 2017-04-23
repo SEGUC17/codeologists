@@ -4,65 +4,66 @@ var bookingController = require('./bookingController');
 var ServiceProvider = require('../models/ServiceProvider');
 var Arena = require('../models/Arena');
 var Booking = require('../models/Booking');
-
+var bookingController = require('./bookingController');
 //reserves a set of FREE hours to certain user in a certain Arena
-var bookHours = function (month, day, startIndex, endIndex, timestamp, arenaName, playerID, callback) {
+function bookHours(month, day, startIndex, endIndex, timestamp, arenaName, playerID, callback) {
+    //create Booking
+    var indices = serviceProviderController.getScheduleIndices(month, day);
 
-  //create Booking
-  var indices = serviceProviderController.getScheduleIndices(month, day);
+    Arena.findOne({ name: arenaName }, function (err, foundArena) {
 
-  Arena.findById(arenaID, function (err, foundArena) {
-
-    if (!err && foundArena) {
-      if (indices.dayIndex >= 0 && indices.weekIndex >= 0 && indices.dayIndex <= 6 && indices.weekIndex <= 3 && startIndex <= endIndex) {
-        if (checkAvailable(parseInt(endIndex, 10), foundArena.schedule[indices.weekIndex][indices.dayIndex], parseInt(startIndex, 10))) {
-          ServiceProvider.findById(foundArena.service_provider, function (spErr, arenaCreator) {
-            if (!spErr && arenaCreator) {
-              var newBooking = new Booking({
-                player: playerID,
-                arena: arenaName,
-                time_stamp: timestamp,
-                bookDay: day,
-                bookMonth: month,
-                start_index: startIndex,
-                end_index: endIndex,
-                accepted: arenaCreator.mode
-              }).save(function (errSave, bookingObj) {
-                if (errSave) {
-                  callback(errSave);
+        if (!err && foundArena) {
+            if (indices.dayIndex >= 0 && indices.weekIndex >= 0 && indices.dayIndex <= 6 && indices.weekIndex <= 3 && startIndex <= endIndex) {
+                if (checkAvailable(parseInt(endIndex, 10), foundArena.schedule[indices.weekIndex][indices.dayIndex], parseInt(startIndex, 10))) {
+                    ServiceProvider.findById(foundArena.service_provider, function (spErr, arenaCreator) {
+                        if (!spErr && arenaCreator) {
+                            var newBooking = new Booking({
+                                player: playerID,
+                                arena: arenaName,
+                                time_stamp: timestamp,
+                                bookDay: day,
+                                bookMonth: month,
+                                start_index: startIndex,
+                                end_index: endIndex,
+                                accepted: arenaCreator.mode
+                            }).save(function (errSave, bookingObj) {
+                                if (errSave) {
+                                    callback(errSave, null);
+                                }
+                                else {
+                                    bookingController.handleBooking(bookingObj._id,function(err,schedule){
+                                    return  callback(err,schedule);
+                                    });
+                                    
+                                }
+                            })
+                        }
+                        else {
+                            if (spErr) {
+                                return callback(spErr, null);
+                            }
+                            else {
+                                return callback("The Creater of the arena is no longer existant or has been removed ", null);
+                            }
+                        }
+                    });
                 }
                 else {
-                  serviceProviderController.handleBooking(bookingObj._id);
-                  return callback(null);
+                    return callback("Time Unavailable", null);
                 }
-              })
+            } else {
+                if (err)
+                    return callback(err, null);
+                else if (!(indices.dayIndex >= 0 && indices.weekIndex >= 0 && indices.dayIndex <= 6 && indices.weekIndex <= 3))
+                    return callback("Day and month ot of bound", null);
+                else
+                    return callback("no such booking", null);
             }
-            else {
-              if (spErr) {
-                return callback(spErr);
-              }
-              else {
-                return callback("The Creater of the arena is no longer existant or has been removed ");
-              }
-            }
-          });
         }
-        else {
-          return callback("Time Unavailable");
-        }
-      } else {
-        if (err)
-        return callback(err);
-        else if (!(indices.dayIndex >= 0 && indices.weekIndex >= 0 && indices.dayIndex <= 6 && indices.weekIndex <= 3))
-        return callback("Day and month ot of bound");
-        else
-        return callback("no such booking");
-      }
-    }
 
-  })
+    })
+
 }
-
 //checks to see if the slots between start index and end index in the schedule of  certain DAY is free if so it return true otherwise false
 //the function takes as input the start index, end index and schedule of a day (1d array)
 
@@ -542,20 +543,89 @@ function createArena(req, res) {
     })
 }
 
-let arenaController = {
-
-  bookHours: bookHours,
-  checkAvailable: checkAvailable,
-  commentOnArena: commentOnArena,
-  getComments: getComments,
-  viewarena: viewarena,
-  editarena: editarena,
-  editarenainfo: editarenainfo,
-  editdefaultschedule: editdefaultschedule,
-  addimage: addimage,
-  setUnavailable: setUnavailable,
-  setAvailable: setAvailable,
-  createArena: createArena,
-  getArenas : getArenas
+const getArenas = function (req, res) {
+    if (req.user.type == 'ServiceProvider') {
+        Arena.find({ service_provider: req.user._id }, 'name', function (dbErr, arenaArr) {
+            if (dbErr)
+                res.status(500).json({ error: "Sorry We have Encountered an internal server error" });
+            else {
+                res.json(arenaArr);
+            }
+        })
+    }
+    else {
+        res.status(403).json({ error: "Please Log In as a Service Provider /Arena owner to view the list of pending booking requests" });
+    }
 }
+function getArenaSchedule(req, res) {
+    var arenaName = req.params.arenaName;
+    Arena.findOne({ name: arenaName }, 'schedule', function (err, foundArena) {
+        if (err ) {
+            res.status(500).json({ error: err });
+        }
+        else if(!foundArena){
+            res.status(404).json({error: "not a valid Arena"})
+        }
+        else {
+            res.json(foundArena);
+        }
+    });
+}
+function getWeekSchedule(req, res) {
+    if (!req.params.dayIndex || !req.params.monthIndex || !req.params.arenaName) 
+        {
+            
+            res.status(400).json({ error: "incomplete path" });
+            return;
+        }
+    
+            
+        Arena.findOne({name:req.params.arenaName},function(error,foundArena){
+            if(error)
+            {
+                 
+                res.status(500).json({error:error});
+
+            }
+            else if(! foundArena)
+            {
+                
+                res.status(404).json({error:" arena not found"});
+            }
+            else
+            {
+                var index =serviceProviderController.getScheduleIndices(req.params.monthIndex,req.params.dayIndex);
+                if(index.dayIndex>=0 && index.dayIndex<=6 && index.weekIndex>=0 && index.weekIndex<=3 )
+                {
+                    
+                    res.json(foundArena.schedule[index.weekIndex][index.dayIndex]);
+                }
+                else
+                {
+                    
+                    res.status(400).json({error:"day or month out of bound"});
+                }
+            }
+        })
+
+
+}
+let arenaController = {
+    getWeekSchedule: getWeekSchedule,
+    getArenaSchedule: getArenaSchedule,
+    getArenas: getArenas,
+    bookHours: bookHours,
+    checkAvailable: checkAvailable,
+    commentOnArena: commentOnArena,
+    viewarena: viewarena,
+    editarena: editarena,
+    editarenainfo: editarenainfo,
+    editdefaultschedule: editdefaultschedule,
+    addimage: addimage,
+    setUnavailable: setUnavailable,
+    setAvailable: setAvailable,
+    createArena: createArena
+};
+
+
 module.exports = arenaController;

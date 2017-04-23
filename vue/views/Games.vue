@@ -1,10 +1,6 @@
 <template>
 
 <div>
-
-  <router-link tag="li" to="/createGame"><a>create game</a></router-link>s
-
-
 	<div v-for="game in games">
     <article class="message" >
     <div class="message-header">

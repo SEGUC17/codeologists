@@ -30,15 +30,9 @@ function ensureAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
         next();
     } else {
-        req.flash('info', 'You must log in first.');
-        res.redirect('/login');
+        res.status(400).json({error:"log in first"});
     }
 }
-
-// router.get('/', function (req, res) {
-//     // setting username and type for testing
-//     res.json({ out: 'out'});
-// });
 
 router.get('/findUser/:user',function(req,res){
     RegisteredUser.findOne({username : req.params.user},function(err,data){
@@ -63,7 +57,8 @@ router.post('/edit_provider_profile', ensureAuthenticated, upload.array('profile
 router.post('/search', visitorController.filter);
 
 router.get('/', function (req, res) {
-    res.render('index');
+    console.log('dgdf');
+    res.render('serviceProviderControlPanel');
 });
 
 
@@ -82,13 +77,21 @@ router.post('/register', function (req, res) {
     else
         res.json({ success: "service provider" });
 });
-
+router.get('/controlpanel',function(req,res){
+    res.render('serviceProviderControlPanel');
+})
 router.get('/newPlayer', function (req, res) {
     res.json({ success: "player" });
 });
 
 router.post('/signup', upload.any(), function (req, res) {
-        visitorController.createUser(req, res);
+    if(req.body.type=='player')
+    {
+        visitorController.createPlayer(req, res);
+    }
+    else
+        visitorController.createServiceProvider(req, res);
+
 });
 
 router.get('/newServiceProvider', function (req, res) {
@@ -105,6 +108,7 @@ router.get('/login', function (req, res) {
 
 router.post('/login', passport.authenticate('local'), function (req, res) {
     res.json({success:"User authenticated successfully",user:req.user.name, type:req.user.type, pp:req.user.profile_pic, email:req.user.email, phone:req.user.phone_number,location:req.user.location});
+
 });
 
 router.get('/logout', function (req, res) {
@@ -117,10 +121,12 @@ router.get('/logout', function (req, res) {
 });
 
 router.get('/myArenas', ensureAuthenticated, serviceProviderController.myArenas);
-
 router.post('/arenas', visitorController.view_all);
+router.get('/arena/:arenaName/show',ensureAuthenticated,visitorController.view_details_of_arena);
+router.get('/arena/:arenaName/getSchedule',ensureAuthenticated, arenaController.getArenaSchedule);
+router.get('/arena/:arenaName/schedule/:monthIndex/:dayIndex',ensureAuthenticated,arenaController.getWeekSchedule);
 
-router.post('/arenaDetails', ensureAuthenticated, visitorController.view_details_of_arena);
+router.get('/getArenas',ensureAuthenticated,arenaController.getArenas);
 
 router.get('/viewgames', ensureAuthenticated, gameController.viewgames);
 
@@ -185,7 +191,7 @@ router.get('/arena/:arenaName/viewBookings', ensureAuthenticated, bookingControl
 router.post('/arena/:arenaName/bookWeekly', ensureAuthenticated, playerController.bookWeekly);
 
 //book free hours
-router.post('/arena/:arenaName/bookHours', ensureAuthenticated, bookingController.createBooking);
+router.post('/arena/:arenaName/bookHours', bookingController.createBooking);
 
 
 router.get('/getArenas',ensureAuthenticated,arenaController.getArenas);
