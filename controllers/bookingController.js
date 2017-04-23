@@ -1,3 +1,4 @@
+
 var Player = require('../models/Player');
 var arenaController = require('./arenaController');
 var serviceProviderController = require('./serviceProviderController');
@@ -5,6 +6,7 @@ var Arena = require('../models/Arena');
 var serviceProvider = require('../models/ServiceProvider');
 var async = require("async");
 var Booking = require('../models/Booking');
+
 var createBooking = function (req, res) {
     Player.findOne({ username: req.user.username }, function (err, player) {
         if (req.body.month && req.body.month && req.body.startIndex && req.body.endIndex) {
@@ -43,7 +45,7 @@ function viewBookings(req, res) {
 
         }
         else {
-            ServiceProvider.findById(foundArena.service_provider, function (errSp, serviceProvider) {
+            serviceProvider.findById(foundArena.service_provider, function (errSp, serviceProvider) {
                 if (errSp) {
                     res.json({ err: "Internal server Error, Sorry for the inconvenience !" });
                 }
@@ -51,16 +53,17 @@ function viewBookings(req, res) {
 
                     if (serviceProvider.username == req.user.username) {
                         //find all pending requests where the request time is greater than today, the arena is the current arena  and have not been accepted
-                        Booking.find({ accepted: false, arena: foundArena._id }).$where('(new Date(new Date().getFullYear(),this.bookMonth,this.bookDay))>(new Date())').exec(function (err, bookingArr) {
+                        Booking.find({ accepted: false, arena: foundArena.name }).$where('(new Date(new Date().getFullYear(),this.bookMonth,this.bookDay))>(new Date())').exec(function (err, bookingArr) {
                             //TODO: render a view (will be done in Sprint 2 ISA)
                             if (err) {
                                 res.json({ err: "Error finding pending requests" });
                             }
                             else {
-
-                                res.json(bookingArr);
+                                res.json({
+                                    bookings : bookingArr , 
+                                    players : getPlayersForBookings(bookingArr)
+                                });
                             }
-
                         })
                     }
                     else {
@@ -75,6 +78,57 @@ function viewBookings(req, res) {
         }
     });
 }
+
+
+function getPlayersForBookings(req){
+    var bookings = req;
+    var acc = [];
+    //console.log(bookings);
+    console.log('---------------------------------------------------------------------------');
+    async.concatSeries(bookings, function(item, callback) {
+        Player.findOne({_id : item.player} , function(err , pla)
+        {
+        console.log('insideeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
+            //console.log(pla.name);
+            if(!err){
+                return [pla.name];
+                // acc.push(pla.name);
+                // console.log(pla.name);
+            }
+        });
+        callback();
+    }, 
+    function(err , res) {
+        // console.log(err);
+        // console.log('minaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+        // console.log(acc);
+        console.log(res);
+        return res;
+    });
+
+
+
+    /*
+    console.log(bookings);
+
+    async.concatSeries(bookings, function(curBooking){
+        Player.findOne({_id : curBooking.player} , function(err , pla){
+            console.log(pla);
+            if(!err)
+            {
+                return [pla];
+            }
+        });
+    } , function(err , out){
+        console.log('outtttttttttttttttttttttt');
+        console.log(out);
+        return out;
+    });
+
+    */
+}
+
+
 var cancelBooking = function (req, res) {
     if (req.user.type != 'Player') {
         res.send("You are not authorized to view this page");
@@ -183,51 +237,6 @@ function playerRateBooking(req, res) {
         });
     });
 
-}
-
-function viewBookings(req, res) {
-    Arena.findOne({name:req.params.arenaName}, function (err, foundArena) {
-        if (err) {
-            res.json({ error: err });
-        }
-        else if (!foundArena) {
-
-            res.json({ error: "Sorry Broken Link, this arena may have been deleted, removed or is no longer existant" });
-
-        }
-        else {
-            serviceProvider.findById(foundArena.service_provider, function (errSp, serviceProvider) {
-                console.log(foundArena.service_provider);
-                if (errSp) {
-                    res.json({ error: "Internal server Error, Sorry for the inconvenience !" });
-                }
-                else if (serviceProvider) {
-
-                    if (serviceProvider.username == req.user.username) {
-                        //find all pending requests where the request time is greater than today, the arena is the current arena  and have not been accepted
-                        Booking.find({ accepted: false, arena: foundArena.name }).$where('(new Date(new Date().getFullYear(),this.bookMonth,this.bookDay))>(new Date())').exec(function (arenaErr, bookingArr) {
-                          
-                            if (arenaErr) {
-                                res.json({ error: "Error finding pending requests" });
-                            }
-                            else {
-
-                                res.json(bookingArr);
-                            }
-
-                        })
-                    }
-                    else {
-                        res.json({ error: "sorry not your arena" });
-                    }
-                }
-                else {
-                    res.json({ error: "Internal Server Error sorry :'(" });
-                };
-            })
-
-        }
-    });
 }
 
 function acceptBooking(booking) {
@@ -502,5 +511,6 @@ let bookingController = {
     handleBooking: handleBooking,
     rejectBooking:rejectBooking,
     providerRateBooking :providerRateBooking,
+    getPlayersForBookings : getPlayersForBookings
 }
 module.exports = bookingController;

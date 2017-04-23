@@ -1,24 +1,44 @@
 <template>
     <div id="root">
         <button v-for="arena in arenas" @click="selectArena(arena.name)">{{arena.name}}</button>
-        <ul>
-            <li v-for="booking in bookings">
-                Booking at {{booking.arena}} on {{booking.bookDay}}/{{booking.bookMonth}} from {{hour(booking.start_index)}}:{{minute(booking.start_index)}}
-                to {{hour(booking.end_index)}}:{{minute(booking.end_index)}}
-                <button type="button" @click="accept(booking)">Accept</button>
-                <button type="button" @click="reject(booking)">Reject</button>
-            </li>
-        </ul>
+
+        <table class="table is-striped">
+          <thead>
+            <th>Arena</th>
+            <th>Date</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Player Name</th>
+            <th>&nbsp</th>
+            <th>&nbsp</th>
+          </thead>
+          <tbody>
+            <tr v-for="(booking , index) in bookings">
+              <td>{{booking.arena}}</td>
+              <td>{{booking.bookDay}}/{{booking.bookMonth}}/{{(new Date()).getFullYear()}}</td>
+              <td>{{hour(booking.start_index)}}:{{minute(booking.start_index)}}</td>
+              <td>{{hour(booking.end_index)}}:{{minute(booking.end_index)}}</td>
+              <td>{{players[index]}}</td>
+              <td><button type="button" @click="accept(booking)">Accept</button></td>
+              <td><button type="button" @click="reject(booking)">Reject</button></td>
+              
+            </tr>
+          </tbody>
+        </table>
+
+
     </div>
 </template>
 
 <script>
+    var async = require("async");
     export default ({
         data() {
             return {
                 bookings: [],
                 arenas: [],
-                curArena :''
+                curArena :'',
+                players : []
             }
         },
         created() {
@@ -26,21 +46,34 @@
         },
         methods: {
             hour(index) {
-                return Math.floor(index / 2);
+              var x = '';
+                if(Math.floor(index)/2 <10)
+                  x+='0';
+                return x+Math.floor(index / 2);
             },
             minute(index) {
                 return (index % 2) == 0 ? '00' : '30';
             },
 
             selectArena(arenaName) {
+              this.players = [];
+              this.curArena = arenaName;
                 axios.get('/arena/' + arenaName + '/viewBookings')
                     .then((res) => {
+                        this.bookings = res.data.bookings;
+                        this.players = res.data.players;
                         this.curArena = arenaName;
-                        console.log(arenaName);
-                        this.bookings = res.data;
-                        console.log(res.data);
+                        this.players = [];
+                        for (var i = 0; i < this.bookings.length; i++) {
+                          console.log(i);
+                              let playerID = this.bookings[i].player;
+                              axios.get('/getNameOfPlayer/' + playerID)
+                              .then(res => {this.players.push(res.data.player.name);})
+                              .catch(err => console.log(err));
+                        }
                     })
                     .catch(err => this.Bookings = []);
+
             },
 
             accept(booking) {
@@ -52,11 +85,7 @@
                             }
                             else {
                                 alert('Successfully accepted');
-                                axios.get('/arena/' + this.curArena + '/viewBookings')
-                                    .then((res) => {
-                                        this.bookings = res.data;
-                                    })
-                                    .catch(err => this.Bookings = []);
+                                this.selectArena(this.curArena);
                             }
                         })
                         .catch(err => {
@@ -74,11 +103,7 @@
                             }
                             else {
                                 alert('Successfully rejected');
-                                axios.get('/arena/' + this.curArena + '/viewBookings')
-                                    .then((res) => {
-                                        this.bookings = res.data;
-                                    })
-                                    .catch(err => this.Bookings = []);
+                                this.selectArena(this.curArena);
                             }
                         })
                         .catch(err => {

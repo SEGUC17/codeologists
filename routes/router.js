@@ -134,6 +134,12 @@ router.post('/profile/whitelist/phone', ensureAuthenticated, serviceProviderCont
 
 router.post('/profile/removewhitelist', ensureAuthenticated, serviceProviderController.remove_from_whitelist);
 
+router.get('/getNameOfPlayer/:id', ensureAuthenticated, playerController.getPlayer);
+
+router.post('/getPlayersForBookings', ensureAuthenticated, bookingController.getPlayersForBookings);
+
+
+
 router.post('/arena/:id/comment', ensureAuthenticated, arenaController.commentOnArena);
 
 router.post('/ProviderRatesBooking/:id', ensureAuthenticated, bookingController.providerRateBooking);

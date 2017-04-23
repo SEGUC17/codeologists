@@ -1,13 +1,16 @@
 <template>
+<div>
+	<div class="w3-quarter"> 
+		<h>&nbsp</h>
+	</div>
 
-
-
-	<div>
-		
+	<div class="w3-half">
+		<br>
+		<br>
 		<form method="post" action="/createGame" @submit.prevent="createGame" @keydown="form.errors.clear($event.target.name)">
 			<div class="control">
 				<label for="name" class="label">Size</label>
-				<input type="text" name="size" class="input" placeholder="Size" v-model="form.size" >
+				<input type="text" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="size" class="input" placeholder="Size" v-model="form.size" >
 				<span class="help is-danger" v-if="form.errors.has('size')" v-text="form.errors.get('size')"></span>
 			</div>
 			
@@ -26,12 +29,16 @@
 				<input id = "end_date" type="date" name="end_date" class="input" :value="form.end_date" v-model="form.end_date">
 				<span class="help is-danger" v-if="form.errors.has('end_date')" v-text="form.errors.get('end_date')"></span>
 			</div>
+			<br>
 			<div class="control">
 				<button class="button is-primary">Create a Game</button>
 			</div>
 		</form>
 	</div>
 
+	<div class="w3-quarter"></div>
+
+</div>
 </template>
 
 <script>
@@ -55,6 +62,7 @@
 			createGame(){
 				this.form.submit('post','/createGame')
 				.then(res => {
+					alert('Game added successfully');
 					this.$router.push('/');
 				})
 				.catch(err => {

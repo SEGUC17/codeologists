@@ -108,8 +108,6 @@ let playerController = {
                     }
 
                   });
-
-
                 }
               });
             }
@@ -142,6 +140,13 @@ let playerController = {
 
     });
   },
+  getPlayer: function (req, res) {
+    Player.findById(req.params.id, function (err, player) {
+      if(err)
+      return res.status(400).json({error: err.message});
+      return res.json({player: player});
+    })
+  }
 }
 
 module.exports = playerController;
