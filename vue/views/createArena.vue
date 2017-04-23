@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="w3-container">
 
 
   <div class="w3-quarter">
