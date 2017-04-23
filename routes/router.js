@@ -71,13 +71,7 @@ router.get('/newPlayer', function (req, res) {
 });
 
 router.post('/signup', upload.any(), function (req, res) {
-    if(req.body.type=='player')
-    {
-        visitorController.createPlayer(req, res);
-    }
-    else
-        visitorController.createServiceProvider(req, res);
-
+        visitorController.createUser(req, res);
 });
 
 router.get('/newServiceProvider', function (req, res) {
@@ -94,7 +88,6 @@ router.get('/login', function (req, res) {
 
 router.post('/login', passport.authenticate('local'), function (req, res) {
     res.json({success:"User authenticated successfully",user:req.user.name, type:req.user.type});
-
 });
 
 router.get('/logout', function (req, res) {
