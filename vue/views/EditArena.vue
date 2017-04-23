@@ -1,54 +1,71 @@
 <template>
+	
+	<div v-if="type=='ServiceProvider'">
 
-
-
-	<div>
+		<div class="tabs is-centered is-medium">
+		  <ul>
+		    <li :class="{'is-active' : selectedTab=='info'}"><a @click="selectedTab='info'">Info</a></li>
+		    <li :class="{'is-active' : selectedTab=='images'}"><a @click="selectedTab='images'">Images</a></li>
+		    <li :class="{'is-active' : selectedTab=='schedule'}"><a @click="selectedTab='schedule'">Default schedule</a></li>
+		  </ul>
+		</div>
 
 		<!--Start of edit arena info form-->
 
-		<form method="post" action="/editarenainfo" @submit.prevent="saveChanges" @keydown="form.errors.clear($event.target.name)">
+		<div class="w3-container w3-center w3-margin">
+			<form method="post" action="/editarenainfo" v-if="selectedTab=='info'" @submit.prevent="saveChanges" @keydown="form.errors.clear($event.target.name)">
 			<div class="control">
-				<label for="name" class="label">Rules and Regulations</label>
+				<label for="rules_and_regulations" class="label">Rules and Regulations</label>
 				<input type="text" name="rules_and_regulations" class="input" placeholder="rules and regulations" v-model="form.rules_and_regulations">
 				<span class="help is-danger" v-if="form.errors.has('rules_and_regulations')" v-text="form.errors.get('rules_and_regulations')"></span>
 			</div>
+			<br>
 			<div class="control">
-				<label for="name" class="label">Location</label>
+				<label for="location" class="label">Location</label>
 				<input type="text" name="location" class="input" placeholder="location" v-model="form.location">
 				<span class="help is-danger" v-if="form.errors.has('location')" v-text="form.errors.get('location')"></span>
 			</div>
+			<br>
 			<div class="control">
-				<label for="name" class="label">Address</label>
+				<label for="address" class="label">Address</label>
 				<input type="text" name="address" class="input" placeholder="detailed address" v-model="form.address">
 				<span class="help is-danger" v-if="form.errors.has('address')" v-text="form.errors.get('address')"></span>
 			</div>
+			<br>
 			<div class="control">
-				<label for="name" class="label">Type</label>
+				<label for="type" class="label">Type</label>
 				<input type="text" name="type" class="input" placeholder="arena type" v-model="form.type">
 				<span class="help is-danger" v-if="form.errors.has('type')" v-text="form.errors.get('type')"></span>
 			</div>
+			<br>
 			<div class="control">
-				<label for="name" class="label">Number of players</label>
-				<input type="text" name="size" class="input" placeholder="number of players" v-model="form.size">
+				<label for="size" class="label">Number of players</label>
+				<input type="number" name="size" class="input" placeholder="number of players" v-model="form.size">
 				<span class="help is-danger" v-if="form.errors.has('size')" v-text="form.errors.get('size')"></span>
 			</div>
+			<br>
 			<div class="control">
-				<label for="name" class="label">Price</label>
-				<input type="text" name="price" class="input" placeholder="price per hour" v-model="form.price">
+				<label for="price" class="label">Price</label>
+				<input type="number" name="price" class="input" placeholder="price per hour" v-model="form.price">
 				<span class="help is-danger" v-if="form.errors.has('price')" v-text="form.errors.get('price')"></span>
 			</div>
+			<br>
 			<div class="control">
 				<button class="button is-primary">Save changes</button>
 			</div>
+			<br>
+			<br>
 		</form>
+
+		</div>
 
 		<!--End of edit arena info form-->
 
 		<!--Start of images part-->
 
-		<!-- Start of display images-->
+		<div v-if="selectedTab=='images'" class="w3-container">
 
-		<!--img v-for="photo in photos" class="mySlides" :src="getPath(photo)" style="width:100%"-->
+		<!-- Arena images dispaly -->
 
 		<div class="w3-row-padding">
 			<div class="w3-third" v-for="photo in photos">
@@ -63,62 +80,97 @@
 			</div>
 		</div>
 
-		<!-- End of display images-->
-
+		<!-- Adding a new image -->
 
 		<form autocomplete="off" method="POST" enctype="multipart/form-data" @submit.prevent="addImage">
 
-			<label for="new_image">New Image</label><br>
-			<input id="new_image" type="file" class="form-control" name="new_image" accept="image/*" @change="onFile" multiple><br>
+			<h2>Add New Image</h2>
 
+			<input id="new_image" type="file" class="form-control" name="new_image" accept="image/*" @change="onFile" multiple><br>
+			<br>
 			<div class="control">
 				<button class="button is-primary">Add</button>
 			</div>
 		</form>
+		<br>
+		<br>
+		</div>
 
 		<!--End of images part-->
 
 		<!--Start of the schedule part-->
-		<h5>{{days[currentDay]}}</h5>
-		<div class="w3-dropdown-hover">
-			<button class="w3-button w3-black">Choose Day</button>
-			<div class="w3-dropdown-content w3-bar-block w3-border">
-				<a v-for="i in 7" class="w3-bar-item w3-button" @click="selectDay(i-1)">{{days[i-1]}}</a>
+
+		<div v-if="selectedTab=='schedule'">
+
+		<div class="w3-center">
+			<div class="w3-half">
+				<div class="w3-dropdown-hover">
+					<button class="w3-button w3-black w3-hover-red">Choose Day</button>
+					<div class="w3-dropdown-content w3-bar-block w3-border">
+						<a v-for="i in 7" class="w3-bar-item w3-button" @click="selectDay(i-1)">{{days[i-1]}}</a>
+					</div>
+				</div>
 			</div>
+
+			<h3 class="w3-half w3-text-red">{{days[currentDay]}}</h3>
+
 		</div>
 
 
 		<table v-for="j in 7" v-if="j-1==currentDay" class="table is-bordered">
 			<tr>
-				<td v-for="i in 12" :class="{ 'w3-pale-red': schedule[j-1][i-1]==-1, 'w3-pale-green': schedule[j-1][i-1]==0 }">
-					<p>{{slots[i-1]}}</p>
-					<input type="checkbox" name="daySlot" @click="toggleSlot(j-1,i-1)" :checked="schedule[j-1][i-1]==-1">
+				<td v-for="i in 12" >
+					<div class="w3-center" @click="toggleSlot(j-1,i-1)">
+						<a>
+							<p><b>{{slots[i-1]}}</b></p>
+							<img v-if="schedule[j-1][i-1]==-1" src="cross.png">
+							<img v-if="schedule[j-1][i-1]==0" src="tick.png">
+						</a>
+					</div>
 				</td>
 			</tr>
 
 			<tr>
-				<td v-for="i in 12" :class="{ 'w3-pale-red': schedule[j-1][i+11]==-1, 'w3-pale-green': schedule[j-1][i+11]==0 }">
-					<p>{{slots[11+i]}}</p>
-					<input type="checkbox" name="daySlot" @click="toggleSlot(j-1,i+11)" :checked="schedule[j-1][11+i]==-1">
+				<td v-for="i in 12" >
+					<div class="w3-center" @click="toggleSlot(j-1,i+11)">
+						<a>
+							<p><b>{{slots[i+11]}}</b></p>
+							<img v-if="schedule[j-1][i+11]==-1" src="cross.png">
+							<img v-if="schedule[j-1][i+11]==0" src="tick.png">
+						</a>
+					</div>
 				</td>
 			</tr>
 
 			<tr>
-				<td v-for="i in 12" :class="{ 'w3-pale-red': schedule[j-1][23+i]==-1, 'w3-pale-green': schedule[j-1][23+i]==0 }">
-					<p>{{slots[23+i]}}</p>
-					<input type="checkbox" name="daySlot" @click="toggleSlot(j-1,i+23)" :checked="schedule[j-1][23+i]==-1">
+				<td v-for="i in 12" >
+					<div class="w3-center" @click="toggleSlot(j-1,i+23)">
+						<a>
+							<p><b>{{slots[i+23]}}</b></p>
+							<img v-if="schedule[j-1][i+23]==-1" src="cross.png">
+							<img v-if="schedule[j-1][i+23]==0" src="tick.png">
+						</a>
+					</div>
 				</td>
 			</tr>
 
 			<tr>
-				<td v-for="i in 12" :class="{ 'w3-pale-red': schedule[j-1][35+i]==-1, 'w3-pale-green': schedule[j-1][35+i]==0 }">
-					<p>{{slots[35+i]}}</p>
-					<input type="checkbox" name="daySlot" @click="toggleSlot(j-1,i+35)" :checked="schedule[j-1][35+i]==-1">
+				<td v-for="i in 12" >
+					<div class="w3-center" @click="toggleSlot(j-1,i+35)">
+						<a>
+							<p><b>{{slots[i+35]}}</b></p>
+							<img v-if="schedule[j-1][i+35]==-1" src="cross.png">
+							<img v-if="schedule[j-1][i+35]==0" src="tick.png">
+						</a>
+					</div>
 				</td>
 			</tr>
 		</table>
 
-		<button @click="updateSchedule">Update Schedule</button>
+		<button class="button is-primary" @click="updateSchedule">Update Schedule</button>
+		<br>
+		<br>
+		</div>
 
 		<!--End of the schedule part-->
 
@@ -143,7 +195,8 @@
 				schedule: [],
 				slots: [],
 				days: [],
-				currentDay: 0
+				currentDay: 0,
+				selectedTab : 'info'
 			}
 		},
 
@@ -171,6 +224,11 @@
 
 
 			});
+		},
+
+		computed: {
+  			user: function () { return window.user; },
+  			type: function () { return window.type; }
 		},
 
 		methods: {
@@ -220,6 +278,8 @@
 				} else {
 					this.schedule[day][slot] = 0;
 				}
+				this.currentDay+=1;
+				this.currentDay-=1;
 			},
 
 			updateSchedule() {

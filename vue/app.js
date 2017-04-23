@@ -48,7 +48,7 @@ window.Form = class Form {
         for (let field in data) {
             this[field] = data[field];
         }
-
+        
         this.errors = new Errors();
     }
 
@@ -110,21 +110,30 @@ new Vue({
 	router,
 
     data:{
-        user:false,
-        type:''
+        showLogin:false,
+        user : false,
+        type : 'visitor',
     },
 
     mounted(){
+        window.user=false;
+        window.type='visitor';
         Event.$on('loggedIn', data => {
+            window.user = data.user;
+            window.type = data.type;
             this.user = data.user;
             this.type = data.type;
+            this.showLogin = false;
         })
     },
 
     methods:{
         logout(){
             axios.get('/logout').then(res =>{
-                this.user=false;
+                window.user=false;
+                window.type='visitor';
+                this.user = false;
+                this.type = 'visitor';
             }).catch(err => {
                 console.log(err);
             });
@@ -132,3 +141,5 @@ new Vue({
     }
 
 });
+
+

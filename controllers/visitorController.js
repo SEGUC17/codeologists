@@ -10,7 +10,7 @@ function validateEmail(email) {
 
 function compute(req, res, result) {
 	if (result.length == 0) {
-		res.send("no Arena matches your value");
+		res.status(404).json({error:"no Arena matches your value"});
 		return;
 	} else {
 		var tmp = 0;
@@ -23,7 +23,7 @@ function compute(req, res, result) {
 		var end = tmp == count ? result.length : tmp * 10;
 		var active = tmp;  //to indicate the active page rightnow
 
-		res.send(result);
+		res.json({result,count,start,end,active});
 		return;
 	}
 }
@@ -83,14 +83,14 @@ let visitorController = {
 					player.phone_number = req.body.phone_number;
 					player.location = req.body.location;
 
-					
 
 					if (req.body.profile_pic.charAt(0)!='/')
 						player.profile_pic.data = req.body.profile_pic;
+
 					player.birthdate = req.body.birthdate;
 					player.ratings_count = 0;
 
-					// Store hash (incl. algorithm, iterations, and salt) 
+					// Store hash (incl. algorithm, iterations, and salt)
 					player.password = hash;
 
 
@@ -169,7 +169,7 @@ let visitorController = {
 						service.profile_pic.data = req.body.profile_pic;
 					service.mode = req.body.mode ? true : false;
 
-					// Store hash (incl. algorithm, iterations, and salt) 
+					// Store hash (incl. algorithm, iterations, and salt)
 					service.password = hash;
 
 					
@@ -214,7 +214,7 @@ let visitorController = {
 
 										for (var k = 0; k < blacklist.length; k++) {//loop searching in blacklist of service provider
 
-											if (req.user._id == blacklist[k]) {
+											if (req.user && req.user._id == blacklist[k]) {
 												result.splice(i, 1);
 												break;
 											}
@@ -228,7 +228,6 @@ let visitorController = {
 							res.json(result);
 							return;
 						}
-
 						res.json(result);
 					})
 				}
@@ -281,7 +280,7 @@ let visitorController = {
 		if (search_type == "price") {
 			Arena.find({ price: search_value }, function (err, doc) {
 				if (err)
-					res.send(err);
+					res.status(500).json({error: err.message});
 				else {
 					compute(req, res, doc);
 				}
@@ -289,7 +288,7 @@ let visitorController = {
 		} else if (search_type == "location") {
 			Arena.find({ location: search_value }, function (err, doc) {
 				if (err)
-					res.send(err);
+					res.status(500).json({error: err.message});
 				else {
 					compute(req, res, doc);
 				}
@@ -297,7 +296,7 @@ let visitorController = {
 		} else {
 			Arena.find({ name: search_value }, function (err, doc) {
 				if (err)
-					res.send(err);
+					res.status(500).json({error: err.message});
 				else {
 					compute(req, res, doc);
 				}

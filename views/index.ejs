@@ -38,39 +38,82 @@ width: 480px;
 	<title>Main view</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.0/css/bulma.css">
+
+	<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-default/index.css">
+
 	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
-	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-	<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-default/index.css">
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
 </head>
 
 <body>
 
+	<div id ="viewBookingsRoot">
+		
+	</div>
+
 	<div id="app">
 
-		<nav class="nav has-shadow">
-			<div class="container">
-				<div class="nav-left">
-					<nav class="tabs is-boxed">
-						<div class="container">
-							<ul>
-								<router-link tag="li" to="/" exact><a>Home</a></router-link>
 
-								<router-link tag="li" to="/myArenas" v-show="type=='Service Provider'"><a>My Arenas</a></router-link>
 
-								<router-link tag="li" to="/login" v-show="!user"><a>Login</a></router-link>
+	<section class="hero is-info is-large">
+		<!-- Hero header: will stick at the top -->
+		<div class="hero-head w3-red">
+			<header class="nav">
+				<div class="container">
+					<div class="nav-left">
+						<a class="nav-item">
+							<img src="logo.png" alt="Logo">
+						</a>
+					</div>
+					<span class="nav-toggle">
+          <span></span>
+					<span></span>
+					<span></span>
+					</span>
+					<div class="nav-right nav-menu">
 
-								<router-link tag="li" to="/signup" v-show="!user"><a>Signup</a></router-link>
+						<router-link class="nav-item is-active" to="/" exact><a>Home</a></router-link>
 
-								<a v-show="user" @click="logout">Logout</a>
+						<router-link class="nav-item" to="/myArenas" v-if="type=='ServiceProvider'"><a>My Arenas</a></router-link>
+						
 
-								<router-link tag="li" to="/registerSP"><a>Register sp</a></router-link>
+						<!-- player profile -->
+						<router-link class="nav-item" to="/myrequests"><a>My requests</a></router-link>
 
-								<router-link tag="li" to="/registerPlayer"><a>sign up</a></router-link>
+						<!-- player profile -->
+						<router-link class="nav-item" to="/notifications"><a>Notifications</a></router-link>
+
+						<router-link v-if="user" class="nav-item" to="/games"><a>Available Games</a></router-link>
+
+						<router-link class="nav-item" to="/Search">Search</router-link>
+						<router-link v-if="user" class="nav-item" to="/profile">{{user}}</router-link>
+
+
+
+						<!-- Hossam
+
+							//player/SP profiles
+        					<router-link to="/edit_profile" exact>edit</router-link>
+
+								<router-link tag="li" to="/comment"><a>comment</a></router-link>
+
+
 
 								<router-link tag="li" to="/createArena"><a>create arena</a></router-link>
 
 								<router-link tag="li" to="/cancelBooking"><a>cancel booking</a></router-link>
+
+								<router-link tag="li" to="/rating"><a>rating</a></router-link>
+
+								<router-link tag="li" to="/createGame"><a>create game</a></router-link>
+
+								<router-link tag="li" to="/changeMode"><a>Turn On/Off</a></router-link>
+								
+								<router-link tag="li" to="/ViewPendingBookings"><a>View Bookings</a></router-link>
+								
 
 							</ul>
 						</div>
@@ -79,12 +122,74 @@ width: 480px;
 			</div>
 		</nav>
 
-		<router-view></router-view>
 
 
+
+						 -->
+
+	
+						 		<!-- SP profile -->
+						 	<router-link class="nav-item" tag="li" to="/blackList"><a>Black List</a></router-link>
+
+                            <router-link class="nav-item" tag="li" to="/whiteList"><a>White List</a></router-link>
+							<a v-if="user" class="button is-info is-inverted" @click="logout">
+	              					<span class="icon">
+	                					<i class="fa fa-github"></i>
+	              					</span>
+									<span >Logout</span>
+								</a>
+
+
+						<router-link v-if="!user" class="nav-item" to="/login-signup/login">
+            				<a class="button is-info is-inverted" @click="showLogin=true">
+              					<span class="icon">
+                					<i class="fa fa-github"></i>
+              					</span>
+							<span >Login or Signup</span>
+						</a>
+						</router-link>
+					</div>
+				</div>
+			</header>
+		</div>
+
+		<!-- Hero content: will be in the middle -->
+		<!-- <img src="image/1.jpg"> -->
+	</section>
+
+	<div class="modal is-active" v-show="showLogin">
+  		<div class="modal-background" @click="showLogin=false"></div>
+  		<div class="modal-content">
+    		<router-view name="loginModal"></router-view>
+  		</div>
+  		<button class="modal-close" @click="showLogin=false"></button>
 	</div>
+
+
+	<router-view></router-view>
+
+  <footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <p>
+        <strong>El3ab</strong> by <a href="http://jgthms.com">Codeolo	gists</a>. The source code is licensed
+        <a href="http://opensource.org/licenses/mit-license.php">MIT</a>. The website content
+        is licensed <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC ANS 4.0</a>.
+      </p>
+      <p>
+        <a class="icon" href="https://github.com/jgthms/bulma">
+          <i class="fa fa-github"></i>
+        </a>
+      </p>
+    </div>
+  </div>
+</footer>
+
+</div>
 	<script src="./js/app.js"></script>
 	<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+
 </body>
 
 </html>

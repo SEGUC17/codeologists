@@ -17,13 +17,68 @@ let routes = [
 	},
 
 	{
-		path: '/login',
-		component: require('./views/Login')
+		path: '/login-signup',
+		components:{
+			default : require('./views/Home'),
+			loginModal : require('./views/LoginSignup')
+		},
+
+		children: [
+        {
+          path: 'login',
+          component: require('./views/Login')
+        },
+        {
+          path: 'signup',
+          component: require('./views/Signup')
+        }
+      ]
+
 	},
 
 	{
 		path : '/editArena',
 		component : require('./views/EditArena')
+	},
+  
+	{
+		path : '/createGame',
+		component : require('./views/CreateGame')
+	},
+	{
+		path : '/changeMode',
+		component : require('./views/changeMode')
+	},
+	
+	{
+		path : '/ViewPendingBookings',
+		component : require('./views/ViewPendingBookings')
+	},
+
+	{
+		path : '/comment',
+		component : require('./views/commentOnArena')
+	},
+
+	{
+		path : '/rating',
+		component : require('./views/NonRatedBookings')
+	},
+  
+	{
+		path:'/myrequests',
+		component : require('./views/Myrequests')
+
+	},
+  
+	{
+		path:'/games',
+		component: require('./views/Games')
+	},
+  
+	{
+		path:'/notifications',
+		component: require('./views/Notifications')
 	},
 
 	{
@@ -32,29 +87,45 @@ let routes = [
 	},
 
 	{
-		path: '/editArena',
-		component: require('./views/EditArena')
-	},
-
-	{
 		path: '/cancelBooking',
 		component: require('./views/delete_booking')
 	},
 
-	{
-		path: '/registerPlayer',
-		component: require('./views/regPlayer')
-	},
+  {
+    	path:'/viewArenas',
+    	component: require('./views/Arenas.vue')
+    },
 
-	{
-		path: '/registerSP',
-		component: require('./views/regSP')
-	},
+    {
+    	path:'/arenaDetails',
+    	component: require('./views/ArenaDetails.vue')
+    },
 
-	{
-		path: '/signup',
-		component : require('./views/Signup')
-	}
+    {
+       path: '/search',
+       component: require('./views/Search.vue')
+
+     },
+
+     {
+       path:'/edit_profile',
+       component : require('./views/EditPage.vue')
+     },
+
+     {
+        path: '/blackList',
+        component: require('./views/Blacklist')
+    },
+    
+    {
+        path: '/whiteList',
+        component: require('./views/Whitelist')
+    },
+
+    {
+    	path : '/profile',
+    	component : require('./views/Profile')
+    }
 
 ];
 

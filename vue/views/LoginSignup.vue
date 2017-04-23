@@ -1,13 +1,13 @@
 <template>
 
-		<form class="box" action="/login" method="post" @submit.prevent="login" @keydown="error=false">
-			<input type="text" name="username" v-model="form.username" class="input" placeholder="Username">	
-			<input type="password" name="password" v-model="form.password" class="input" placeholder="Password">
-			<input type="submit" value="login" class="button">
+		<div>
 
-			<span class="help is-danger" v-if="error">Invalid username or password</span>
+		<router-link to="/login-signup/login"><a>login</a></router-link>
+		<router-link to="/login-signup/signup"><a>signup</a></router-link>
 
-		</form>
+		<router-view></router-view>
+
+		</div>
 
 </template>
 
