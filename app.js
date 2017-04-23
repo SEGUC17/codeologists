@@ -13,14 +13,13 @@ var passport = require('passport');
 var flash = require('connect-flash');
 var Booking = require('./models/Booking');
 var Arena = require('./models/Arena');
-
-
-schedule.scheduleJob({ hour: 00, minute: 00, dayOfWeek: 5 }, systemController.updateSchedule);
+var logger = require('morgan');
+var serviceProviderController =  require('./controllers/serviceProviderController');
+schedule.scheduleJob({ hour: 07, minute: 00, dayOfWeek: 6 }, systemController.updateSchedule);
 
 //database connection url
 var db_url = "mongodb://localhost:27017/db";
 mongoose.Promise = Promise;
-
 
 // config app
 app.set('view engine', 'ejs');
@@ -40,6 +39,7 @@ app.use(flash());
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(logger('short'));
 app.use(require('./routes/router.js'));
 
 

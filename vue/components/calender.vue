@@ -2,6 +2,11 @@
 export default {
     methods:
     {
+        getData(){
+        var arenaName = "12";
+        axios.get('/arena/'+arenaName+'/getSchedule').then((res) => this.updateSchedule(res.data)).catch(error => this.errors = (error.data));
+        
+        },
         showPrev(){
             if(this.calMonth != ((new Date()).getMonth()))
             {
@@ -52,12 +57,12 @@ export default {
             var date = new Date();
             date.setHours(0,0,0,0);
             var weekDay = (date.getDay()+1)%7;
-            if(!((date)>(dateToComp) || !this.arena.schedule || Math.floor((dateToComp-date)/(3600*1000*24))+weekDay>27) ) //or diff in days >27-weekDayIndex
+            if(!((date)>(dateToComp) || !this.schedule || Math.floor((dateToComp-date)/(3600*1000*24))+weekDay>27) ) //or diff in days >27-weekDayIndex
             {
                 
-                Event.$emit('showagain',{schedule:this.arena.schedule[index.weekIndex][index.dayIndex],day:day,month:this.calMonth,arenaName:this.arena.name});
+                Event.$emit('showagain',{schedule:this.schedule[index.weekIndex][index.dayIndex],day:day,month:this.calMonth,arenaName:this.arenaName});
             }
-            else if(! this.arena.schedule)
+            else if(! this.schedule)
             {   
                 Event.$emit('showagain');
             }
@@ -73,12 +78,14 @@ export default {
             var difInWeeks = Math.floor((curDate - firstDayInWeek) / 1000 / 60 / 60 / 24 / 7);
             return { weekIndex: difInWeeks, dayIndex: (curDate.getDay() + 1) % 7 };
         },
-        refresh(){
+        refresh(eventData){
             //TODO get the value of arenaName from $route.params
+            //change when merging
+          
             
-            var arenaName = "12";
-            axios.get('/arena/'+arenaName+'/show').then((res) => this.updateBookings(res.data)).catch(error => this.errors = (error.data));
-        
+            var index = this.getScheduleIndex(eventData.day,eventData.month);
+            this.schedule[index.weekIndex][index.dayIndex] = eventData.schedule;
+            
         },
         getRange(monthIndex){
             if(monthIndex ==0 || monthIndex ==2 || monthIndex==4 || monthIndex ==6 || monthIndex ==7 || monthIndex ==9 || monthIndex ==11)
@@ -96,20 +103,16 @@ export default {
             startOfMonth.setMonth(this.calMonth);
             return (startOfMonth.getDay() -1)%7;
         },
-        updateBookings(newArenaData,eventData){
-           
-            this.arena = newArenaData;
-            if(!eventData)
-            return //handling the refresh call in mounted();
-            var index = this.getScheduleIndex(eventData.day,eventData.month);
-            console.log(this.arena.schedule[index.weekIndex][index.dayIndex]);
-            Event.$emit('updatedBookings',this.arena.schedule[index.weekIndex][index.dayIndex]);
+        updateSchedule(newArenaData){
+            
+            this.schedule = newArenaData.schedule;
         }
     },
     data()
     {
         return {
-            arena:{},
+            schedule:{},
+            arenaName:'12', //hard coded for now when integrating get it from /$route.params
             errors:{},
             
         }
@@ -119,7 +122,7 @@ export default {
         //TODO get the value of arena name from $route.params
       
          
-        this.refresh(); 
+        this.getData(); 
     },
     computed :
     {
@@ -175,7 +178,7 @@ export default {
     },
     created(){
         Event.$emit('calendercreated');
-        Event.$on('bookingsent',() => this.refresh());
+        Event.$on('bookingsent',(data) => this.refresh(data) );
        
     },
     props:['monthName']

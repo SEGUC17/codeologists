@@ -29,8 +29,10 @@ function bookHours(month, day, startIndex, endIndex, timestamp, arenaName, playe
                                     callback(errSave, null);
                                 }
                                 else {
-                                    bookingController.handleBooking(bookingObj._id);
-                                    return callback(null, bookingObj);
+                                    bookingController.handleBooking(bookingObj._id,function(err,schedule){
+                                    return  callback(err,schedule);
+                                    });
+                                    
                                 }
                             })
                         }
@@ -488,9 +490,64 @@ const getArenas = function (req, res) {
         res.status(403).json({ error: "Please Log In as a Service Provider /Arena owner to view the list of pending booking requests" });
     }
 }
+function getArenaSchedule(req, res) {
+    var arenaName = req.params.arenaName;
+    Arena.findOne({ name: arenaName }, 'schedule', function (err, foundArena) {
+        if (err ) {
+            res.status(500).json({ error: err });
+        }
+        else if(!foundArena){
+            res.status(404).json({error: "not a valid Arena"})
+        }
+        else {
+            res.json(foundArena);
+        }
+    });
+}
+function getWeekSchedule(req, res) {
+    if (!req.params.dayIndex || !req.params.monthIndex || !req.params.arenaName) 
+        {
+            
+            res.status(400).json({ error: "incomplete path" });
+            return;
+        }
+    
+            
+        Arena.findOne({name:req.params.arenaName},function(error,foundArena){
+            if(error)
+            {
+                 
+                res.status(500).json({error:error});
+
+            }
+            else if(! foundArena)
+            {
+                
+                res.status(404).json({error:" arena not found"});
+            }
+            else
+            {
+                var index =serviceProviderController.getScheduleIndices(req.params.monthIndex,req.params.dayIndex);
+                if(index.dayIndex>=0 && index.dayIndex<=6 && index.weekIndex>=0 && index.weekIndex<=3 )
+                {
+                    
+                    res.json(foundArena.schedule[index.weekIndex][index.dayIndex]);
+                }
+                else
+                {
+                    
+                    res.status(400).json({error:"day or month out of bound"});
+                }
+            }
+        })
+
+
+}
 let arenaController = {
+    getWeekSchedule: getWeekSchedule,
+    getArenaSchedule: getArenaSchedule,
     getArenas: getArenas,
-    bookHours:bookHours,
+    bookHours: bookHours,
     checkAvailable: checkAvailable,
     commentOnArena: commentOnArena,
     viewarena: viewarena,

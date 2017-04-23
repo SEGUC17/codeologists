@@ -104,8 +104,10 @@ router.get('/logout', function (req, res) {
 });
 router.get('/getIndex/:day/:month',serviceProviderController.IndexAPI);
 router.post('/arenas', visitorController.view_all);
-    
 router.get('/arena/:arenaName/show',visitorController.view_details_of_arena);
+//add ensure authenticated  to the following two routes ! 
+router.get('/arena/:arenaName/getSchedule',arenaController.getArenaSchedule);
+router.get('/arena/:arenaName/schedule/:monthIndex/:dayIndex',arenaController.getWeekSchedule);
 
 router.get('/getArenas',ensureAuthenticated,arenaController.getArenas);
 

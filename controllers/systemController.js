@@ -11,7 +11,7 @@ schedule of each arena to the default_weekly_schedule of that arena.
 function updateSchedule() {
     //update schedules of all arenas !    
     Arena.find(function (err, arenaArr) {
-
+        
         if (!err) {
             async.each(arenaArr,function(arena){
                 arena.schedule.shift();

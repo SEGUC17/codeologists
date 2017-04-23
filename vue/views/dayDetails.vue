@@ -41,21 +41,16 @@
         data(){
             return{
                 shown:true,
-                schedule:{},
+                schedule:null,
                 startTime:null,
                 endTime:null,
                 day:null,
                 month:null,
                 error:false,
                 arenaName:null,
-                isActive:[true,false],
             }
         },
         methods:{
-            toggleDropdown(index){
-                	document.getElementById(index).classList.toggle('active');
-		            return false;
-            },
             hideMe:function(){
                 this.shown =false;
                 this.startTime=null;
@@ -100,37 +95,33 @@
                  {
                      "Content-Type":"application/x-www-form-urlencoded"
                  }
-                 }).then(()=> this.updateSchedule()).catch(error => this.error=true);
+                 }).then((data)=> this.updateSchedule(data)).catch(error => this.error=true);
              },
              assignValues(data){
                  this.shown= true;                
                  if(!data)
                  return;
+                 this.schedule = data.schedule;
                  this.day = data.day;
                  this.month = data.month;
-                 this.schedule =data.schedule;
                  this.arenaName = data.arenaName;
              },
-             updateSchedule(){
+             updateSchedule(data){
                     //update schedule of dayDtails component
-                    Event.$emit('bookingsent',{day:this.day,month:this.month});
-                    for(var i=this.findIndex(this.startTime);i<this.findIndex(this.endTime);i++)
-                    {
-                        this.schedule[i]=-1;
-                    }
                     this.startTime=null;
-                    this.endTime = null;
-                    var a= this.schedule;
-                    this.schedule = null;
-                    this.schedule =a;
-                    console.log("done");
-            }
+                    this.endTime=null;
+                    this.schedule = data.data;
+                   
+                    Event.$emit('bookingsent',{day:this.day,month:this.month,schedule:this.schedule});
+            },
 
         
         },
         computed:{
             freeSlots(){
                 var freeSlotsArray = [];
+                if(!this.schedule)
+                return freeSlotsArray;
                 for(var i=0;i<this.schedule.length;i++)
                 {
                     if(this.schedule[i]==0)
@@ -140,6 +131,8 @@
             },
             reservedSlots(){
              var bookedBlocks = [];
+             if(!this.schedule)
+             return bookedBlocks;
                 for(var i=0;i<this.schedule.length;i++)
                 {
                     if(this.schedule[i]!=0)
@@ -168,7 +161,7 @@
             this.hideMe();
             Event.$on('hidedaydetails',() => this.hideMe());
             Event.$on('showagain',(data) => this.assignValues(data));
-            Event.$on('updatedBookings',(eventData) => this.updateSchedule(eventData));
+            
         }
         
         

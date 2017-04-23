@@ -13,25 +13,25 @@ var createBooking = function (req, res) {
         if (req.body.month && req.body.day && req.body.startIndex && req.body.endIndex) {
             if (err) {
                 console.log(err);
-                res.json({ error: err });
+                res.status(403).json({ error: err });
             }
             else if (!player) {
-                res.json({ error: "Please log in as a Player first" });
+                res.status(403).json({ error: "Please log in as a Player first" });
             }
             else {
                 require('./arenaController').bookHours(req.body.month, req.body.day, req.body.startIndex, req.body.endIndex, new Date(), req.params.arenaName, player._id, function (bookingErr, data) {
                     if (bookingErr) {
-                        res.json({ error: bookingErr });
+                        res.status(403).json({ error: bookingErr });
 
                     }
                     else {
-                        res.json({ error: null });
+                        res.json(data);
                     }
                 })
             }
         }
         else {
-            res.json({ error: "Incomplete input data " });
+            res.status(403).json({ error: "Incomplete input data " });
         }
     })
 }
@@ -62,7 +62,7 @@ function viewBookings(req, res) {
                                 res.status(403).json({ error: "Error finding pending requests" });
                             }
                             else {
-                                
+
                                 res.json(bookingArr);
                             }
 
@@ -189,66 +189,53 @@ function playerRateBooking(req, res) {
 
 }
 
-function acceptBooking(booking) {
-    
-
-        var bookingObj = booking;
-        Arena.findOne({ name: booking.arena }, function (error2, arenaa) {
-            var schedule = arenaa.schedule;
-            var indices = serviceProviderController.getScheduleIndices(booking.bookMonth, booking.bookDay);
-            var dayIndex = indices.dayIndex;
-            var weekIndex = indices.weekIndex;
-            var start = booking.start_index;
-            var end = booking.end_index;
-            Booking.find({ arena: arenaa._id, bookDay: booking.bookDay, bookMonth: booking.bookMonth }
-                , function (error3, allBookings) {
-                    if (!error3 && allBookings) {
-                        async.each(allBookings, function (currentBooking, callback) {
-                            if (!(currentBooking.accepted) && !(currentBooking._id.equals(booking._id))) {
-                                var start1 = currentBooking.start_index;
-                                var end1 = currentBooking.end_index;
-                                if ((start1 >= start && start1 <= end) || (end1 >= start && end1 <= end)) {
-                                    Arena.findOne({ _id: currentBooking.arena }, function (err, arenaa) {
-                                        if (!err && arenaa) {
-                                            var notification = 'Unfortunately,your booking on day ' + (currentBooking.bookDay) + ' on month ' +
-                                                (currentBooking.bookMonth) + ' for ' + (arenaa.name) + ' from '
-                                                + getTimeFromIndex(start1) + ' to ' + getTimeFromIndex(end1) + ' has been rejected';
-                                            Player.findOne({ _id: currentBooking.player }, function (err, playerr) {
-                                                if (!err && playerr) {
-                                                    playerr.notifications.push(notification);
-                                                    playerr.save();
-                                                    Booking.remove({ _id: currentBooking._id }, function (err, result) {
-
-                                                    });
-                                                }
-                                            });
-                                        }
-                                    });
-                                }
-                            }
-                        }, function (err) {
-                        })
-                    }
-                    for (var i = start; i <= end; i++) {
-                        arenaa.schedule[weekIndex][dayIndex][i] = booking._id;
-                    }
-
-                    bookingObj.accepted = true;
-                    bookingObj.save(function (err) {
-                        arenaa.markModified('schedule');
-                        arenaa.save(function (err) {
-
-                        })
-                    })
+function acceptBooking(booking, callbackF) {
 
 
-                });
-
+    Arena.findOne({ name: booking.arena }, function (error2, arenaa) {
+        if (error2) {
+            callbackF(error2, null);
+            return;
+        }
+        var schedule = arenaa.schedule;
+        var indices = serviceProviderController.getScheduleIndices(booking.bookMonth, booking.bookDay);
+        var dayIndex = indices.dayIndex;
+        var weekIndex = indices.weekIndex;
+        var start = booking.start_index;
+        var end = booking.end_index;
+       Arena.findOne({name:booking.arena},function(errArena,arena){
+        if(errArena){
+            callbackF(errArena,null);
+        }
+        else if(!arena)
+        {
+            return callbackF({error:"not a valid Arena any more"},null);
+        }
+        else{
+            for(var i=start;i<=end;i++)
+            {
+                if(arena.schedule[weekIndex][dayIndex][i] !=0)
+                {
+                    callbackF({error:"You tried to override a booking"},null);
+                    return;
+                }
+                
+                arena.schedule[weekIndex][dayIndex][i]=booking._id;
+            }
+            arena.markModified('schedule');
+            arena.save(function(arenaSaveErr,arenaObj){
+                if(arenaSaveErr){
+                   return callbackF(arenaSaveErr,null);
+                }
+                else
+                {
+                   return callbackF(null,arenaObj.schedule[weekIndex][dayIndex]);
+                }
+            })
+        }
         })
-
-    
+    });
 }
-
 
 function acceptBooking2(req, res) {
     if (req.user.type != 'ServiceProvider') {
@@ -335,16 +322,42 @@ function acceptBooking2(req, res) {
         }
     })
 }
-function handleBooking(id) {
-    Booking.findOne({ _id: id }, function (err, booking2) {
-        if (!(err || !booking2))
-            Arena.findOne({ name: booking2.arena }, function (err, arena) {
-                ServiceProvider.findOne({ _id: arena.service_provider }, function (err2, serviceProvider) {
-                    if (!err2 && serviceProvider && serviceProvider.mode == true)
-                        acceptBooking(booking2);
-
-                })
+function handleBooking(id, callback) {
+    Booking.findOne({ _id: id }, function (errBooking, booking2) {
+        if (!(errBooking || !booking2)) {
+            Arena.findOne({ name: booking2.arena }, function (errArena, arena) {
+                if (!errArena && arena) {
+                    ServiceProvider.findOne({ _id: arena.service_provider }, function (errSP, serviceProvider) {
+                        if (!errSP && serviceProvider && serviceProvider.mode == true) {
+                            acceptBooking(booking2, function (err, data) {
+                               return callback(err, data);
+                            });
+                        }
+                        else if(!serviceProvider) {
+                          return  callback({ error: "bad route" }, null);
+                        }
+                        else if(errSP)
+                        {
+                           return callback({error:errSP.message},null);
+                        }
+                        else
+                        {
+                            var index = serviceProviderController.getScheduleIndices(booking2.bookMonth,booking2.bookDay);
+                            return callback(null,arena.schedule[idnex.weekIndex][index.dayIndex]);
+                        }
+                    })
+                }
+                else {
+                    callback({ error: "Error encountered" })
+                }
             });
+        }
+        else if (errBooking) {
+          return  callback(errBooking,null);
+        }
+        else {
+         return   callback({ error: "booking not found" },null);
+        }
     });
 }
 function rejectBooking(req, res) {

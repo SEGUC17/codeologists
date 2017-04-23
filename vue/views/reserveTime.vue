@@ -12,8 +12,10 @@
    import bulma from 'bulma';
     export default {
         data(){
-            return {
+            return {//arena name and schedule are to be changed to props ! 
                 showNextMonth :false,
+                schedule:"",
+                arenaName:'',
             }
         },
         computed:{
@@ -54,6 +56,7 @@
             {
                 Event.$on('showfirstmonth',() => this.showNextMonth = false);
                 Event.$on('shownextmonth',() => this.showNextMonth = (this.nextMonthHasDays))
+                
             }
     }
 </script>
