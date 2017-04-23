@@ -140,7 +140,6 @@ let visitorController = {
 
 
 	/*createPlayer: function (req, res) {
->>>>>>> 3396376f1911a03c8d5b4cd9c646402c101c4f38
 		if(req.body.password=='')
 		{
 			req.checkBody('type', 'Account type is required.').notEmpty();
