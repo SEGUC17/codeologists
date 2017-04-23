@@ -95,7 +95,7 @@
 					mode:'checked',
 					profile_pic:'/default-user-image.png'
 				}),
-				loading:'button is-primary w3-xlarge'
+				loading:'button is-primary w3-xlarge',
 				loginData:{
 					username:'',
 					password:''
@@ -111,7 +111,7 @@
 				.then(res => {
 					axios.post('/login', querystring.stringify(this.loginData), { headers: { "Content-Type": "application/x-www-form-urlencoded" } })
 	                .then(response => {
-	                	
+	                	Event.$emit('loggedIn',response.data);
 	                    this.$router.push('/');
 	                })
 	                .catch(error => {
