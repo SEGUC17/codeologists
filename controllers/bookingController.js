@@ -135,8 +135,13 @@ var cancelBooking = function (req, res) {
             if (status) {
                 Arena.findOne({ name: arena }, function (err, doc) {
                     for (var i = 0; i < 48; i++) {
+                     console.log(week);
+                     console.log(day);
+                     console.log(doc.schedule[week]);
+
+
                         var currDay = doc.schedule[week][day];
-                        if (i >= start && i <= end && currDay[i].equals(id))
+                        if (i >= start && i <= end && currDay[i] == id)
                             doc.schedule[week][day][i] = 0;
                     }
                     doc.markModified('schedule');
@@ -144,10 +149,11 @@ var cancelBooking = function (req, res) {
                         if (err)
                           res.json(500, {error: err.message});
                     });
+
                 });
             }
 
-            Booking.remove({
+             Booking.remove({
                 _id: bookingID
             }, function (err) {
                 if (err) {res.json(500, {error: err.message});
