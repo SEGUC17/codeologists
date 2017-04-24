@@ -4,9 +4,11 @@ var Booking = require('../models/Booking');
 var Player = require('../models/Player');
 var async = require('async');
 
-/* 
-updateSchedule() is supposed to update the schedule of all arenas at the start of a new week  by setting the 4th week of the  
-schedule of each arena to the default_weekly_schedule of that arena.
+/*
+systemController.updateSchedule()
+a function that runs each week exactly once to shift the schedule of all arenas one element to the left to correspond to the fact that one week has passed, thus keeping the system consistant.
+@params : none
+@return : none
 */
 function updateSchedule() {
     //update schedules of all arenas !    

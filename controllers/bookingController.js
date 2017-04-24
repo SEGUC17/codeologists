@@ -6,7 +6,12 @@ var ServiceProvider = require('../models/ServiceProvider');
 var Booking = require('../models/Booking');
 
 var async = require("async");
-
+/*
+bookingController.createBooking
+a post request function that finds relevent information about the booking and calls the bookHours function then waits for its callback !
+@param: the month and day of the booking, a start and an end index that correspond to end and start dates of the booking, and the response object.
+@return returns in the response object the schedule of the arena in which the booking was made in the day that it was made (day schedule is represented as 1D array where each index corresponds to half an hour i.e array of 48 elements that corresponds to 24 hours of the day);
+*/
 createBooking = function (req, res) {
     Player.findOne({ username: req.user.username }, function (err, player) {
         if (req.body.month && req.body.day && req.body.startIndex && req.body.endIndex) {
@@ -34,6 +39,12 @@ createBooking = function (req, res) {
         }
     })
 }
+/*
+bookingController.viewBookings :
+Afunction for a service provider that enables him to view the bookings that are not accepted for some specific arena of his arenas 
+@param : arenaName : the name of the arena
+@output : an array of bookings as mentioned in the description
+*/
 function viewBookings(req, res) {
     Arena.findOne({name:req.params.arenaName}, function (err, foundArena) {
         if (err) {
@@ -75,7 +86,12 @@ function viewBookings(req, res) {
         }
     });
 }
-
+/*
+bookingController.getPlayersForBookings : 
+A function that gets the player names of some bookings
+@param : an array of bookings
+@return : an array of names of the players
+*/
 function getPlayersForBookings(req){
     var bookings = req;
     var acc = [];
@@ -95,6 +111,12 @@ function getPlayersForBookings(req){
 }
 
 
+/*
+bookingController.cancelBooking:
+This functions cancels a booking by removing it from the database, and from the schedule of the arena on which this booking is scheduled. 
+@param: arena name (from req.body), booking id (from req.params)
+@return: -
+*/
 
 var cancelBooking = function (req, res) {
     if (req.user.type != 'Player') {
@@ -183,7 +205,12 @@ var viewPlayerBookings = function (req, res){
      }
 };
 
-
+/*
+bookingController.getTimeFromIndex
+Helper function that takes a day slot and transforms the slot to a day hour
+@param: day slot
+@return: hour of day
+*/
 function getTimeFromIndex(index) {
   var hour = Math.floor(index / 2);
   var minute = '00';
@@ -191,6 +218,13 @@ function getTimeFromIndex(index) {
   minute = '30';
   return {hour: hour, minute: minute};
 };
+
+/*
+bookingController.getUnratedBookings:
+A get request function that gets all unrated bookings that a user should rate, it decides based on the type of user and the value of arena_rating and player_rating in the booking which bookings should be retrieved.
+@param: takes the user type and id
+@return: retrieves all unrated bookings that the user should rate from database and send it in the response
+*/
 
 function getUnratedBookings(req, res) {
   var date = new Date();
@@ -252,6 +286,13 @@ function getUnratedBookings(req, res) {
         });
       }
     };
+
+/*
+bookingController.rateBooking
+A post request function that updates the database with the rating, if the rater is a player, the arena is rated, otherwise the player is rated.
+@param: rating value, user and booking
+@return: updates the booking rating in the database and also updates the average rating and the count of ratings of either the arena or the player.
+*/
 
     function rateBooking (req, res) {
       if(!req.body.rating || parseInt(req.body.rating) > 5 || parseInt(req.body.rating) < 1)
@@ -355,7 +396,12 @@ function getUnratedBookings(req, res) {
       });
     }
 
-
+/*
+bookingController.acceptBooking
+a function that loops on all indecies in the schedule of the arena in which the booking was made and then reserves it to the user who made the booking
+@params : the booking object and a callback function to be called at the end of the computation
+@return :void
+*/
    
     function acceptBooking(booking, callbackF) {
 
@@ -405,7 +451,12 @@ function getUnratedBookings(req, res) {
     });
 }
 
-
+/*
+booking Controller.acceptBooking2 : 
+A function that enables the service provider to accept a pending booking
+@param : an id of the booking
+@return : returns a response depending on whether the booking was accepted or not
+*/
       function acceptBooking2(req, res) {
     if (req.user.type != 'ServiceProvider') {
         res.json(403,{error:'You are not authorized to do this'});
@@ -498,6 +549,13 @@ function getUnratedBookings(req, res) {
         }
     })
 }
+/*
+bookingController.handleBooking
+the function is to deal with the settings of the serviceprovider if he has set the auto-accept mode to on then it will simply call acceptBooking and on callback it will callback the bookHours function
+otherwise it will callback bookHours function write away ,
+@params:objectID of the booking object, and a callback function, it will pass to the callback function an error if any and/or the schedule of arena after logging the booking into the system
+@return:void
+*/
 function handleBooking(id, callback) {
     Booking.findOne({ _id: id }, function (errBooking, booking2) {
         if (!(errBooking || !booking2)) {
@@ -536,7 +594,12 @@ function handleBooking(id, callback) {
         }
     });
 }
-
+/*
+bookingController.rejectBooking : 
+A function that enables the service provider to reject a pending booking
+@param : booking id to be rejected
+@return : returns a response depending on whether the booking was rejected or not
+*/
         function rejectBooking(req, res) {
     if (!(req.params.bookingID)){
         res.json (400 ,{error :'Missing field'});
