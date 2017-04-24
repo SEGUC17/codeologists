@@ -260,145 +260,152 @@ function addimage(req, res, nxt) {
   });
 }
 function setUnavailable(req, res) {
+    if (req.user && (req.user.type == "ServiceProvider")) {
+        ServiceProvider.findOne({ username: req.user.username }, function (err, sp) {
+            Arena.findOne({ name: req.params.arenaName }, function (err2, arena) {
+                if(!sp)
+                    res.status(400).json({error:"error"});
+                else{
+                //checking if this arena belongs to that user(service provider)
+                if (arena && arena.service_provider.equals(sp._id)) {
 
-  if (req.user && (req.user.type == "ServiceProvider")) {
-    ServiceProvider.findOne({ username: req.user.username }, function (err, sp) {
-      Arena.findOne({ _id: req.params.arena_id }, function (err2, arena) {
+                    var startIndex = req.body.startIndex;
+                    var endIndex = req.body.endIndex;
+                    var day = req.body.day;
+                    var month = req.body.month;
 
-        //checking if this arena belongs to that user(service provider)
-        if (arena && arena.service_provider.equals(sp._id)) {
+                    //checking if all required fields are delivered
+                    if (month && day && endIndex && startIndex) {
 
-          var startIndex = req.body.startIndex;
-          var endIndex = req.body.endIndex;
-          var day = req.body.day;
-          var month = req.body.month;
+                        var Indices = serviceProviderController.getScheduleIndices(month, day);
+                        var weekIndex = Indices.weekIndex;
+                        var dayIndex = Indices.dayIndex;
+                        var flag = 0;
 
-          //checking if all required fields are delivered
-          if (month && day && endIndex && startIndex) {
+                        Arena.findOne({name:req.params.arenaName}, function (err, arena) {
+                            if (arena) {
 
-            var Indices = serviceProviderController.getScheduleIndices(month, day);
-            var weekIndex = Indices.weekIndex;
-            var dayIndex = Indices.dayIndex;
-            var flag = 0;
+                                //saving the day which will be modifed to restore it to the schedule later if there's an error
+                                var before_edit = [];
+                                for (var i = 0; i < 48; i++) {
+                                    before_edit[i] = arena.schedule[weekIndex][dayIndex][i];
+                                };
 
-            Arena.findById(req.params.arena_id, function (err, arena) {
-              if (arena) {
+                                var start = parseInt(startIndex,10);
+                                var end = parseInt(endIndex,10);
+                                //setting only available slots to be unavailable. if a booked slot encountered an error statement will be sent to the user (service provider).
+                                for (var i = start; i <= end; i++) {
+                                    if (arena.schedule[weekIndex][dayIndex][i] == 0 || arena.schedule[weekIndex][dayIndex][i] == -1)
+                                    {
+                                        (arena.schedule)[weekIndex][dayIndex][i] = -1;}
 
-                //saving the day which will be modifed to restore it to the schedule later if there's an error
-                var before_edit = [];
-                for (var i = 0; i < 48; i++) {
-                  before_edit[i] = arena.schedule[weekIndex][dayIndex][i];
-                };
+                                    else 
+                                    {
+                                        flag = 1;
+                                        break;
+                                    }
 
-                //setting only available slots to be unavailable. if a booked slot encountered an error statement will be sent to the user (service provider).
-                for (var i = startIndex; i <= endIndex; i++) {
-                  if (arena.schedule[weekIndex][dayIndex][i] == 0 || arena.schedule[weekIndex][dayIndex][i] == -1)
-                  (arena.schedule)[weekIndex][dayIndex][i] = -1;
+                                };
+                                //checking if the user(servvice provider) tries to set a booked slot to be unavailable.
+                                if (flag) {
+                                    for (var i = 0; i < 48; i++) {
+                                        arena.schedule[weekIndex][dayIndex][i] = before_edit[i];
+                                    };
+                                    res.json({ error: "You can not set booked slots to be unavailable" });
+                                }
+                                else {
+                                    arena.markModified("schedule");
+                                    arena.save(function (err, arr) {
+                                        if (err) {
+                                            res.json({ error: "error in arena DB" });
+                                        }
+                                    });
+                                    res.json({ schedule: arena.schedule });
+                                }
 
-                  else {
-                    flag = 1;
-                    break;
-                  }
-
-                };
-                //checking if the user(servvice provider) tries to set a booked slot to be unavailable.
-                if (flag) {
-                  for (var i = 0; i < 48; i++) {
-                    arena.schedule[weekIndex][dayIndex][i] = before_edit[i];
-                  };
-                  res.json({ error: "You can not set booked slots to be unavailable" });
+                            }
+                            else {
+                                res.status(404).json({ error: "error, wrong arena id" });
+                            };
+                        });
+                    }
+                    else {
+                        //if one of the fields in req.body isn't delivered 
+                        res.json({ error: "Missing data" });
+                    }
                 }
                 else {
-                  arena.markModified("schedule");
-                  arena.save(function (err, arr) {
-                    if (err) {
-                      res.json({ error: "error in arena DB" });
-                    }
-                  });
-                  res.json({ schedule: arena.schedule });
+                    //if the arena does not belong to this service provider or there's no such arena 
+                    res.status(404).json({ error: "You are not allowed to view this page or there's no such arena" });
                 }
-
-              }
-              else {
-                res.status(404).json({ error: "error, wrong arena id" });
-              };
+            }
             });
-          }
-          else {
-            //if one of the fields in req.body isn't delivered
-            res.json({ error: "Missing data" });
-          }
-        }
-        else {
-          //if the arena does not belong to this service provider or there's no such arena
-          res.status(404).json({ error: "You are not allowed to view this page or there's no such arena" });
-        }
-      });
-    });
-  }
-  else {
-    //if the user(visitor) isn't logged in or he is logged in but he is not a service provider
-    res.status(403).json({ error: "You are not allowed to view this page" });
+        });
+    }
+    else {
+        //if the user(visitor) isn't logged in or he is logged in but he is not a service provider
+        res.status(403).json({ error: "You are not allowed to view this page" });
 
-  }
+    }
 
 }
 
 function setAvailable(req, res) {
+    if (req.user && (req.user.type == "ServiceProvider")) {
+        ServiceProvider.findOne({ username: req.user.username }, function (err, sp) {
+            Arena.findOne({ name: req.params.arenaName }, function (err2, arena) {
 
-  if (req.user && (req.user.type == "ServiceProvider")) {
-    ServiceProvider.findOne({ username: req.user.username }, function (err, sp) {
-      Arena.findOne({ _id: req.params.arena_id }, function (err2, arena) {
+                //checking if this arena belongs to that user(service provider)
+                if (arena && arena.service_provider.equals(sp._id)) {
+                    var startIndex = req.body.startIndex;
+                    var endIndex = req.body.endIndex;
+                    var day = req.body.day;
+                    var month = req.body.month;
+                    //checking if all required fields are delivered
+                    if (month && day && endIndex && startIndex) {
 
-        //checking if this arena belongs to that user(service provider)
-        if (arena && arena.service_provider.equals(sp._id)) {
+                        var Indices = serviceProviderController.getScheduleIndices(month, day);
+                        var weekIndex = Indices.weekIndex;
+                        var dayIndex = Indices.dayIndex;
 
-          var startIndex = req.body.startIndex;
-          var endIndex = req.body.endIndex;
-          var day = req.body.day;
-          var month = req.body.month;
+                        Arena.findOne({name : req.params.arenaName}, function (err, arena) {
+                            if(arena){
+                            var schedule = arena.schedule;
+                            var i = startIndex;
+                            //making the slots between the startIndex and the endIndex (inclusive) available
+                            var start = parseInt(startIndex,10);
+                            var end = parseInt(endIndex,10);
+                            for ( i = start; i <= end; i++) {
+                                schedule[weekIndex][dayIndex][i] = 0;
+                            };
 
-          //checking if all required fields are delivered
-          if (month && day && endIndex && startIndex) {
-            var Indices = serviceProviderController.getScheduleIndices(month, day);
-            var weekIndex = Indices.weekIndex;
-            var dayIndex = Indices.dayIndex;
+                            arena.schedule = schedule;                            
+                            arena.markModified("schedule");
+                            arena.save(function (err) {
+                                if (err) {
+                                    res.json({ error: "error in arena DB" });
+                                }
+                            });
+                            res.status(200).json({ schedule: arena.schedule });
+                        }});
 
-            Arena.findById(req.params.arena_id, function (err, arena) {
-              var schedule = arena.schedule;
-
-              //making the slots between the startIndex and the endIndex (inclusive) available
-              for (var i = startIndex; i <= endIndex; i++) {
-                schedule[weekIndex][dayIndex][i] = 0;
-              };
-
-              arena.schedule = schedule;
-              arena.markModified("schedule");
-              arena.save(function (err) {
-                if (err) {
-                  res.json({ error: "error in arena DB" });
+                    }
+                    else {
+                        //if one of the fields in req.body isn't delivered 
+                        res.json({ error: "Missing data" });
+                    }
                 }
-              });
-              res.status(200).json({ schedule: arena.schedule });
+                else {
+                    //if the arena does not belong to this service provider or there's no such arena
+                    res.status(404).json({ error: "You are not allowed to view this page or there's no such arena" });
+                }
             });
-
-          }
-          else {
-            //if one of the fields in req.body isn't delivered
-            res.json({ error: "Missing data" });
-          }
-        }
-        else {
-          //if the arena does not belong to this service provider or there's no such arena
-          res.status(404).json({ error: "You are not allowed to view this page or there's no such arena" });
-        }
-      });
-    });
-  }
-  else {
-    //if the user(visitor) isn't logged in or he is logged in but he is not a service provider
-    res.status(403).json({ error: "You are not allowed to view this page" });
-  }
+        });
+    }
+    else {
+        //if the user(visitor) isn't logged in or he is logged in but he is not a service provider   
+        res.status(403).json({ error: "You are not allowed to view this page" });
+    }
 }
 
 function createArena(req, res) {

@@ -145,12 +145,30 @@ let routes = [
     	 
     	{
         path:'dayDetail/:dayIndex',
-        component:require('./views/dayDetails.vue')
+        component:require('./views/dayDetails')
         
     	},
     	 
     	]
 
+    },
+
+    {
+    	path:'/editSchedule/:arenaName',
+    	components : {
+    		default:require('./views/reserveTime2'),
+    		daypanel:require('./views/dayDetails2')
+    			},
+    	children:
+    	[
+    	 
+    	{
+        path:'dayDetail2/:dayIndex',
+        component:require('./views/dayDetails2')
+        
+    	},
+    	 
+    	]
     }
 
 ];

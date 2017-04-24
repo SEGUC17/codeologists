@@ -179,7 +179,7 @@ router.post('/acceptBooking/:bookingID', ensureAuthenticated, bookingController.
 router.post('/rejectBooking/:bookingID', ensureAuthenticated, bookingController.rejectBooking);
 router.post('/createGame', ensureAuthenticated, gameController.createGame);
 
-router.post("/sp/arena/:arena_id", ensureAuthenticated, function (req, res) {
+router.post("/sp/arena/:arenaName",ensureAuthenticated, function (req, res) {
     if (req.body.flag == 1) {
         arenaController.setUnavailable(req, res);
     }

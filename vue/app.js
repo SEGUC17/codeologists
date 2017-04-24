@@ -8,6 +8,12 @@ import reserveTime from './views/reserveTime.vue';
 Vue.component('calender', calender);
 Vue.component('dayDetails', dayDetails);
 Vue.component('reservetime',reserveTime);
+import calender2 from './components/calender2.vue';
+import dayDetails2 from './views/dayDetails2';
+import reserveTime2 from './views/reserveTime2.vue';
+Vue.component('calender2', calender2);
+Vue.component('dayDetails2', dayDetails2);
+Vue.component('reservetime2',reserveTime2); 
 
 window.Event = new Vue();
 
@@ -153,8 +159,9 @@ new Vue({
     },
     created(){
         Event.$on('calendercreated', () => this.redirect());
+        Event.$on('calendercreated2', () => this.redirect());
     },
-    components: {reserveTime},
+    components: {reserveTime,calender2, dayDetails2,reserveTime2 }
 
 });
 

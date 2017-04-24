@@ -3,6 +3,14 @@
 		<article class="message" v-for="arena in arenas">
 			<div class="message-header">
 				<p>{{arena.name}}</p>
+
+				<button class="button is-primary">
+	    			<router-link :to="getUrl(arena)">
+	    				<a>Edit Current Scheule</a>
+	    			</router-link>
+	    		</button>
+
+
 				<button @click="editClicked(arena)" class="button is-primary">
 	    			<router-link to="/editArena">
 	    				<a>Edit</a>
@@ -34,6 +42,10 @@
 		methods: {
 			editClicked(arena) {
 				Event.$emit('edit-arena', arena);
+			},
+
+			getUrl(arena){
+				return "/editSchedule/"+arena.name;
 			}
 		}
 	}

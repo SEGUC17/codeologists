@@ -24,6 +24,7 @@
     "fs": "0.0.1-security",
     "laravel-mix": "^0.10.0",
     "moment-timezone": "^0.5.11",
+    "mongodb": "^2.2.26",
     "mongoose": "^4.9.2",
     "morgan": "^1.8.1",
     "multer": "^1.3.0",
