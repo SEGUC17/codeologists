@@ -125,7 +125,7 @@
                  ).catch(error => {this.error=true
                                     alert(error)    });
              },
-             setUnavailable2(){console.log(this.findIndex(this.startTime)+"--"+this.findIndex(this.endTime));
+             setUnavailable2(){
                 axios.post('/sp/arena/'+this.arenaName,querystring.stringify(
                  {
                      day:this.day,
@@ -227,9 +227,9 @@
         created()
         {   this.hideMe();
             //Event.$emit('daydetailcreated');
-            Event.$on('hidedaydetails',() => this.hideMe());
-            Event.$on('showagain',(data) => this.assignValues(data));
-            Event.$on('updatedBookings',(eventData) => this.updateSchedule(eventData));
+            Event.$on('hidedaydetails2',() => this.hideMe());
+            Event.$on('showagain2',(data) => this.assignValues(data));
+            Event.$on('updatedBookings2',(eventData) => this.updateSchedule(eventData));
         }
         
         

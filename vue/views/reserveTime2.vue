@@ -1,14 +1,14 @@
 <template>
 <div id="rservetimeroot"  >
 
-<calender v-if="!showNextMonth" :id="getCurrentMonth"  :monthName="getCurrentMonth" ><template slot="month">{{getCurrentMonth}}</template></calender>
+<calender2 v-if="!showNextMonth" :id="getCurrentMonth"  :monthName="getCurrentMonth" ><template slot="month">{{getCurrentMonth}}</template></calender2>
 
-<calender :id="getNextMonth" v-if="showNextMonth && nextMonthHasDays"  :monthName="getNextMonth" ><template slot="month">{{getNextMonth}}</template></calender>
+<calender2 :id="getNextMonth" v-if="showNextMonth && nextMonthHasDays"  :monthName="getNextMonth" ><template slot="month">{{getNextMonth}}</template></calender2>
 <router-view ></router-view>
 </div>
 </template>
 <script>
-import calender from '../components/calender2';
+import calender2 from '../components/calender2';
 import bulma from 'bulma';
     export default {
         data(){
@@ -36,7 +36,7 @@ import bulma from 'bulma';
             },
 
         },
-        components:[calender],
+        components:[calender2],
         methods:{
             getRange(monthIndex){
                 if(monthIndex ==0 || monthIndex ==2 || monthIndex ==4 || monthIndex ==6 || monthIndex ==7 || monthIndex ==9 || monthIndex ==11)
@@ -52,8 +52,8 @@ import bulma from 'bulma';
             },
         created()
             {
-                Event.$on('showfirstmonth',() => this.showNextMonth = false);
-                Event.$on('shownextmonth',() => this.showNextMonth = (this.nextMonthHasDays))
+                Event.$on('showfirstmonth2',() => this.showNextMonth = false);
+                Event.$on('shownextmonth2',() => this.showNextMonth = (this.nextMonthHasDays))
             }
     }
 </script>

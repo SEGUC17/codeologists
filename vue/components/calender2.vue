@@ -5,10 +5,10 @@ export default {
         showPrev(){
             if(this.calMonth != ((new Date()).getMonth()))
             {
-                Event.$emit('hidedaydetails');
+                Event.$emit('hidedaydetails2');
             }
             
-            Event.$emit('showfirstmonth');    
+            Event.$emit('showfirstmonth2');    
             
             
         },
@@ -16,19 +16,19 @@ export default {
 
             if(this.calMonth == ((new Date()).getMonth()))
             {
-                Event.$emit('hidedaydetails');
+                Event.$emit('hidedaydetails2');
             }
             
 
-               Event.$emit('shownextmonth');    
+               Event.$emit('shownextmonth2');    
                 
         },
         findHREF:function(index){
             if(this.isButtonEnabled(index))
-            return "/dayDetail/"+index;
+            return "/dayDetail2/"+index;
             else
             {   
-                return "/dayDetail/1";
+                return "/dayDetail2/1";
             }
         },
        isButtonEnabled:function(index){
@@ -55,11 +55,11 @@ export default {
             if(!((date)>(dateToComp) || !this.arena.schedule || Math.floor((dateToComp-date)/(3600*1000*24))+weekDay>27) ) //or diff in days >27-weekDayIndex
             {
                 
-                Event.$emit('showagain',{schedule:this.arena.schedule[index.weekIndex][index.dayIndex],day:day,month:this.calMonth,arenaName:this.arena.name});
+                Event.$emit('showagain2',{schedule:this.arena.schedule[index.weekIndex][index.dayIndex],day:day,month:this.calMonth,arenaName:this.arena.name});
             }
             else if(! this.arena.schedule)
             {   
-                Event.$emit('showagain');
+                Event.$emit('showagain2');
             }
         },
         getScheduleIndex(bDay,bMonth)
@@ -103,7 +103,7 @@ export default {
              return //handling the refresh call in mounted();
              var index = this.getScheduleIndex(eventData.day,eventData.month);
              console.log(this.arena.schedule[index.weekIndex][index.dayIndex]);
-             Event.$emit('updatedBookings',this.arena.schedule[index.weekIndex][index.dayIndex]);}
+             Event.$emit('updatedBookings2',this.arena.schedule[index.weekIndex][index.dayIndex]);}
     },
     data()
     {
@@ -175,7 +175,7 @@ export default {
     created(){
     
         Event.$on('changed',()=>this.refresh());
-        Event.$emit('calendercreated');
+        Event.$emit('calendercreated2');
        
     },
     props:['monthName']

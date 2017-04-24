@@ -18,6 +18,7 @@
     "ejs": "^2.5.6",
     "express": "^4.15.2",
     "fs": "0.0.1-security",
+    "element-ui": "^1.2.9",
     "moment-timezone": "^0.5.11",
     "mongoose": "^4.9.2",
     "multer": "^1.3.0",
@@ -30,9 +31,8 @@
     "querystring": "^0.2.0",
     "stringify": "^5.1.0",
     "vue": "^2.2.6",
-    "vue-router": "^2.4.0"
-  },
-  "devDependencies": {
+    "vue-router": "^2.4.0",
     "laravel-mix": "^0.10.0"
   }
+    
 }

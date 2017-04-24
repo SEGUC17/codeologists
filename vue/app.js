@@ -7,16 +7,13 @@ window.querystring = require('querystring');
 import vueRouter from 'vue-router';
 import router from './router.js'
 import booking from './components/booking.vue';
-import day from './components/day.vue';
-import calender from './components/calender.vue';
-import calenderHeader from './components/calenderHeader.vue';
-import month from './components/month.vue';
-import dayDetails from './views/dayDetails';
-Vue.component('day', day);
-Vue.component('calender', calender);
-Vue.component('calenderHeader', calenderHeader);
-Vue.component('month', month);
-Vue.component('dayDetails', dayDetails);
+import calender2 from './components/calender2.vue';
+import dayDetails2 from './views/dayDetails2';
+import reserveTime2 from './views/reserveTime2.vue';
+import ElementUI from 'element-ui';
+Vue.component('calender2', calender2);
+Vue.component('dayDetails2', dayDetails2);
+Vue.component('reservetime2',reserveTime2);   
 Vue.use(vueRouter);
 //handle errors
 var viewBookings = new Vue({
@@ -49,20 +46,16 @@ var viewBookings = new Vue({
 
 });
 
-var bookHours = new Vue({
+var setUnavailable = new Vue({
     el: "#schedlueRoot",
-    components: { day, calender, dayDetails },
+    components: { calender2, dayDetails2,reserveTime2 },
     router: router,
     methods: {
-        redirect(data) {
+        redirect2() {
             
-           //if(data.month == (new Date().getMonth()))
-             if(false)   
-                router.replace('/dayDetail/' + data.day);
-            else
-               router.replace('/dayDetail/22');
-           
-        }
+               router.replace('/dayDetail2/-1');
+        
+        },
     },
     data: {
 
@@ -70,7 +63,7 @@ var bookHours = new Vue({
 
     },
     created() {
-        Event.$on('calendercreated', (data) => this.redirect(data));
+        Event.$on('calendercreated2', () => this.redirect2());
     }
 })
 

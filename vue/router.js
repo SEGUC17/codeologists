@@ -1,8 +1,8 @@
 import VueRouter from 'vue-router';
 let routes = [
     {
-        path:'/dayDetail/:dayIndex',
-        component:require('./views/dayDetails.vue'),
+        path:'/dayDetail2/:dayIndex',
+        component:require('./views/dayDetails2.vue'),
         
     }
     ,  
