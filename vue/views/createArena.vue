@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="w3-container">
 
 
   <div class="w3-quarter">
@@ -83,18 +83,18 @@
         </div> -->
 
         <div class="tabs ">
-    		  <ul>
-    		    <li :class="{'black-tab' : selectedTab=='sat'}">
+          <ul>
+            <li :class="{'black-tab' : selectedTab=='sat'}">
               <a @click="selectedTab='sat'; currentDay = 0">
                 <h6 :class="{'white-text': selectedTab == 'sat'}">Saturday</h6>
               </a>
             </li>
-    		    <li :class="{'black-tab' : selectedTab=='sun'}">
+            <li :class="{'black-tab' : selectedTab=='sun'}">
               <a @click="selectedTab='sun'; currentDay = 1">
                 <h6 :class="{'white-text': selectedTab == 'sun'}">Sunday</h6>
               </a>
             </li>
-    		    <li :class="{'black-tab' : selectedTab=='mon'}">
+            <li :class="{'black-tab' : selectedTab=='mon'}">
               <a @click="selectedTab='mon'; currentDay = 2">
                 <h6 :class="{'white-text': selectedTab == 'mon'}">Monday</h6>
               </a>
@@ -104,12 +104,12 @@
                 <h6 :class="{'white-text': selectedTab == 'tues'}">Tuesday</h6>
               </a>
             </li>
-    		    <li :class="{'black-tab' : selectedTab=='wed'}">
+            <li :class="{'black-tab' : selectedTab=='wed'}">
               <a @click="selectedTab='wed'; currentDay = 4">
                 <h6 :class="{'white-text': selectedTab == 'wed'}">Wednesday</h6>
               </a>
             </li>
-    		    <li :class="{'black-tab' : selectedTab=='thurs'}">
+            <li :class="{'black-tab' : selectedTab=='thurs'}">
               <a @click="selectedTab='thurs'; currentDay = 5">
                 <h6 :class="{'white-text': selectedTab == 'thurs'}">Thursday</h6>
               </a>
@@ -119,8 +119,8 @@
                 <h6 :class="{'white-text': selectedTab == 'fri'}">Friday</h6>
               </a>
             </li>
-    		  </ul>
-    		</div>
+          </ul>
+        </div>
 
 
         <table v-for="j in 7" v-if="j-1==currentDay" class="table is-bordered">
@@ -225,7 +225,6 @@
         selectedTab : 'sat'
       }
     },
-
     created(){
       this.schedule = new Array(7);
       for (var i = 0; i < 7; i++) {
@@ -244,12 +243,9 @@
         if (i == 22)
           am = false;
       }
-
       this.days = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
       this.currentDay = 0;
-
     },
-
     methods: {
       create(){
         var arr = new Array(7);
@@ -262,7 +258,6 @@
               arr[ii].push(jj);
           }
         }
-
         this.form.saturday = arr[0];
         this.form.sunday = arr[1];
         this.form.monday = arr[2];
@@ -270,28 +265,25 @@
         this.form.wednesday = arr[4];
         this.form.thursday = arr[5];
         this.form.friday = arr[6];
-
         this.form.submit('post','/createArena')
-				.then(res => {
+        .then(res => {
           if(res.error)
             alert(res.error);
           else
-					     alert('arena added');
-				})
-				.catch(err => {
+               alert('arena added');
+        })
+        .catch(err => {
           if(err.error)
             alert(err.error);
           if(err.response.data.error)
             alert(err.response.data.error);
           else
-					     alert(err.message);
-				});
+               alert(err.message);
+        });
       },
-
       selectDay(day) {
         this.currentDay = day;
       },
-
       toggleSlot(day, slot) {
         if (this.schedule[day][slot] == 0) {
           this.schedule[day][slot] = -1;
@@ -301,7 +293,6 @@
         this.currentDay += 1;
         this.currentDay -= 1;
       },
-
       next() {
        this.active = this.active== 0?1:0;
      }

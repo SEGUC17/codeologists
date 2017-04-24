@@ -2,13 +2,13 @@ var Player = require('../models/Player');
 var arenaController = require('./arenaController');
 var serviceProviderController = require('./serviceProviderController');
 var Arena = require('../models/Arena');
-var serviceProvider = require('../models/ServiceProvider');
+var ServiceProvider = require('../models/ServiceProvider');
 var Booking = require('../models/Booking');
 
 var async = require("async");
 
 createBooking = function (req, res) {
-    ServiceProvider.findOne({ username: req.user.username }, function (err, player) {
+    Player.findOne({ username: req.user.username }, function (err, player) {
         if (req.body.month && req.body.day && req.body.startIndex && req.body.endIndex) {
             if (err) {
                 console.log(err);
@@ -521,7 +521,7 @@ function handleBooking(id, callback) {
                         else
                         {
                             var index = serviceProviderController.getScheduleIndices(booking2.bookMonth,booking2.bookDay);
-                            return callback(null,arena.schedule[idnex.weekIndex][index.dayIndex]);
+                            return callback(null,arena.schedule[index.weekIndex][index.dayIndex]);
                         }
                     })
                 }
