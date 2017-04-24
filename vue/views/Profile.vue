@@ -26,8 +26,11 @@
           <router-link to="/edit_profile" exact>Edit Profile</router-link>
 
           <br>
+          <div v-if="type=='ServiceProvider'">
 
-          <mode></mode>
+            <mode></mode>
+
+          </div>
 
         </div>
       </div>
@@ -117,7 +120,8 @@
       }
     },
     computed : {
-      user: function () { return window.user; }
+      user: function () { return window.user; },
+      type: function () { return window.type; }
     },
     created() {
       axios.get('/findUser/'+window.user)
