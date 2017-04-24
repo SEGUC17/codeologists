@@ -1,6 +1,14 @@
 
 var Game = require('../models/Game');
 var Player=require('../models/Player');
+/*
+gameController.createGame
+A function that creates a game for the player
+@param : the start date, the desired start date for some game
+@param : the end date, the desired end date for some game
+@param : the location, the desired location for the game
+@param : the size, the desired size of some game
+*/
 var createGame = function (req, res) {
 
     req.checkBody('start_date', 'Start Date is required.').notEmpty();
@@ -37,6 +45,15 @@ var createGame = function (req, res) {
     })
 
 }
+/*
+Function: gameController.viewgames
+
+functionality: this function fetches the games 
+
+@param: null 
+
+@returns list of the games 
+*/
 function viewgames(req, res) {
 
     Game.find(function (err, games) {
@@ -46,7 +63,18 @@ function viewgames(req, res) {
             res.json(games);
 
     });
-};function requestgame(req, res, nxt) {
+};
+
+/*
+gameControler.requestgame:
+a function attaches the request to the game .
+@param req.user.username :the current user to which the request belong
+@param req.body.comment: a comment to be added to the request
+@param req.params.id :the id of the game to which the request is sent
+@return :whether the request was attached to the game correctly
+*/
+
+function requestgame(req, res, nxt) {
 
     var NewReq = { playerUsername: req.user.username, comment: req.body.comment, accepted: false };
     var id = req.params.id;
@@ -84,6 +112,16 @@ function viewgames(req, res) {
         }
     });
 }
+
+/*
+gameControler.acceptrequest:
+ a function accept the request and attaches the a message to the notifications of the player sending the request with the accept state 
+@param req.params.id :the id of the game to which the request accepted
+@param req.body.playerUsername: the username of the player whose request to be accepted 
+@param req.user.username :the current accepting the request
+@return :returns a message with whether the process succeeded
+*/
+
 function acceptrequest(req, res, nxt) {
     var id = req.params.id;
     var playerUsername = req.body.playerUsername;
@@ -134,6 +172,16 @@ function acceptrequest(req, res, nxt) {
 
 
 
+/*
+gameControler.rejectrequest:
+a function accept the request and attaches the a message to the notifications of the player sending the request with the reject state
+@param req.params.id :the id of the game to which the request accepted
+@param req.body.playerUsername: the username of the player whose request to be rejected 
+@param req.user.username :the current rejecting the request
+@returns a message with whether the process succeeded
+@return :returns a message with whether the process succeeded
+
+*/
 
 function rejectrequest(req, res, nxt) {
     var id = req.params.id;
@@ -183,6 +231,13 @@ function rejectrequest(req, res, nxt) {
         }
     });
 }
+
+/*
+gameControler.myrequests:
+@param req.user.username :the current user
+@return :returns the list of requests to the game created by the current user .
+*/
+
 function myrequests(req, res) {
 var currentuser = req.user.username;
    Game.findOne({ creator: currentuser }, function (err, game) {
@@ -199,6 +254,12 @@ var currentuser = req.user.username;
         }
     });
 };
+/*
+gameControler.mygame:
+@param req.user.username :the current user
+@return:returns the id of   the game created by the current user 
+*/
+
 function mygame(req, res) {
 var currentuser = req.user.username;
 

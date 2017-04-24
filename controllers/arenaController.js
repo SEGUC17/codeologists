@@ -5,7 +5,12 @@ var ServiceProvider = require('../models/ServiceProvider');
 var Arena = require('../models/Arena');
 var Booking = require('../models/Booking');
 var bookingController = require('./bookingController');
-//reserves a set of FREE hours to certain user in a certain Arena
+/*
+arenaController.bookHours
+a function that creates the booking object then passes it on to the handle booking function, then calls back the createBooking function with the 'updated' day schedule and error if any
+@params day, month,start and end indicies,arena name,time of booking request,the ID of the player who intiated the booking request, and callback function to call when it has finished its computation
+@return void
+*/
 function bookHours(month, day, startIndex, endIndex, timestamp, arenaName, playerID, callback) {
     //create Booking
     var indices2 = serviceProviderController.getScheduleIndices(month, day);
@@ -82,6 +87,13 @@ function checkAvailable(endIndex, schedule, startIndex) {
   return true;
 }
 
+/*
+arenaController.getComments: 
+a get request function retrieves the comments of arena from the database based on its ID.
+@param: takes the ID of the arena 
+@return: returns a list of comments in the response
+*/
+
 function getComments(req, res) {
   Arena.findOne({ _id: req.params.id }, function (err, arena) {
     if(err){
@@ -95,6 +107,13 @@ function getComments(req, res) {
   });
 }
 
+
+/*
+arenaController.commentOnArena:
+a post request function that takes a comment and adds it to the list of comments of the arena with the ID. 
+@param: takes the comment content and ID of arena
+@return: updates the database with a new comment object.
+*/
 
 function commentOnArena(req, res) {
   if (!req.body.comment)
@@ -126,6 +145,15 @@ function viewarena(req, res) {
     res.json({ arena: arena, err: err });
   });
 };
+/*
+Function: arenaController.editarena
+
+functionality: this function returns the arena to be edited.
+
+@param arena_id: the id of the arena to be edited.
+
+@returns JSON object of the arena.
+*/
 function editarena(req, res) {
   var arenaid = req.params.arenaid;
   Arena.findOne({ _id: arenaid }, function (err, arena) {
@@ -158,7 +186,15 @@ const getArenas = function (req, res) {
     }
 }
 
+/*
+Function: arenaController.editarenainfo
 
+functionality: this function edits the arena info 
+
+@param (rules_and_regulations,address,location,size,type,price): arena info/details 
+
+@returns the arena after editing it 
+*/
 function editarenainfo(req, res) {
   console.log(req.body);
   var arenaid = req.params.arenaid;
@@ -201,6 +237,17 @@ function editarenainfo(req, res) {
     }
   });
 };
+
+/*
+Function: arenaController.editdefaultschedule
+
+functionality: this function edits the default schedule of an arena
+
+@param: arena_id: the arena id whose default schedule to be edited
+        schedule: the default schedule 
+
+@returns the arena whose default schedule was edited.
+*/
 function editdefaultschedule(req, res, nxt) {
     var arenaid = req.params.arenaid;
     Arena.findOne({ _id: arenaid }, function (err, arena) {
@@ -236,6 +283,15 @@ function editdefaultschedule(req, res, nxt) {
     });
 }
 
+/*
+Function: arenaController.addimage
+
+functionality: this function adds an image to an arena
+
+@param: arena_id: is the id of the arena to be edited 
+
+@returns the arena after adding an image to it.
+*/
 function addimage(req, res, nxt) {
   var newimage = { data: req.files[0].buffer };
   var arenaid = req.params.arenaid;
@@ -259,6 +315,21 @@ function addimage(req, res, nxt) {
     }
   });
 }
+
+/*
+arenaController.setUnavailable  
+
+This function sets the chosen slots in the schedule to be unavailable by setting their value to -1 in the schedule of the arena whose name is present in the params.  
+
+@param startIndex : start index of the slots to be unavailable.   
+     endIndex   : end index of the slots to be unavailable. 
+     (month,day): date of the selected day.
+     arenaName  : the arena whose schedule is to be edited.
+
+@return -
+
+*/
+
 function setUnavailable(req, res) {
     if (req.user && (req.user.type == "ServiceProvider")) {
         ServiceProvider.findOne({ username: req.user.username }, function (err, sp) {
@@ -350,6 +421,21 @@ function setUnavailable(req, res) {
 
 }
 
+/*
+arenaController.setAailable
+
+This function sets the chosen slots in the schedule to be available by setting their value to 0 in the schedule of the arena whose name is present in the params
+
+@param startIndex : start index of the slots to be unavailable.   
+     endIndex   : end index of the slots to be unavailable. 
+     (month,day): date of the selected day.
+     arenaName  : the arena whose schedule is to be edited.
+
+
+@return -
+
+*/
+
 function setAvailable(req, res) {
     if (req.user && (req.user.type == "ServiceProvider")) {
         ServiceProvider.findOne({ username: req.user.username }, function (err, sp) {
@@ -408,6 +494,12 @@ function setAvailable(req, res) {
     }
 }
 
+/*
+arenaController.createArena:
+This function creates a new arena by setting (name, size, type, location, address, price, regulations and default weekly schedule of the arena).
+@param: arena name, size, type, location, address, price, rules_and_regulations, 7 arrays each represents the unavailable slots on a certain day.
+@return: The created arena
+*/
 function createArena(req, res) {
     if(!req.user)
     {

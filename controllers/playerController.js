@@ -24,6 +24,17 @@ function validateEmail(email) {
   return re.test(email);
 }
 
+/*
+playerController.compute: 
+takes the result from search method then compute the paging attributes and send them with *the result 
+*@param result : result passed from the search function
+*@param req : the req passed from the search function
+*@param res : the res passed from the search function
+*@param count : the number of pages to be displayed
+*@param start : the position in result from which the page will start to display elements
+*@param end : the position in result at which the page will stop displaying elements
+*@param active : the index of the active page
+*/
 function compute(req, res, result) {
   if (result.length == 0) {
     res.status(404).json({error:"no Arena matches your value"});
@@ -62,6 +73,15 @@ var bookWeekly = function (req, res) {
 //should be moved to arenaController : commentOnArena,commentOnArena
 
 let playerController = {
+
+ /* 
+playerController.search:
+retrieve and view arenas matched the attribute value selected by the user after eliminating *the arenas in which the user is blacklisted
+*@param search_type : the type of the search; price or name or location
+*@param search_value : the required value of the search type
+*@param req.user._id: the player’s id to find out if he is in blacklist of certain arena’s servic *provider
+*@param result : the final array of arenas the player can see after eliminating those who is blacklisted in 
+*/
 
   search:function(req,res){
               var search_type = req.body.search_type;
@@ -170,6 +190,14 @@ let playerController = {
 
   bookWeekly: bookWeekly,
 
+/* 
+playerController.edit_profile_page:
+prepare the edit profile page ,retrieve the player’s record from DB to be able to fill the *fields to be changed.
+*@param req.user.username : the user’s username to fetch his record
+*@param result : the user’s record from db 
+*@param date : the user’s birthdate after being formatted according to the html format
+*/
+
   edit_profile_page: function (req, res) { // prepar the edit profile page
     //retrieve the players's record from DB to be able to fill the fields to be changed
     Player.findOne({ username: req.user.username }, function (err, result) {
@@ -181,6 +209,22 @@ let playerController = {
       }
     })
   },
+
+ /* playerController.edit_profile_info:
+ using the username retrieve his record from DB and then checking for exceptions using *express-validator then match the password from the user with the password from the db if it *correct we edit the record from the db with the new info from the user and save it again. 
+*@param req.user.username : the user’s username to fetch his record
+*@param req.body.name : the user’s updated name 
+*@param req,body.phone_number:the user’s updated phone_number
+*@param req.body.new_password : the user’s new password
+*@param req.body.old_password: the user’s current password
+*@param req.body.location : the user’s updated location
+*@param req.body.email : the user’s updated email
+*@param req.body.birthdate: the user’s updated birthdate
+*@param req.body.profile_pic : the user’s new profile picture
+*@param result : the user’s record after being updated
+*@param date : the user’s birthdate after being updated and formatted according to the html format
+*/
+
   edit_profile_info: function (req, res) { //accepting new info and update the DB record
     Player.findOne({ username: req.user.username }, function (err, result) {
       if (err)
@@ -264,6 +308,11 @@ let playerController = {
       return res.json({player: player});
     })
   },
+/*
+playerController.myNotifications:
+@param req.user.username :the current user
+@return :returns the list  of   the notifications belonging to  the current user
+*/
   
   myNotifications:function(req,res){
     var currentuser = req.user.username;

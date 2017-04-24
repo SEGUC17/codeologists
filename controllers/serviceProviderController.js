@@ -21,6 +21,14 @@ function IndexAPI(req,res){
     res.json(getScheduleIndices(req.params.month,req.params.day));
 }
 
+/*
+serviceProviderController.getScheduleIndices : 
+A function that gives the indices in our schedule of some specific day
+@param : month1 :the month of the date
+@param : day1 : the day of the date
+@return : a json object contains the two indices in the schedule, the day index and the week index
+*/
+
 var getScheduleIndices = function (month1, day1) {
     var date = new Date();
     date.setHours(0, 0, 0, 0);
@@ -31,6 +39,13 @@ var getScheduleIndices = function (month1, day1) {
     var difInWeeks = Math.floor((curDate - firstDayInWeek) / 1000 / 60 / 60 / 24 / 7);
     return { weekIndex: difInWeeks, dayIndex: (curDate.getDay() + 1) % 7 };
 }
+
+/*
+serviceProviderController.getTimeFromIndex :
+A function that gets the time from the index
+@param : index : the index in the schedule
+@return : a string with the time corresponding to that index
+*/
 
 var getTimeFromIndex = function (index) {
     var hour = Math.floor(index / 2);
@@ -47,7 +62,12 @@ let serviceProviderController =
         IndexAPI:IndexAPI,
         getScheduleIndices: getScheduleIndices,
         getTimeFromIndex: getTimeFromIndex,
-
+/*
+serviceProviderController.getTheMode ; 
+A function that gets the auto-accept-mode of some service provider
+@param : service provider id
+@return : a boolean of whether the auto-accept-mode is on or off
+*/
         getTheMode: function(req,res){
             if(!req || !req.user || !req.user.username){
                 res.json(400, 'Please login');
@@ -73,6 +93,12 @@ let serviceProviderController =
             }   
                 },
 
+/*
+serviceProviderController.turnAutoAcceptModeOn
+A function that enables the provider to enable his auto accept mode on
+@param : the service provider id
+@return : a response for whether the mode has been turned on or not
+*/
         turnAutoAcceptModeOn: function (req, res) {
             if (req.user.type != 'ServiceProvider') {
                 res.json(403, {error :'You are not authorized to do this action'});
@@ -97,7 +123,12 @@ let serviceProviderController =
                 }
             });
         },
-
+/*
+serviceProviderController.turnAutoAcceptModeOff
+A function that enables the provider to enable his auto accept mode on
+@param : the service provider id
+@return : a response for whether the mode has been turned off or not
+*/
         turnAutoAcceptModeOff: function (req, res) {
             if (req.user.type != 'ServiceProvider') {
                 res.json(403, {error :'You are not authorized to do this action'});
@@ -122,7 +153,13 @@ let serviceProviderController =
                 }
             });
         },
-        
+ 
+ /*
+serviceProviderController.showblacklist:
+retrieve the service provider's blacklist from the DB using his username to display it on the front-end
+@param: -
+@output: blacklist array
+*/       
     showblacklist: function(req, res) {
 
         var serviceProviderUsername = req.user.username;
@@ -152,9 +189,13 @@ let serviceProviderController =
         })
     },
 
-    /**
-     * adds a player to the black list using username.
-     */
+/*
+serviceProviderController.add_to_blacklist:
+adds a certain player to a serviceprovider's blacklist using the player's username 
+@param: player to be blacklisted username
+@output: -
+*/
+
     add_to_blacklist: function(req, res) {
 
         var playerUsername = req.body.PlayerUsername;
@@ -199,9 +240,13 @@ let serviceProviderController =
         });
     },
 
-    /**
-     * adds a player to the black list using phone number.
-     */
+/*
+serviceProviderController.add_to_blacklist_phone:
+adds a certain player to a serviceprovider's blacklist using the player's phone number
+@param: player to be blacklisted phone number
+@output: -
+*/
+
     add_to_blacklist_phone: function(req, res) {
 
         var serviceProviderUsername = req.user.username;
@@ -246,9 +291,13 @@ let serviceProviderController =
         });
     },
 
-    /**
-     * removes a player from the white list using username.
-     */
+/*
+serviceProviderController.remove_from_blacklist:
+removes a certain player from a serviceprovider's blacklist using the player's username 
+@param: player to be removed from blacklist username
+@output: -
+*/
+
     remove_from_blacklist: function(req, res) {
 
         var serviceProviderUsername = req.user.username;
@@ -289,6 +338,14 @@ let serviceProviderController =
             });
         });
     },
+
+/*
+serviceProviderController.showwhitelist:
+retrieve the service provider's whitelist from the DB using his username to display it on the front-end
+@param: -
+@output: whitelist array
+*/
+
     showwhitelist: function(req, res) {
 
         var serviceProviderUsername = req.user.username;
@@ -317,9 +374,12 @@ let serviceProviderController =
 
         })
     },
-    /**
-     * adds a player to the black list using username.
-     */
+/*
+serviceProviderController.add_to_whitelist:
+adds a certain player to a serviceprovider's whitelist using the player's username 
+@param: player to be whitelisted username
+@output: -
+*/
     add_to_whitelist: function(req, res) {
 
         var serviceProviderUsername = req.user.username;
@@ -364,9 +424,12 @@ let serviceProviderController =
         });
     },
 
-    /**
-     * adds a player to the white list using phone number.
-     */
+/*
+serviceProviderController.add_to_whitelist_phone:
+adds a certain player to a serviceprovider's whitelist using the player's phone number
+@param: player to be whitelisted phonenumber
+@output: -
+*/
     add_to_whitelist_phone: function(req, res) {
 
         var serviceProviderUsername = req.user.username;
@@ -412,9 +475,12 @@ let serviceProviderController =
         });
     },
 
-    /**
-     * removes a player from the white list using username.
-     */
+/*
+serviceProviderController.remove_from_whitelist:            
+removes a certain player from a serviceprovider's whitelist using the player's username 
+@param: player to be removed from whitelist username
+@output: - 
+*/
     remove_from_whitelist: function(req, res) {
 
         var serviceProviderUsername = req.user.username;
@@ -465,6 +531,13 @@ let serviceProviderController =
             });
         },
 
+/*
+serviceProviderController.edit_profile_page:
+prepare the edit profile page ,retrieve the player’s record from DB to be able to fill the *fields to be changed.
+*@param req.user.username : the user’s username to fetch his record
+*@param result : the user’s record from db 
+*/
+
        edit_profile_page: function (req, res) { // prepar the edit profile page
             //retrieve the players's record from DB to be able to fill the fields to be changed
             ServiceProvider.findOne({ username: req.user.username }, function (err, result) {
@@ -476,6 +549,21 @@ let serviceProviderController =
                 }
             })
         },
+
+/*
+serviceProviderController.edit_profile_info:
+using the username retrieve his record from DB and then checking for exceptions using *express-validator then match the password from the user with the password from the db if it *correct we edit the record from the db with the new info from the user and save it again. 
+*@param req.user.username : the user’s username to fetch his record
+*@param req.body.name : the user’s updated name 
+*@param req,body.phone_number:the user’s updated phone_number
+*@param req.body.new_password : the user’s new password
+*@param req.body.old_password: the user’s current password
+*@param req.body.location : the user’s updated location
+*@param req.body.email : the user’s updated email
+*@param req.body.profile_pic : the user’s new profile picture
+*@param result : the user’s record after being updated
+*/
+
         edit_profile_info: function (req, res) { //accepting new info and update the DB record
             ServiceProvider.findOne({ username: req.user.username}, function (err, result) {
                 if (err)
