@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="w3-container" v-if="type=='Player'">
 	<div class="w3-quarter"> 
 		<h>&nbsp</h>
 	</div>
@@ -68,6 +68,11 @@
 				.catch(err => {
 				});
 			}
-		}
+		},
+
+        computed: {
+            user: function () { return window.user; },
+            type: function () { return window.type; }
+        }
 	}
 </script>

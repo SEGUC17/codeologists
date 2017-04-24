@@ -22,9 +22,11 @@
 
 		  </div>
 		  <div class="w3-padding w3-display-bottomright">
-				<a class="button is-primary is-focused w3-red">
+		  	<router-link :to="getUrl">
+				<a @click.native="showReserveTimes()" class="button is-primary is-focused w3-red">
 					<b>Book Now</b>
 				</a>
+			</router-link>
 		  </div>
 		  <div class="w3-padding w3-display-left">
 				<h2 style="font-size: 120%; color:white; text-align: left; padding-left: 0.5cm" >{{arena.location}}</h2>
@@ -149,8 +151,7 @@
 
 		created(){
 
-			Event.$on('view_details_of_arena', arena => { 
-
+			Event.$on('view_details_of_arena', arena => {
 				this.arena = arena;
 				this.photos = arena.photos;
 				this.arenaId=arena._id;	
@@ -175,9 +176,15 @@
 			},
 			
 		},
-		computed:{
-			
-		}
+
+		computed: {
+            user: function () { return window.user; },
+            type: function () { return window.type; },
+            getUrl() {
+            	return "/schedule/"+this.arena.name;
+            }
+        }
+
 	}
 </script>
 

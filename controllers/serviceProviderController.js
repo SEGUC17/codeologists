@@ -54,7 +54,6 @@ let serviceProviderController =
                 res.json(400,{ error : 'You are not logged in'});
             }
             ServiceProvider.findOne({ username: username }, function (err, user) {
-                console.log(user.mode);
                     if (!err)
                         res.json(200,{ mode : user.mode});
                     });

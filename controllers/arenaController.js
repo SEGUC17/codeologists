@@ -9,7 +9,7 @@ var bookingController = require('./bookingController');
 function bookHours(month, day, startIndex, endIndex, timestamp, arenaName, playerID, callback) {
     //create Booking
     var indices2 = serviceProviderController.getScheduleIndices(month, day);
-    var indices={dayIndex : parseInt(indices2.dayIndex,10) , monthIndex : parseInt(indices2.monthIndex,10)}
+    var indices={dayIndex : parseInt(indices2.dayIndex,10) , weekIndex : parseInt(indices2.weekIndex,10)}
     Arena.findOne({ name: arenaName }, function (err, foundArena) {
 
         if (!err && foundArena) {

@@ -5852,7 +5852,8 @@ new Vue({
         },
         redirect: function redirect() {
 
-            __WEBPACK_IMPORTED_MODULE_1__routes__["a" /* default */].replace('/dayDetail/-1');
+            //router.replace('/dayDetail/-1');
+
         }
     },
     created: function created() {
@@ -12205,8 +12206,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         getData: function getData() {
             var _this = this;
 
-            var arenaName = "12";
-            axios.get('/arena/' + arenaName + '/getSchedule').then(function (res) {
+            axios.get('/arena/' + this.arenaName + '/getSchedule').then(function (res) {
                 return _this.updateSchedule(res.data);
             }).catch(function (error) {
                 return _this.errors = error.data;
@@ -12229,8 +12229,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         },
 
         findHREF: function findHREF(index) {
-            if (this.isButtonEnabled(index)) return "/dayDetail/" + index;else {
-                return "/dayDetail/1";
+            if (this.isButtonEnabled(index)) return "/schedule/" + this.arenaName + "/dayDetail/" + index;else {
+                return "/schedule/" + this.arenaName + "/dayDetail/-1";
             }
         },
         isButtonEnabled: function isButtonEnabled(index) {
@@ -12295,7 +12295,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     data: function data() {
         return {
             schedule: {},
-            arenaName: '12', //hard coded for now when integrating get it from /$route.params
             errors: {}
 
         };
@@ -12310,6 +12309,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     computed: {
         calMonth: function calMonth() {
             if (!this.monthName) return -1;else if (this.monthName === 'January') return 0;else if (this.monthName === 'February') return 1;else if (this.monthName === 'Mars') return 2;else if (this.monthName === 'April') return 3;else if (this.monthName === 'May') return 4;else if (this.monthName === 'June') return 5;else if (this.monthName === 'July') return 6;else if (this.monthName === 'August') return 7;else if (this.monthName === 'September') return 8;else if (this.monthName === 'October') return 9;else if (this.monthName === 'November') return 10;else if (this.monthName === 'December') return 11;else return -1;
+        },
+        arenaName: function arenaName() {
+            return this.$route.params.arenaName;
         },
         year: function year() {
             return new Date().getFullYear();
@@ -12480,6 +12482,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
 
 
 
@@ -12497,7 +12501,6 @@ var querystring = __webpack_require__(6);
 		var _this = this;
 
 		Event.$on('view_details_of_arena', function (arena) {
-
 			_this.arena = arena;
 			_this.photos = arena.photos;
 			_this.arenaId = arena._id;
@@ -12519,7 +12522,19 @@ var querystring = __webpack_require__(6);
 			document.getElementById("modal01").style.display = "block";
 		}
 	},
-	computed: {}
+
+	computed: {
+		user: function user() {
+			return window.user;
+		},
+		type: function type() {
+			return window.type;
+		},
+		getUrl: function getUrl() {
+			return "/schedule/" + this.arena.name;
+		}
+	}
+
 });
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(3).Buffer))
 
@@ -12528,14 +12543,7 @@ var querystring = __webpack_require__(6);
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
-//
-//
-//
-//
+/* WEBPACK VAR INJECTION */(function(Buffer) {Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
@@ -12572,27 +12580,43 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 var querystring = __webpack_require__(6);
 /* harmony default export */ __webpack_exports__["default"] = ({
-	data: function data() {
-		return {
-			arenas: []
-		};
-	},
-	created: function created() {
-		var _this = this;
+  data: function data() {
+    return {
+      arenas: [],
+      location: ''
+    };
+  },
+  created: function created() {
+    var _this = this;
 
-		Event.$on('view-arenas', function (arenas) {
-			_this.arenas = arenas.data;
-		});
-	},
+    Event.$on('view-arenas', function (arenas) {
+      _this.arenas = arenas.data;
+    });
+  },
 
 
-	methods: {
-		view_details: function view_details(arena) {
+  methods: {
+    view_details: function view_details(arena) {
 
-			Event.$emit('view_details_of_arena', arena);
-		}
-	}
+      Event.$emit('view_details_of_arena', arena);
+      console.log(arena);
+    },
+    getPath: function getPath(photo) {
+      return 'data:image/*;base64,' + new Buffer(photo.data.data).toString('base64');
+    }
+  },
+
+  computed: {
+    user: function user() {
+      return window.user;
+    },
+    type: function type() {
+      return window.type;
+    }
+  }
+
 });
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(3).Buffer))
 
 /***/ }),
 /* 42 */
@@ -12810,6 +12834,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				alert('Game added successfully');
 				_this.$router.push('/');
 			}).catch(function (err) {});
+		}
+	},
+
+	computed: {
+		user: function user() {
+			return window.user;
+		},
+		type: function type() {
+			return window.type;
 		}
 	}
 });
@@ -13376,6 +13409,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -13409,6 +13449,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		selectReq: function selectReq(e) {
 			this.showmodal = true;
 			this.selected = e.target.value;
+		}
+	},
+
+	computed: {
+		user: function user() {
+			return window.user;
+		},
+		type: function type() {
+			return window.type;
 		}
 	}
 });
@@ -14457,6 +14506,7 @@ var async = __webpack_require__(20);
             this.players = [];
             this.curArena = arenaName;
             axios.get('/arena/' + arenaName + '/viewBookings').then(function (res) {
+                console.log(res);
                 _this2.bookings = res.data.bookings;
                 _this2.players = res.data.players;
                 _this2.curArena = arenaName;
@@ -14505,6 +14555,15 @@ var async = __webpack_require__(20);
                     alert(err);
                 });
             }
+        }
+    },
+
+    computed: {
+        user: function user() {
+            return window.user;
+        },
+        type: function type() {
+            return window.type;
         }
     }
 });
@@ -15633,6 +15692,21 @@ var routes = [{
 }, {
 	path: '/profile',
 	component: __webpack_require__(97)
+}, {
+	path: '/SearchPlayer',
+	component: __webpack_require__(145)
+}, {
+	path: '/schedule/:arenaName',
+	components: {
+		default: __webpack_require__(106),
+		daypanel: __webpack_require__(104)
+	},
+	children: [{
+		path: 'dayDetail/:dayIndex',
+		component: __webpack_require__(104)
+
+	}]
+
 }];
 
 /* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0_vue_router__["a" /* default */]({
@@ -17435,8 +17509,31 @@ module.exports = Component.exports
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', [(_vm.arenas[0]) ? _c('h1', [_vm._v("Arenas in " + _vm._s(_vm.arenas[0].location))]) : _vm._e(), _vm._v(" "), _vm._l((_vm.arenas), function(arena) {
-    return (_vm.arenas[0]) ? _c('section', [_c('h4', [_vm._v("Name: " + _vm._s(arena.name))]), _vm._v(" "), _c('h4', [_vm._v("Address: " + _vm._s(arena.address))]), _vm._v(" "), _c('h4', [_vm._v("Size: " + _vm._s(arena.size))]), _vm._v(" "), _c('h4', [_vm._v("Type: " + _vm._s(arena.type))]), _vm._v(" "), _c('h4', [_vm._v("Rating: " + _vm._s(arena.avg_rating))]), _vm._v(" "), _c('router-link', {
+  return _c('div', [_c('div', {
+    staticClass: "is-grouped w3-container"
+  }, _vm._l((_vm.arenas), function(arena) {
+    return _c('div', [_c('article', {
+      staticClass: "media"
+    }, [_c('figure', {
+      staticClass: "media-left"
+    }, [_c('p', {
+      staticClass: "image is-128x128"
+    }, [(arena.photos) ? _c('img', {
+      attrs: {
+        "src": _vm.getPath(arena.photos[0]),
+        "alt": "Image"
+      }
+    }) : _c('img', {
+      attrs: {
+        "src": "/1.jpg",
+        "alt": "Image"
+      }
+    })])]), _vm._v(" "), _c('div', {
+      staticClass: "media-content"
+    }, [_c('div', {
+      staticClass: "content"
+    }, [_c('p', [_c('strong', [_vm._v("Name:")]), _c('small', [_vm._v("  " + _vm._s(arena.name))]), _vm._v(" "), _c('br'), _vm._v(" "), _c('strong', [_vm._v("Location:")]), _c('small', [_vm._v("  " + _vm._s(arena.location))]), _vm._v(" "), _c('br'), _vm._v(" "), (_vm.user) ? _c('router-link', {
+      staticClass: "button is-primary",
       attrs: {
         "to": "/arenaDetails",
         "tag": "button"
@@ -17446,8 +17543,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
           _vm.view_details(arena)
         }
       }
-    }, [_vm._v("view details")]), _vm._v(" "), _c('hr'), _c('br')], 1) : _vm._e()
-  })], 2)
+    }, [_vm._v("view details")]) : _vm._e(), _vm._v(" "), _c('br')], 1)])])])])
+  }))])
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -17480,7 +17577,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_c('template', {
     slot: "month"
-  }, [_vm._v(_vm._s(_vm.getNextMonth))])], 2) : _vm._e(), _vm._v(" "), _c('router-view')], 1)
+  }, [_vm._v(_vm._s(_vm.getNextMonth))])], 2) : _vm._e()], 1)
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -18046,7 +18143,9 @@ if (false) {
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', [_c('div', {
+  return (_vm.type == 'Player') ? _c('div', {
+    staticClass: "w3-container"
+  }, [_c('div', {
     staticClass: "w3-quarter"
   }, [_c('h', [_vm._v(" ")])], 1), _vm._v(" "), _c('div', {
     staticClass: "w3-half"
@@ -18205,7 +18304,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }) : _vm._e()]), _vm._v(" "), _c('br'), _vm._v(" "), _vm._m(0)])]), _vm._v(" "), _c('div', {
     staticClass: "w3-quarter"
-  })])
+  })]) : _vm._e()
 },staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', {
     staticClass: "control"
@@ -18336,7 +18435,7 @@ if (false) {
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', {
+  return (_vm.type == 'ServiceProvider') ? _c('div', {
     staticClass: "w3-container"
   }, [_vm._l((_vm.arenas), function(arena) {
     return _c('button', {
@@ -18351,6 +18450,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "table is-striped"
   }, [_vm._m(0), _vm._v(" "), _c('tbody', _vm._l((_vm.bookings), function(booking, index) {
     return _c('tr', [_c('td', [_vm._v(_vm._s(booking.arena))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(booking.bookDay) + "/" + _vm._s(booking.bookMonth) + "/" + _vm._s((new Date()).getFullYear()))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(_vm.hour(booking.start_index)) + ":" + _vm._s(_vm.minute(booking.start_index)))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(_vm.hour(booking.end_index)) + ":" + _vm._s(_vm.minute(booking.end_index)))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(_vm.players[index]))]), _vm._v(" "), _c('td', [_c('button', {
+      staticClass: "button w3-green",
       attrs: {
         "type": "button"
       },
@@ -18360,6 +18460,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         }
       }
     }, [_vm._v("Accept")])]), _vm._v(" "), _c('td', [_c('button', {
+      staticClass: "button w3-red",
       attrs: {
         "type": "button"
       },
@@ -18369,7 +18470,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         }
       }
     }, [_vm._v("Reject")])])])
-  }))])], 2)
+  }))])], 2) : _vm._e()
 },staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('thead', [_c('th', [_vm._v("Arena")]), _vm._v(" "), _c('th', [_vm._v("Date")]), _vm._v(" "), _c('th', [_vm._v("Start Time")]), _vm._v(" "), _c('th', [_vm._v("End Time")]), _vm._v(" "), _c('th', [_vm._v("Player Name")]), _vm._v(" "), _c('th', [_vm._v(" ")]), _vm._v(" "), _c('th', [_vm._v(" ")])])
 }]}
@@ -18928,7 +19029,20 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "text-align": "left",
       "padding-left": "0.5cm"
     }
-  }, [_vm._v("(" + _vm._s(_vm.arena.ratings_count) + " votes)")])], 1), _vm._v(" "), _vm._m(0), _vm._v(" "), _c('div', {
+  }, [_vm._v("(" + _vm._s(_vm.arena.ratings_count) + " votes)")])], 1), _vm._v(" "), _c('div', {
+    staticClass: "w3-padding w3-display-bottomright"
+  }, [_c('router-link', {
+    attrs: {
+      "to": _vm.getUrl
+    }
+  }, [_c('a', {
+    staticClass: "button is-primary is-focused w3-red",
+    nativeOn: {
+      "click": function($event) {
+        _vm.showReserveTimes()
+      }
+    }
+  }, [_c('b', [_vm._v("Book Now")])])])], 1), _vm._v(" "), _c('div', {
     staticClass: "w3-padding w3-display-left"
   }, [_c('h2', {
     staticStyle: {
@@ -18985,7 +19099,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "w3-container"
   }, [_c('article', {
     staticClass: "message"
-  }, [_vm._m(1), _vm._v(" "), _c('div', {
+  }, [_vm._m(0), _vm._v(" "), _c('div', {
     staticClass: "message-body"
   }, [_vm._v("\n    " + _vm._s(_vm.arena.rules_and_regulations) + "\n  ")])])]), _vm._v(" "), _c('div', {
     staticClass: "w3-row-padding"
@@ -19006,19 +19120,13 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         }
       }
     })])
-  })), _vm._v(" "), _vm._m(2), _vm._v(" "), _c('comments', {
+  })), _vm._v(" "), _vm._m(1), _vm._v(" "), _c('comments', {
     attrs: {
       "initialMina": this.arenaId,
       "initialcomments": this.arena.comments
     }
   })], 1)
 },staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', {
-    staticClass: "w3-padding w3-display-bottomright"
-  }, [_c('a', {
-    staticClass: "button is-primary is-focused w3-red"
-  }, [_c('b', [_vm._v("Book Now")])])])
-},function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', {
     staticClass: "message-header"
   }, [_c('p', [_vm._v("Rules and Regulations")])])
@@ -20096,7 +20204,15 @@ if (false) {
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', _vm._l((_vm.games), function(game) {
+  return _c('div', {
+    staticClass: "w3-container"
+  }, [_c('br'), _vm._v(" "), (_vm.type == 'Player') ? _c('router-link', {
+    staticClass: "button w3-blue",
+    attrs: {
+      "tag": "button",
+      "to": "/createGame"
+    }
+  }, [_vm._v(" Create New Game")]) : _vm._e(), _vm._v(" "), _c('br'), _vm._v(" "), _vm._l((_vm.games), function(game) {
     return _c('div', [_c('article', {
       staticClass: "message"
     }, [_vm._m(0, true), _vm._v(" "), _c('h3', [_vm._v("Creator : " + _vm._s(game.creator))]), _vm._v(" "), _c('h3', [_vm._v("Size : " + _vm._s(game.size))]), _vm._v(" "), _c('h3', [_vm._v("Location : " + _vm._s(game.location))]), _vm._v(" "), _c('h3', [_vm._v("Start date  : " + _vm._s(game.start_date))]), _vm._v(" "), _c('h3', [_vm._v("End date : " + _vm._s(game.end_date))]), _vm._v(" "), _c('button', {
@@ -20158,7 +20274,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         }
       }
     })])]) : _vm._e()])
-  }))
+  })], 2)
 },staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', {
     staticClass: "message-header"
@@ -30451,6 +30567,375 @@ module.exports = function(module) {
 
 module.exports = __webpack_require__(19);
 
+
+/***/ }),
+/* 144 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+var querystring = __webpack_require__(6);
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      no_search: true,
+      search_type: 'name',
+      search_value: '',
+      arenas: [''],
+      count: '',
+      start: '',
+      end: '',
+      active: 2,
+      elements: 0,
+      err: false,
+      msg: '',
+      getPath: function getPath(photo) {
+        if (photo) return 'data:image/*;base64,' + new Buffer(photo.data.data).toString('base64');
+      }
+    };
+  },
+  created: function created() {
+    this.no_search = true;
+    this.search_type = 'name';
+    this.no_match = false;
+  },
+
+  methods: {
+    onSubmit: function onSubmit() {
+      var _this = this;
+
+      axios.post('/searchPlayer', querystring.stringify({
+        search_type: this.search_type,
+        search_value: this.search_value
+      })).then(function (response) {
+        _this.count = response.data.count;
+        _this.start = response.data.start;
+        _this.end = response.data.end;
+        _this.active = response.data.active;
+        _this.no_search = false;
+        _this.elements = _this.end - _this.start;
+        _this.arenas = [''];
+        _this.err = false;
+        for (var i = 0; i < _this.end; i++) {
+          _this.arenas.push(response.data.result[i]);
+        }
+      }).catch(function (error) {
+        _this.arenas = [];_this.search_value = '';
+        _this.err = true;
+        _this.search_type = 'name';
+        _this.no_search = true;
+        _this.count = '';
+        _this.elements = '';
+        _this.arenas = [''];
+        _this.msg = error.response.data.error;
+      });
+    },
+    onindex: function onindex(event) {
+      var _this2 = this;
+
+      axios.post('/searchPlayer', querystring.stringify({
+        search_type: this.search_type,
+        index: event.target.value,
+        search_value: this.search_value
+      })).then(function (response) {
+        _this2.count = response.data.count;
+        _this2.start = response.data.start;
+        _this2.end = response.data.end;
+        _this2.elements = _this2.end - _this2.start;
+        _this2.active = response.data.active;
+        _this2.no_search = false;
+        _this2.err = false;
+        _this2.arenas = [''];
+        for (var i = _this2.start; i < _this2.end; i++) {
+          _this2.arenas.push(response.data.result[i]);
+        }
+        _this2.active = response.data.active;
+        console.log(_this2.active);
+      }).catch(function (error) {
+        _this2.arenas = [];_this2.search_value = '';
+        _this2.err = true;
+        _this2.search_type = 'name';
+        _this2.no_search = true;
+        _this2.count = '';
+        _this2.arenas = [''];
+        _this2.elements = '';
+        _this2.msg = error.response.data.error;
+      });
+    },
+    view_details: function view_details(arena) {
+      Event.$emit('view_details_of_arena', arena);
+    }
+  }
+});
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(3).Buffer))
+
+/***/ }),
+/* 145 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Component = __webpack_require__(0)(
+  /* script */
+  __webpack_require__(144),
+  /* template */
+  __webpack_require__(146),
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "/home/kharouba/Desktop/SE2/codeologists/vue/views/playerSearch.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] playerSearch.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-97f74c0e", Component.options)
+  } else {
+    hotAPI.reload("data-v-97f74c0e", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 146 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "is-grouped container"
+  }, [_c('br'), _c('br'), _vm._v(" "), _c('form', {
+    attrs: {
+      "autocomplete": "off",
+      "method": "POST"
+    },
+    on: {
+      "submit": function($event) {
+        $event.preventDefault();
+        _vm.onSubmit($event)
+      }
+    }
+  }, [_c('div', {
+    staticClass: "control"
+  }, [_c('label', {
+    staticClass: "label",
+    attrs: {
+      "for": "drop"
+    }
+  }, [_vm._v("Search Type")]), _vm._v(" "), _c('div', {
+    staticClass: "select"
+  }, [_c('select', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.search_type),
+      expression: "search_type"
+    }],
+    staticClass: "input",
+    attrs: {
+      "id": "drop",
+      "name": "cars"
+    },
+    on: {
+      "change": function($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function(o) {
+          return o.selected
+        }).map(function(o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val
+        });
+        _vm.search_type = $event.target.multiple ? $$selectedVal : $$selectedVal[0]
+      }
+    }
+  }, [_c('option', {
+    attrs: {
+      "value": "price"
+    }
+  }, [_vm._v("Price")]), _vm._v(" "), _c('option', {
+    attrs: {
+      "value": "location"
+    }
+  }, [_vm._v("Location")]), _vm._v(" "), _c('option', {
+    attrs: {
+      "value": "name"
+    }
+  }, [_vm._v("Name")])])])]), _vm._v(" "), _c('div', {
+    staticClass: "field"
+  }, [_c('label', {
+    staticClass: "label",
+    attrs: {
+      "for": "val"
+    }
+  }, [_vm._v("Search Value")]), _vm._v(" "), _c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.search_value),
+      expression: "search_value"
+    }],
+    staticClass: "input",
+    attrs: {
+      "type": "text",
+      "id": "val"
+    },
+    domProps: {
+      "value": (_vm.search_value)
+    },
+    on: {
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.search_value = $event.target.value
+      }
+    }
+  }), _vm._v(" "), (_vm.err) ? _c('span', {
+    staticClass: "help is-danger"
+  }, [_vm._v(_vm._s(_vm.msg))]) : _vm._e()]), _vm._v(" "), _vm._m(0)]), _vm._v(" "), _c('div', {
+    staticClass: "is-centered"
+  }, [(_vm.no_search) ? _c('h1', [_vm._v("select search type and enter search value to show you the matched Arenas")]) : _vm._e()]), _vm._v(" "), _vm._l((_vm.elements), function(n) {
+    return _c('div', [_c('article', {
+      staticClass: "media"
+    }, [_c('figure', {
+      staticClass: "media-left"
+    }, [_c('p', {
+      staticClass: "image is-128x128"
+    }, [(_vm.arenas.photos) ? _c('img', {
+      attrs: {
+        "src": _vm.getPath(_vm.arenas.photos[0]),
+        "alt": "Image"
+      }
+    }) : _c('img', {
+      attrs: {
+        "src": "/field-big.jpg",
+        "alt": "Image"
+      }
+    })])]), _vm._v(" "), _c('div', {
+      staticClass: "media-content"
+    }, [_c('div', {
+      staticClass: "content"
+    }, [_c('p', [_c('strong', [_vm._v("Name:")]), _c('small', [_vm._v("  " + _vm._s(_vm.arenas[n].name))]), _vm._v(" "), _c('br'), _vm._v(" "), _c('strong', [_vm._v("Price:")]), _c('small', [_vm._v("  " + _vm._s(_vm.arenas[n].price))]), _vm._v(" "), _c('br'), _vm._v(" "), _c('strong', [_vm._v("Location:")]), _c('small', [_vm._v("  " + _vm._s(_vm.arenas[n].location))]), _vm._v(" "), _c('br'), _vm._v(" "), _c('router-link', {
+      staticClass: "button is-primary",
+      attrs: {
+        "to": "/arenaDetails",
+        "tag": "button"
+      },
+      nativeOn: {
+        "click": function($event) {
+          _vm.view_details(_vm.arenas[n])
+        }
+      }
+    }, [_vm._v("view details")])], 1), _c('hr', {
+      staticStyle: {
+        "background-color": "#fff border-top: 2px dotted #8c8b8b"
+      }
+    }), _vm._v(" "), _c('br'), _vm._v(" "), _c('p')])])])])
+  }), _vm._v(" "), _c('nav', {
+    staticClass: "pagination is-centered"
+  }, [_c('ul', {
+    staticClass: "pagination-list"
+  }, [_c('li', _vm._l((_vm.count), function(n) {
+    return _c('input', {
+      class: n == _vm.active ? 'pagination-link is-current' : 'pagination-link',
+      attrs: {
+        "type": "submit",
+        "id": n,
+        "name": "submit"
+      },
+      domProps: {
+        "value": n
+      },
+      on: {
+        "click": _vm.onindex
+      }
+    })
+  }))])])], 2)
+},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', [_c('input', {
+    staticClass: "button is-primary",
+    attrs: {
+      "type": "submit",
+      "name": "submit",
+      "value": "search"
+    }
+  }), _vm._v(" "), _c('br'), _c('br')])
+}]}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-97f74c0e", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);

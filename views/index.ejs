@@ -80,7 +80,10 @@
 
 							<router-link v-if="user" class="nav-item" to="/games"><a>Available Games</a></router-link>
 
-							<router-link class="nav-item" to="/Search">Search</router-link>
+							<router-link v-if="!user" class="nav-item" to="/Search">Search</router-link>
+
+							<router-link v-if="user" class="nav-item" to="/SearchPlayer">Search</router-link>
+
 							<router-link v-if="user" class="nav-item" to="/profile">{{user}}</router-link>
 
 
@@ -119,7 +122,7 @@
 
 
 		<router-view></router-view>
-
+		<router-view name="daypanel"></router-view>
 		<footer class="footer">
 			<div class="container">
 				<div class="content has-text-centered">

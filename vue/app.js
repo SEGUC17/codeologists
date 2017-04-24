@@ -147,7 +147,7 @@ new Vue({
         },
         redirect() {
             
-               router.replace('/dayDetail/-1');
+               //router.replace('/dayDetail/-1');
            
         },
     },

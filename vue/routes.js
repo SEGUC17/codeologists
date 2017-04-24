@@ -125,6 +125,32 @@ let routes = [
     {
     	path : '/profile',
     	component : require('./views/Profile')
+    },
+
+    {
+    	path : '/SearchPlayer',
+    	component : require('./views/playerSearch')
+    },
+
+    
+
+    {
+    	path:'/schedule/:arenaName',
+    	components : {
+    		default:require('./views/reserveTime'),
+    		daypanel:require('./views/dayDetails')
+    			},
+    	children:
+    	[
+    	 
+    	{
+        path:'dayDetail/:dayIndex',
+        component:require('./views/dayDetails.vue')
+        
+    	},
+    	 
+    	]
+
     }
 
 ];

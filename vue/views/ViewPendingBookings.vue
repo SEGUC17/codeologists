@@ -1,5 +1,5 @@
 <template>
-    <div class="w3-container">
+    <div class="w3-container" v-if="type=='ServiceProvider'">
         <button class="button is-primary w3-margin-right" v-for="arena in arenas" @click="selectArena(arena.name)">{{arena.name}}</button>
 
         <br>
@@ -22,8 +22,8 @@
               <td>{{hour(booking.start_index)}}:{{minute(booking.start_index)}}</td>
               <td>{{hour(booking.end_index)}}:{{minute(booking.end_index)}}</td>
               <td>{{players[index]}}</td>
-              <td><button type="button" @click="accept(booking)">Accept</button></td>
-              <td><button type="button" @click="reject(booking)">Reject</button></td>
+              <td><button class="button w3-green" type="button" @click="accept(booking)">Accept</button></td>
+              <td><button class="button w3-red" type="button" @click="reject(booking)">Reject</button></td>
               
             </tr>
           </tbody>
@@ -63,6 +63,7 @@
               this.curArena = arenaName;
                 axios.get('/arena/' + arenaName + '/viewBookings')
                     .then((res) => {
+                        console.log(res);
                         this.bookings = res.data.bookings;
                         this.players = res.data.players;
                         this.curArena = arenaName;
@@ -115,6 +116,11 @@
                 }
             }
 
+        },
+
+        computed: {
+            user: function () { return window.user; },
+            type: function () { return window.type; }
         }
     })
 

@@ -3,9 +3,10 @@ export default {
     methods:
     {
         getData(){
-        var arenaName = "12";
-        axios.get('/arena/'+arenaName+'/getSchedule').then((res) => this.updateSchedule(res.data)).catch(error => this.errors = (error.data));
         
+        axios.get('/arena/'+this.arenaName+'/getSchedule').then((res) => this.updateSchedule(res.data)).catch(error => this.errors = (error.data));
+        
+
         },
         showPrev(){
             if(this.calMonth != ((new Date()).getMonth()))
@@ -30,10 +31,10 @@ export default {
         },
         findHREF:function(index){
             if(this.isButtonEnabled(index))
-            return "/dayDetail/"+index;
+            return "/schedule/"+this.arenaName+"/dayDetail/"+index;
             else
             {   
-                return "/dayDetail/1";
+                return "/schedule/"+this.arenaName+"/dayDetail/-1";
             }
         },
         isButtonEnabled:function(index){
@@ -112,7 +113,6 @@ export default {
     {
         return {
             schedule:{},
-            arenaName:'12', //hard coded for now when integrating get it from /$route.params
             errors:{},
             
         }
@@ -155,6 +155,10 @@ export default {
             return 11;
             else
             return -1;
+        },
+        arenaName()
+        {
+            return this.$route.params.arenaName;
         },
         year(){
             return (new Date()).getFullYear();
