@@ -154,13 +154,9 @@ var cancelBooking = function (req, res) {
             if (status) {
                 Arena.findOne({ name: arena }, function (err, doc) {
                     for (var i = 0; i < 48; i++) {
-                     console.log(week);
-                     console.log(day);
-                     console.log(doc.schedule[week]);
-
-
                         var currDay = doc.schedule[week][day];
-                        if (i >= start && i <= end && currDay[i] == id)
+
+                        if (i >= start && i <= end && currDay[i].equals(id))
                             doc.schedule[week][day][i] = 0;
                     }
                     doc.markModified('schedule');

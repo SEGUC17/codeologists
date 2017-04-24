@@ -17,9 +17,6 @@ function bookHours(month, day, startIndex, endIndex, timestamp, arenaName, playe
     var indices={dayIndex : parseInt(indices2.dayIndex,10) , weekIndex : parseInt(indices2.weekIndex,10)}
     startIndex = parseInt(startIndex , 10);
     endIndex = parseInt(endIndex, 10);
-    console.log(indices);
-    console.log(startIndex);
-    console.log(endIndex);
     Arena.findOne({ name: arenaName }, function (err, foundArena) {
 
         if (!err && foundArena) {
@@ -70,7 +67,7 @@ function bookHours(month, day, startIndex, endIndex, timestamp, arenaName, playe
                     return callback("no such booking", null);
             }
         }else{
-          console.log(err);
+          callback("Error occured!", null);
         }
 
     })
@@ -97,9 +94,6 @@ a get request function retrieves the comments of arena from the database based o
 function getComments(req, res) {
   Arena.findOne({ _id: req.params.id }, function (err, arena) {
     if(err){
-      console.log(req.params.id);
-
-      console.log(err);
       res.status(400).json({ error: err.message });
       return;
     }
@@ -196,7 +190,6 @@ functionality: this function edits the arena info
 @returns the arena after editing it 
 */
 function editarenainfo(req, res) {
-  console.log(req.body);
   var arenaid = req.params.arenaid;
   Arena.findOne({ _id: arenaid }, function (err, arena) {
     if (err) {
@@ -583,6 +576,7 @@ function createArena(req, res) {
     default_schedule.push(wed);
     default_schedule.push(thurs);
     default_schedule.push(fri);
+
  
     var normal_schedule = [];
     var weekNo = 4;

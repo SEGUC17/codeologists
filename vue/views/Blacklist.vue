@@ -63,7 +63,9 @@
         methods: {
 
             getPath(photo) {
-                return 'data:image/*;base64,' + (new Buffer(photo.data.data).toString('base64'));
+                  if(photo && photo.data)
+                  return 'data:image/*;base64,' + (new Buffer(photo.data.data).toString('base64'));
+                return '';
               },
 
             showPlayers(players) {

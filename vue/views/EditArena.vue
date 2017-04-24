@@ -238,7 +238,6 @@
 						this.$router.push('/myArenas');
 					})
 					.catch(err => {
-						alert(err);
 					});
 			},
 
@@ -250,7 +249,6 @@
 						this.$router.push('/myArenas');
 					})
 					.catch(err => {
-						alert(err);
 					});
 			},
 
@@ -259,7 +257,9 @@
 			},
 
 			getPath(photo) {
-				return 'data:image/*;base64,' + (new Buffer(photo.data.data).toString('base64'));
+				if(photo && photo.data)
+                  return 'data:image/*;base64,' + (new Buffer(photo.data.data).toString('base64'));
+                return '';
 			},
 
 			// Modal Image Gallery
@@ -293,7 +293,6 @@
 						this.$router.push('/myArenas');
 					})
 					.catch(err => {
-						alert(err);
 					});
 			}
 

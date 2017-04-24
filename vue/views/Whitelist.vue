@@ -12,7 +12,7 @@
 
             <figure class="media-left">
               <p class="image is-64x64">
-                <img :src="getPath(players[index].photo)" alt="profile img" />
+                <img :src="getPath(player.photo)" alt="profile img" />
               </p>
             </figure>
           <div class="media-content">
@@ -63,7 +63,9 @@
         methods: {
 
             getPath(photo) {
-                return 'data:image/*;base64,' + (new Buffer(photo.data.data).toString('base64'));
+                  if(photo && photo.data)
+                  return 'data:image/*;base64,' + (new Buffer(photo.data.data).toString('base64'));
+                return '';
               },
 
             showPlayers(players) {
