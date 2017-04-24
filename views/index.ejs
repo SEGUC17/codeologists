@@ -88,18 +88,13 @@
 
 
 							<a v-if="user" class="button is-info is-inverted" @click="logout">
-								<span class="icon">
-	                					<i class="fa fa-github"></i>
-	              					</span>
 								<span>Logout</span>
 							</a>
 
 
 							<router-link v-if="!user" class="nav-item" to="/login-signup/login">
 								<a class="button is-info is-inverted" @click="showLogin=true">
-									<span class="icon">
-                					<i class="fa fa-github"></i>
-              					</span>
+									
 									<span>Login or Signup</span>
 								</a>
 							</router-link>
@@ -113,11 +108,11 @@
 		</section>
 
 		<div class="modal is-active" v-show="showLogin">
-			<div class="modal-background" @click="showLogin=false"></div>
+			<div class="modal-background" @click="backHome"></div>
 			<div class="modal-content">
 				<router-view name="loginModal"></router-view>
 			</div>
-			<button class="modal-close" @click="showLogin=false"></button>
+			<button class="modal-close" @click="backHome"></button>
 		</div>
 
 
@@ -128,13 +123,7 @@
 			<div class="container">
 				<div class="content has-text-centered">
 					<p>
-						<strong>El3ab</strong> by <a href="http://jgthms.com">Codeolo	gists</a>. The source code is licensed
-						<a href="http://opensource.org/licenses/mit-license.php">MIT</a>. The website content is licensed <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC ANS 4.0</a>.
-					</p>
-					<p>
-						<a class="icon" href="https://github.com/jgthms/bulma">
-							<i class="fa fa-github"></i>
-						</a>
+						<strong>OFFSIDE</strong> by <a href="https://secourse.co/teams/codeologists/info">Codeologists</a>. 
 					</p>
 				</div>
 			</div>

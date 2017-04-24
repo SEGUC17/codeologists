@@ -147,10 +147,18 @@ new Vue({
                 window.type='visitor';
                 this.user = false;
                 this.type = 'visitor';
+                this.$router.push('/');
             }).catch(err => {
                 console.log(err);
             });
         },
+
+        backHome(){
+            this.showLogin=false;
+            this.$router.push('/');
+        },
+
+
         redirect() {
             
                //router.replace('/dayDetail/-1');

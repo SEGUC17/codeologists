@@ -6178,9 +6178,14 @@ new Vue({
                 window.type = 'visitor';
                 _this3.user = false;
                 _this3.type = 'visitor';
+                _this3.$router.push('/');
             }).catch(function (err) {
                 console.log(err);
             });
+        },
+        backHome: function backHome() {
+            this.showLogin = false;
+            this.$router.push('/');
         },
         redirect: function redirect() {
 
@@ -13980,28 +13985,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
 	data: function data() {
@@ -21494,32 +21477,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "to": "/viewArenas"
     }
-  }, [_c('a', [_vm._v("Show Arenas")])])], 1)])])]), _vm._v(" "), _vm._m(0), _vm._v(" "), _c('hr'), _vm._v(" "), _vm._m(1)])
-},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('section', {
-    staticClass: "section"
-  }, [_c('div', {
-    staticClass: "container"
-  }, [_c('div', {
-    staticClass: "heading"
-  }, [_c('h1', {
-    staticClass: "title"
-  }, [_vm._v("About us")]), _vm._v(" "), _c('h2', {
-    staticClass: "subtitle"
-  }, [_vm._v("\n          A simple container to divide your page into "), _c('strong', [_vm._v("sections")]), _vm._v(", like the one you're currently reading\n        ")])])])])
-},function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('section', {
-    staticClass: "section"
-  }, [_c('div', {
-    staticClass: "container"
-  }, [_c('div', {
-    staticClass: "heading"
-  }, [_c('h1', {
-    staticClass: "title"
-  }, [_vm._v("Ay hags")]), _vm._v(" "), _c('h2', {
-    staticClass: "subtitle"
-  }, [_vm._v("\n          A simple container to divide your page into "), _c('strong', [_vm._v("sections")]), _vm._v(", like the one you're currently reading\n        ")])])])])
-}]}
+  }, [_c('a', [_vm._v("Show Arenas")])])], 1)])])])])
+},staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
   module.hot.accept()

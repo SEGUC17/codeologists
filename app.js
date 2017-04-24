@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var mongoose = require('mongoose');
 var nodemon = require('nodemon');
 var path = require('path');
+var stripe = require("stripe")("sk_test_Ny38x1Z7YQaYzmFq0YwMPP2w");
 var schedule = require('node-schedule');
 var session = require('express-session');
 var systemController = require('./controllers/systemController');
