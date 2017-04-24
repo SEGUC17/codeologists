@@ -10,6 +10,11 @@ function bookHours(month, day, startIndex, endIndex, timestamp, arenaName, playe
     //create Booking
     var indices2 = serviceProviderController.getScheduleIndices(month, day);
     var indices={dayIndex : parseInt(indices2.dayIndex,10) , weekIndex : parseInt(indices2.weekIndex,10)}
+    startIndex = parseInt(startIndex , 10);
+    endIndex = parseInt(endIndex, 10);
+    console.log(indices);
+    console.log(startIndex);
+    console.log(endIndex);
     Arena.findOne({ name: arenaName }, function (err, foundArena) {
 
         if (!err && foundArena) {

@@ -49,14 +49,28 @@ let serviceProviderController =
         getTimeFromIndex: getTimeFromIndex,
 
         getTheMode: function(req,res){
-            var username = req.user.username;
-            if(!req.user){
-                res.json(400,{ error : 'You are not logged in'});
+            if(!req || !req.user || !req.user.username){
+                res.json(400, 'Please login');
+                return;
             }
-            ServiceProvider.findOne({ username: username }, function (err, user) {
-                    if (!err)
-                        res.json(200,{ mode : user.mode});
-                    });
+            else
+            {
+                var username = req.user.username;
+                if(!req.user)
+                {
+                    res.json(400,{ error : 'You are not logged in'});
+                }
+                ServiceProvider.findOne({ username: username }, function (err, user) 
+                {
+                        if (!err && user)
+                            res.json(200,{ mode : user.mode});
+                        else
+                        {
+                            res.json(400, 'Please login');
+                            return;
+                        }
+                });
+            }   
                 },
 
         turnAutoAcceptModeOn: function (req, res) {
