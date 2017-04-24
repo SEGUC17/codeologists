@@ -194,6 +194,8 @@ router.post('/arena/:arenaName/bookWeekly', ensureAuthenticated, playerControlle
 router.post('/arena/:arenaName/bookHours',ensureAuthenticated, bookingController.createBooking);
 
 
+router.post('/searchPlayer',ensureAuthenticated,playerController.search);
+
 router.get('/getArenas',ensureAuthenticated,arenaController.getArenas);
 
 router.get('/myrequests',ensureAuthenticated,gameController.myrequests);

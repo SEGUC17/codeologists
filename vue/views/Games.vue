@@ -1,6 +1,13 @@
 <template>
 
-<div>
+<div class="w3-container">
+
+  <br>
+  <router-link class="button w3-blue" v-if="type=='Player'" tag="button" to='/createGame'> Create New Game</router-link>
+  <br>
+
+
+
 	<div v-for="game in games">
     <article class="message" >
     <div class="message-header">
@@ -70,6 +77,11 @@
           this.selected=e.target.value;
         }
 			
-		}
+		},
+
+        computed: {
+            user: function () { return window.user; },
+            type: function () { return window.type; }
+        }
 	}
 </script>

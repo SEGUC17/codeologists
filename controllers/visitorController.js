@@ -279,7 +279,16 @@ let visitorController = {
 	filter: function (req, res) {
 		var search_type = req.body.search_type;
 		var search_value = req.body.search_value;
+		 req.checkBody('search_value','search_value is empty!...enter a value').notEmpty();
+              if(req.validationErrors())
+                  return res.status(400).json({error:"search_value is empty!...enter a value."});
 		if (search_type == "price") {
+			req.checkBody('search_value','price must be a number.').isNumeric();
+
+              var errors = req.validationErrors();
+
+            if(errors)
+            return res.status(400).json({error:"price must be a number."});
 			Arena.find({ price: search_value }, function (err, doc) {
 				if (err)
 					res.status(500).json({error: err.message});

@@ -35,42 +35,40 @@ createBooking = function (req, res) {
     })
 }
 function viewBookings(req, res) {
-    Arena.findOne({ name: req.params.arenaName }, function (err, foundArena) {
+    Arena.findOne({name:req.params.arenaName}, function (err, foundArena) {
         if (err) {
-            res.status(403).json({ error: err });
+            res.json({ err: err });
         }
         else if (!foundArena) {
-
-            res.status(403).json({ error: "Sorry Broken Link, this arena may have been deleted, removed or is no longer existant" });
-
+            res.json({ err: "Sorry Broken Link, this arena may have been deleted, removed or is no longer existant" });
         }
         else {
             ServiceProvider.findById(foundArena.service_provider, function (errSp, serviceProvider) {
                 if (errSp) {
-                    res.status(403).json({ error: "Internal server Error, Sorry for the inconvenience !" });
+                    res.json({ err: "Internal server Error, Sorry for the inconvenience !" });
                 }
                 else if (serviceProvider) {
-
                     if (serviceProvider.username == req.user.username) {
                         //find all pending requests where the request time is greater than today, the arena is the current arena  and have not been accepted
-                        Booking.find({ accepted: false, arena: foundArena._id }).$where('(new Date(new Date().getFullYear(),this.bookMonth,this.bookDay))>(new Date())').exec(function (arenaErr, bookingArr) {
+                        Booking.find({ accepted: false, arena: foundArena.name }).$where('(new Date(new Date().getFullYear(),this.bookMonth,this.bookDay))>(new Date())').exec(function (err, bookingArr) {
                             //TODO: render a view (will be done in Sprint 2 ISA)
-                            if (arenaErr) {
-                                res.status(403).json({ error: "Error finding pending requests" });
+                            if (err) {
+                                res.json({ err: "Error finding pending requests" });
                             }
                             else {
-
-                                res.json(bookingArr);
+                                res.json({
+                                    bookings : bookingArr , 
+                                    players : getPlayersForBookings(bookingArr)
+                                });
                             }
-
                         })
                     }
                     else {
-                        res.status(403).json({ error: "sorry not your arena" });
+                        res.json({ err: "sorry not your arena" });
                     }
                 }
                 else {
-                    res.status(403).json({ error: "Internal Server Error sorry :'(" });
+                    res.json({ err: "Internal Server Error sorry 😢" });
                 };
             })
 
