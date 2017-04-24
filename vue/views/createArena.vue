@@ -265,6 +265,7 @@
         this.form.wednesday = arr[4];
         this.form.thursday = arr[5];
         this.form.friday = arr[6];
+
         this.form.submit('post','/createArena')
         .then(res => {
           if(res.error)

@@ -74,7 +74,7 @@
                    err : false,
                    msg: '',
                    getPath(photo){
-                     if(photo)
+                     if(photo && photo.data)
    return 'data:image/*;base64,'+(new Buffer(photo.data.data).toString('base64'));
 }
               };
