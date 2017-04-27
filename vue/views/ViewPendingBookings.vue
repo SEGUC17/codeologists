@@ -18,9 +18,9 @@
           <tbody>
             <tr v-for="(booking , index) in bookings">
               <td>{{booking.arena}}</td>
-              <td>{{booking.bookDay}}/{{booking.bookMonth}}/{{(new Date()).getFullYear()}}</td>
+              <td>{{booking.bookDay}}/{{booking.bookMonth+1}}/{{(new Date()).getFullYear()}}</td>
               <td>{{hour(booking.start_index)}}:{{minute(booking.start_index)}}</td>
-              <td>{{hour(booking.end_index)}}:{{minute(booking.end_index)}}</td>
+              <td>{{hour(booking.end_index+1)}}:{{minute(booking.end_index+1)}}</td>
               <td>{{players[index]}}</td>
               <td><button class="button w3-green" type="button" @click="accept(booking)">Accept</button></td>
               <td><button class="button w3-red" type="button" @click="reject(booking)">Reject</button></td>

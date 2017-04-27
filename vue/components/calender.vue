@@ -5,7 +5,9 @@ export default {
         getData(){
         
         axios.get('/arena/'+this.arenaName+'/getSchedule').then((res) => this.updateSchedule(res.data)).catch(error => this.errors = (error.data));
-        
+        axios.get('/arena/'+this.arenaName+'/getPrice').then(res => {
+            this.pricePerHour = res.data.price;
+        }).catch((err) => window.alert('Error'));
 
         },
         showPrev(){
@@ -61,7 +63,7 @@ export default {
             if(!((date)>(dateToComp) || !this.schedule || Math.floor((dateToComp-date)/(3600*1000*24))+weekDay>27) ) //or diff in days >27-weekDayIndex
             {
                 
-                Event.$emit('showagain',{schedule:this.schedule[index.weekIndex][index.dayIndex],day:day,month:this.calMonth,arenaName:this.arenaName});
+                Event.$emit('showagain',{schedule:this.schedule[index.weekIndex][index.dayIndex],day:day,month:this.calMonth,arenaName:this.arenaName,price:this.pricePerHour});
             }
             else if(! this.schedule)
             {   
@@ -105,7 +107,6 @@ export default {
             return (startOfMonth.getDay() -1)%7;
         },
         updateSchedule(newArenaData){
-            
             this.schedule = newArenaData.schedule;
         }
     },
@@ -114,6 +115,7 @@ export default {
         return {
             schedule:{},
             errors:{},
+            pricePerHour:{}
             
         }
     },

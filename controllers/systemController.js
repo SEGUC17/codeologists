@@ -3,7 +3,7 @@ var Game = require('../models/Game');
 var Booking = require('../models/Booking');
 var Player = require('../models/Player');
 var async = require('async');
-
+var stripe = require('stripe')("sk_test_Ny38x1Z7YQaYzmFq0YwMPP2w");
 /*
 systemController.updateSchedule()
 a function that runs each week exactly once to shift the schedule of all arenas one element to the left to correspond to the fact that one week has passed, thus keeping the system consistant.
@@ -73,8 +73,30 @@ function collectGarbage() {
     })
 
 }
+function chargeMoney (req, res,next) {
 
+    var token = req.body.stripeToken;
+    var chargeAmount = req.body.chargeAmount;
+    var charge = stripe.charges.create({
+        amount: chargeAmount,
+        currency: "usd",
+        source: token,
+    }, function (err, charge) {
+        if (err && err.type != "StripeCardError") {
+            console.log(err);
+            res.status(400).json({ message: "Stripe Card Error, Type: "+err.type });
+            //next middleware should book time 
+        }
+        if (err && err.type === "StripeCardError") {
+            console.log("Your cad was declined");
+            res.status(400).json({ message: "Your CAD was declined, Type : CAD declined" })
+        }
+
+    });
+    
+}
 let systemControlller = {
+    chargeMoney:chargeMoney,
     updateSchedule: updateSchedule,
     collectGarbage: collectGarbage
 }

@@ -136,7 +136,7 @@
       getPath(photo) {
                 if(photo && photo.data)
                   return 'data:image/*;base64,' + (new Buffer(photo.data.data).toString('base64'));
-                return '';
+                return 'default-user-image.png';
               },
     },
     components : {

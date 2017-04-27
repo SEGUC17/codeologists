@@ -63,7 +63,7 @@
         <div class="field">
         <label class="label">Rules and regulations:</label>
         <p class="control">
-        <textarea class="textarea" placeholder="Rules and regulations" v-model = "form.rules_and_regulations"></textarea><br></p>
+        <textarea class="textarea" placeholder="Rules and regulations" v-model = "form.rules_and_regulations" required="true"></textarea><br></p>
         </div>
       </div>
       <!-- End of info part -->
@@ -176,7 +176,7 @@
       <!--End of the schedule part-->
 
       <el-button class = "button is-primary" :disabled="form.name === ''
-      || form.address === '' || form.location === '' || form.size === '' || form.type === '' || form.price === ''"
+      || form.address === '' || form.location === '' || form.size === '' || form.type === '' || form.price === '' || form.rules_and_regulations == ''"
        v-if = "active == 0" @click="next">Next</el-button>
       <table>
         <tr>

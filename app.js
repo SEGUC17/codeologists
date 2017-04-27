@@ -16,9 +16,9 @@ var Booking = require('./models/Booking');
 var Arena = require('./models/Arena');
 var logger = require('morgan');
 var validator = require('express-validator');
-var serviceProviderController =  require('./controllers/serviceProviderController');
+var serviceProviderController = require('./controllers/serviceProviderController');
 schedule.scheduleJob({ hour: 07, minute: 00, dayOfWeek: 6 }, systemController.updateSchedule);
-
+var router =    require('./routes/router');
 //database connection url
 var db_url = "mongodb://localhost:27017/db";
 mongoose.Promise = Promise;
@@ -44,8 +44,15 @@ app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(logger('short'));
-app.use(require('./routes/router.js'));
+// stripe specific routes
 
+app.use(router);
+
+
+
+
+
+//router
 
 //start server
 app.listen(8080, function () {

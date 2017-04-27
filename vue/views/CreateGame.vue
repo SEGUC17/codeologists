@@ -66,6 +66,7 @@
 					this.$router.push('/');
 				})
 				.catch(err => {
+					alert(err.error);
 				});
 			}
 		},

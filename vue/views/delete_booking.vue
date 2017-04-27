@@ -16,7 +16,7 @@
             <tr style="font-size: 12px">
               <td>Date: {{month(booking.bookMonth)}} {{booking.bookDay}}</td>
               <td>From: {{hour(booking.start_index)}}:{{minute(booking.start_index)}}</td>
-              <td>To: {{hour(booking.end_index)}}:{{minute(booking.end_index)}}</td>
+              <td>To: {{hour(booking.end_index+1)}}:{{minute(booking.end_index+1)}}</td>
             </tr>
           </table>
         </div>

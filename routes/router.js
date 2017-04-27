@@ -13,7 +13,7 @@ var serviceProviderController = require('../controllers/serviceProviderControlle
 var visitorController = require('../controllers/visitorController');
 var Player = require('../models/Player');
 var RegisteredUser = require('../models/RegisteredUser');
-
+var systemController =require('../controllers/systemController');
 var passport = require('./passportConfig');
 var router = express.Router();
 
@@ -30,19 +30,19 @@ function ensureAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
         next();
     } else {
-        res.status(400).json({error:"log in first"});
+        res.status(400).json({ error: "log in first" });
     }
 }
 
-router.get('/',function(req,res){
+router.get('/', function (req, res) {
     return res.render('index');
 });
 
-router.get('/findUser/:user',function(req,res){
-    RegisteredUser.findOne({username : req.params.user},function(err,data){
-        if(err){
+router.get('/findUser/:user', function (req, res) {
+    RegisteredUser.findOne({ username: req.params.user }, function (err, data) {
+        if (err) {
             return res.status(500).json(err);
-        }else{
+        } else {
             res.json(data);
         }
     });
@@ -77,7 +77,7 @@ router.post('/register', function (req, res) {
     else
         res.json({ success: "service provider" });
 });
-router.get('/controlpanel',function(req,res){
+router.get('/controlpanel', function (req, res) {
     res.render('serviceProviderControlPanel');
 })
 router.get('/newPlayer', function (req, res) {
@@ -85,8 +85,7 @@ router.get('/newPlayer', function (req, res) {
 });
 
 router.post('/signup', upload.any(), function (req, res) {
-    if(req.body.type=='player')
-    {
+    if (req.body.type == 'player') {
         visitorController.createPlayer(req, res);
     }
     else
@@ -107,14 +106,14 @@ router.get('/login', function (req, res) {
 });
 
 router.post('/login', passport.authenticate('local'), function (req, res) {
-    res.json({success:"User authenticated successfully",user:req.user.name, type:req.user.type, pp:req.user.profile_pic, email:req.user.email, phone:req.user.phone_number,location:req.user.location});
+    res.json({ success: "User authenticated successfully", user: req.user.username, type: req.user.type, pp: req.user.profile_pic, email: req.user.email, phone: req.user.phone_number, location: req.user.location });
 
 });
 
 router.get('/logout', function (req, res) {
     if (req.user) {
         req.logout();
-        res.json({success:"You have been logged out successfully"});
+        res.json({ success: "You have been logged out successfully" });
     }
     else
         res.status(400).json({ error: "Cannot logout if you are not logged in" });
@@ -122,11 +121,11 @@ router.get('/logout', function (req, res) {
 
 router.get('/myArenas', ensureAuthenticated, serviceProviderController.myArenas);
 router.post('/arenas', visitorController.view_all);
-router.get('/arena/:arenaName/show',ensureAuthenticated,visitorController.view_details_of_arena);
-router.get('/arena/:arenaName/getSchedule',ensureAuthenticated, arenaController.getArenaSchedule);
-router.get('/arena/:arenaName/schedule/:monthIndex/:dayIndex',ensureAuthenticated,arenaController.getWeekSchedule);
+router.get('/arena/:arenaName/show', ensureAuthenticated, visitorController.view_details_of_arena);
+router.get('/arena/:arenaName/getSchedule', ensureAuthenticated, arenaController.getArenaSchedule);
+router.get('/arena/:arenaName/schedule/:monthIndex/:dayIndex', ensureAuthenticated, arenaController.getWeekSchedule);
 
-router.get('/getArenas',ensureAuthenticated,arenaController.getArenas);
+router.get('/getArenas', ensureAuthenticated, arenaController.getArenas);
 
 router.get('/viewgames', ensureAuthenticated, gameController.viewgames);
 
@@ -171,15 +170,23 @@ router.get('/createArena', ensureAuthenticated, function (req, res) {
 });
 router.post('/createArena', ensureAuthenticated, upload.any(), arenaController.createArena);
 router.post('/cancelBooking/:bookingID', ensureAuthenticated, bookingController.cancelBooking);
-router.get('/viewPlayerBookings',ensureAuthenticated, bookingController.viewPlayerBookings);
+router.get('/viewPlayerBookings', ensureAuthenticated, bookingController.viewPlayerBookings);
 
 router.post('/turnAcceptModeOn', ensureAuthenticated, serviceProviderController.turnAutoAcceptModeOn);
 router.post('/turnAcceptModeOff', ensureAuthenticated, serviceProviderController.turnAutoAcceptModeOff);
 router.post('/acceptBooking/:bookingID', ensureAuthenticated, bookingController.acceptBooking2);
 router.post('/rejectBooking/:bookingID', ensureAuthenticated, bookingController.rejectBooking);
 router.post('/createGame', ensureAuthenticated, gameController.createGame);
+//stripe routes
 
-router.post("/sp/arena/:arenaName",ensureAuthenticated, function (req, res) {
+/*
+to do :add ensure authenticated
+to do : once a paymnent has been made accept the booking 
+*/
+router.post('/charge', ensureAuthenticated, systemController.chargeMoney);
+
+router.get('/arena/:arenaName/getPrice',arenaController.getPrice);
+router.post("/sp/arena/:arenaName", ensureAuthenticated, function (req, res) {
     if (req.body.flag == 1) {
         arenaController.setUnavailable(req, res);
     }
@@ -191,20 +198,20 @@ router.get('/arena/:arenaName/viewBookings', ensureAuthenticated, bookingControl
 router.post('/arena/:arenaName/bookWeekly', ensureAuthenticated, playerController.bookWeekly);
 
 //book free hours
-router.post('/arena/:arenaName/bookHours',ensureAuthenticated, bookingController.createBooking);
+router.post('/arena/:arenaName/bookHours', ensureAuthenticated, bookingController.createBooking);
 
 
-router.post('/searchPlayer',ensureAuthenticated,playerController.search);
+router.post('/searchPlayer', ensureAuthenticated, playerController.search);
 
-router.get('/getArenas',ensureAuthenticated,arenaController.getArenas);
+router.get('/getArenas', ensureAuthenticated, arenaController.getArenas);
 
-router.get('/myrequests',ensureAuthenticated,gameController.myrequests);
-router.get('/mygame',ensureAuthenticated,gameController.mygame);
+router.get('/myrequests', ensureAuthenticated, gameController.myrequests);
+router.get('/mygame', ensureAuthenticated, gameController.mygame);
 router.post('/RequestGame/:id', ensureAuthenticated, gameController.requestgame);
 router.post('/AcceptRequest/:id', ensureAuthenticated, gameController.acceptrequest);
 router.post('/RejectRequest/:id', ensureAuthenticated, gameController.rejectrequest);
-router.get('/myNotifications',ensureAuthenticated,playerController.myNotifications);
+router.get('/myNotifications', ensureAuthenticated, playerController.myNotifications);
 
-router.get('/getTheMode' , ensureAuthenticated , serviceProviderController.getTheMode);
+router.get('/getTheMode', ensureAuthenticated, serviceProviderController.getTheMode);
 
 module.exports = router;

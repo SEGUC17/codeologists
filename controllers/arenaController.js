@@ -200,7 +200,7 @@ function editarenainfo(req, res) {
     }
     if (req.user && arena.service_provider == req.user._id) {
 
-      req.checkBody('rules_and_regulations', 'Rules and Regulations are required.').notEmpty();
+      
       req.checkBody('address', 'Address is required.').notEmpty();
       req.checkBody('location', 'Location is required.').notEmpty();
       req.checkBody('size', 'The arena size is required.').notEmpty();
@@ -695,8 +695,26 @@ function getWeekSchedule(req, res) {
         })
 
 
+};
+function getPrice(req,res){
+    Arena.findOne({name:req.params.arenaName},function(err,foundArena){
+        if(err)
+        {
+            res.status(500).json({error:"internal Error"});
+
+        }
+        else if(!foundArena)
+        {
+          res.status(400).json({error:"No such arena"});  
+        }
+        else
+        {
+            res.json({price:foundArena.price});
+        }
+    })
 }
 let arenaController = {
+    getPrice:getPrice,
     getWeekSchedule: getWeekSchedule,
     getArenaSchedule: getArenaSchedule,
     getArenas: getArenas,

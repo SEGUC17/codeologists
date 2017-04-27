@@ -1,6 +1,6 @@
 
 var Game = require('../models/Game');
-var Player=require('../models/Player');
+var Player = require('../models/Player');
 /*
 gameController.createGame
 A function that creates a game for the player
@@ -25,25 +25,29 @@ var createGame = function (req, res) {
     var location2 = req.body.location;
     var start_date2 = req.body.start_date;
     var end_date2 = req.body.end_date;
-    let added = new Game
-        ({
-            creator: creator2,
-            size: size2,
-            location: location2,
-            start_date: start_date2,
-            end_date: end_date2
-        });
-    added.save(function (err, added) {
-        if (err){
-            res.json(400 , {error : "Error while creating the game"});
-            return;
-        }
-        else{
-            res.json(200 , {success :'Game created successfully'});
-            return;
-        }
-    })
-
+    if (start_date2 > end_date2 || end_date2 < new Date()) {
+        res.status(400).json({ error: "Enter a valid date" });
+    }
+    else {
+        let added = new Game
+            ({
+                creator: creator2,
+                size: size2,
+                location: location2,
+                start_date: start_date2,
+                end_date: end_date2
+            });
+        added.save(function (err, added) {
+            if (err) {
+                res.json(400, { error: "Error while creating the game" });
+                return;
+            }
+            else {
+                res.json(200, { success: 'Game created successfully' });
+                return;
+            }
+        })
+    }
 }
 /*
 Function: gameController.viewgames
@@ -79,21 +83,21 @@ function requestgame(req, res, nxt) {
     var NewReq = { playerUsername: req.user.username, comment: req.body.comment, accepted: false };
     var id = req.params.id;
     if (id == null) {
-    res.status(500).json({ error: 'can not send a game request of undefined game' });
+        res.status(500).json({ error: 'can not send a game request of undefined game' });
     }
     if (NewReq.playerUsername == null) {
-     res.status(401).json({ error: 'can not request a game  for unauthorized user' });
+        res.status(401).json({ error: 'can not request a game  for unauthorized user' });
     }
 
 
     Game.findOne({ _id: id }, function (err, game) {
         if (err) {
-                            res.status(400).json(err);
+            res.status(400).json(err);
 
         } else {
 
             var arrayLength = game.requests.length;
-            if(game.creator==req.user.username){
+            if (game.creator == req.user.username) {
                 res.send("Can't send a request because it's your own game");
                 return;
             }
@@ -127,27 +131,27 @@ function acceptrequest(req, res, nxt) {
     var playerUsername = req.body.playerUsername;
     var currentuser = req.user.username;
     if (id == null) {
-                 res.status(400).json({ error: 'can not accept a game request of undefined game' });
+        res.status(400).json({ error: 'can not accept a game request of undefined game' });
     }
     if (playerUsername == null) {
-         res.status(400).json({ error: 'can not accept a game request of undefined user' });
+        res.status(400).json({ error: 'can not accept a game request of undefined user' });
 
     }
     if (currentuser == null) {
-                 res.status(401).json({ error: 'can not accept a game request for unauthorized user' });
+        res.status(401).json({ error: 'can not accept a game request for unauthorized user' });
 
     }
     Game.findOne({ _id: id }, function (err, game) {
         if (err) {
-                            res.status(400).json({ error: err });
+            res.status(400).json({ error: err });
         } else {
-            
+
             for (var i = 0; i < game.requests.length; i++) {
                 var n = game.requests[i].playerUsername.localeCompare(playerUsername);
                 if (n == 0) {
-                   // game.requests[i].accepted = true;
-                  game.requests.splice(i);
-                  game.markModified("requests");
+                    // game.requests[i].accepted = true;
+                    game.requests.splice(i);
+                    game.markModified("requests");
                     game.save();
                     Player.findOne({ username: playerUsername }, function (err, player) {
                         if (err) {
@@ -189,33 +193,33 @@ function rejectrequest(req, res, nxt) {
     var currentuser = req.user.username;
     if (id == null) {
 
-    res.status(400).json({ error: 'can not reject a game request of undefined game' });
+        res.status(400).json({ error: 'can not reject a game request of undefined game' });
 
     }
     if (playerUsername == null) {
-                 res.status(400).json({ error: 'can not reject a game request of undefined user' });
+        res.status(400).json({ error: 'can not reject a game request of undefined user' });
     }
     if (currentuser == null) {
-        
-         res.status(401).json({ error: 'can not reject a game request for unauthorized user' });
+
+        res.status(401).json({ error: 'can not reject a game request for unauthorized user' });
 
     }
     Game.findOne({ _id: id }, function (err, game) {
         if (err) {
-                            res.status(400).json({ error: err });
+            res.status(400).json({ error: err });
         } else {
 
             for (var i = 0; i < game.requests.length; i++) {
                 var n = game.requests[i].playerUsername.localeCompare(playerUsername);
                 if (n == 0) {
                     game.requests.splice(i);
-                   game.markModified("requests");
+                    game.markModified("requests");
                     game.save(nxt);
 
                     Player.findOne({ username: playerUsername }, function (err, player) {
                         if (err) {
                             res.status(400).json(err);
-                            
+
                         } else {
                             player.notifications.push(currentuser.concat(' has rejected your request to play the game on ').concat(game.start_date));
                             player.save(nxt);
@@ -239,13 +243,13 @@ gameControler.myrequests:
 */
 
 function myrequests(req, res) {
-var currentuser = req.user.username;
-   Game.findOne({ creator: currentuser }, function (err, game) {
+    var currentuser = req.user.username;
+    Game.findOne({ creator: currentuser }, function (err, game) {
         if (err) {
-        res.status(400).json({ error: err });
-        return;
+            res.status(400).json({ error: err });
+            return;
         } else {
-            if(game==null){
+            if (game == null) {
                 res.json([]);
                 return;
             }
@@ -261,14 +265,14 @@ gameControler.mygame:
 */
 
 function mygame(req, res) {
-var currentuser = req.user.username;
+    var currentuser = req.user.username;
 
-   Game.findOne({ creator: currentuser }, function (err, game) {
+    Game.findOne({ creator: currentuser }, function (err, game) {
         if (err) {
-         res.status(400).json({ error: err });
-         return;
+            res.status(400).json({ error: err });
+            return;
         } else {
-            if(game==null){
+            if (game == null) {
                 res.json("");
                 return;
             }
@@ -282,9 +286,9 @@ let gameController = {
     viewgames: viewgames,
     acceptrequest: acceptrequest,
     rejectrequest: rejectrequest,
-    requestgame:requestgame,
-    myrequests:myrequests,
-    mygame:mygame
+    requestgame: requestgame,
+    myrequests: myrequests,
+    mygame: mygame
 }
 
 module.exports = gameController;

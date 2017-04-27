@@ -68,8 +68,7 @@ function viewBookings(req, res) {
                             }
                             else {
                                 res.json({
-                                    bookings : bookingArr , 
-                                    players : getPlayersForBookings(bookingArr)
+                                    bookings : bookingArr
                                 });
                             }
                         })
