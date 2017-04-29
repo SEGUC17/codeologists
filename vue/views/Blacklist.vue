@@ -4,7 +4,7 @@
 <div id="list" class="columns is-mobile">
     <div class="column is-half is-offset-one-quarter">
 
-      <input v-model="PlayerInfo" v-on:keyup.enter="onSubmit" placeholder="add a player">
+      <input v-model="PlayerInfo" v-on:keyup.enter="onSubmit" placeholder="add a player" style='width:100%'>
         
         <div v-for="(player, index) in players" v-bind:key="player" >
         <br>

@@ -120,11 +120,11 @@
       }
     },
     computed : {
-      user: function () { return window.user; },
-      type: function () { return window.type; }
+      user: function () { return this.$session.get('user'); },
+      type: function () { return this.$session.get('type'); }
     },
     created() {
-      axios.get('/findUser/'+window.user)
+      axios.get('/findUser/'+this.$session.get('user'))
         .then(res =>{
           this.profileUser=res.data;
         })

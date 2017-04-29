@@ -188,7 +188,6 @@
                                                   if(this.suggestions.length > 4)
                                                     break;
                                               }
-                                              console.log(this.suggestions);
                                             }
                                           )
                                              .catch(error => {
