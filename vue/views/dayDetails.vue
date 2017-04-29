@@ -59,7 +59,7 @@
             </div>
             </td>
           </tr>
-          
+          <button class="button is-black is-inverted is-large" @click="bookHours()" :disabled="startTime == null || endTime==null">Play !</button>
           </table>
             </div>
             <div  id="StripeForm" v-if="this.startTime != null && this.endTime != null">
