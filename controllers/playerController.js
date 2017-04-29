@@ -154,9 +154,6 @@ retrieve and view arenas matched the attribute value selected by the user after 
                                },function(){
                                  compute(req,res,result);
                                });
-
-
-
                  }
                     });
                   }
@@ -189,7 +186,7 @@ retrieve and view arenas matched the attribute value selected by the user after 
 
 
                  }
-               }).limit(4);
+               });
                   }
               } else {
                         if(limit == 0)

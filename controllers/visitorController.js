@@ -370,13 +370,13 @@ retrieve and view arenas matched the attribute value selected by the visitor aft
 			}
 			else
 			{
-				Arena.find({ location: {'$regex' : '.*' + search_value + '.*'}}, function (err, doc) {
+				Arena.find({ location: {'$regex' : '.*' + search_value + '.*'}}, { location: 1, name: 1},function (err, doc) {
 					if (err)
 						res.status(500).json({error: err.message});
 					else {
 						compute(req, res, doc);
 					}
-				}).limit(4);
+				});
 			}
 		} else {
 			if(limit == 0)
@@ -391,7 +391,7 @@ retrieve and view arenas matched the attribute value selected by the visitor aft
 			}
 			else
 			{
-				Arena.find({ name: {'$regex' : '.*' + search_value + '.*'}}, function (err, doc) {
+				Arena.find({ name: {'$regex' : '.*' + search_value + '.*'}}, { location: 1, name: 1}, function (err, doc) {
 					if (err)
 						res.status(500).json({error: err.message});
 					else {

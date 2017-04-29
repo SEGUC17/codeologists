@@ -19,8 +19,8 @@
 
           <div class = "w3-border">
             <ul>
-              <li><div v-for = "suggestion in suggestions" @click = "search_value = suggestion; suggestions = []">
-                <a >{{suggestion}}</a>
+              <li><div v-for = "suggestion in suggestions" @click = "search_value = suggestion; suggestions = []" class="w3-hover-grey">
+                {{suggestion}}
               </div></li>
             </ul>
           </div>
@@ -164,22 +164,31 @@
   			                       	},
 
                                 suggest(){
+                                  console.log('hi');
                                   this.suggestions = [];
                                   axios.post('/search', querystring.stringify({
                                             search_type : this.search_type,
                                             search_value : this.search_value,
                                             limit: 1
                                           })).then(response => {
+                                            console.log(response.data.result);
                                             var searchType = this.search_type;
-                                              for (var i = 0; i < 4; i++) {
+                                              for (var i = 0; i < response.data.result.length; i++) {
                                                 if(response.data.result[i])
                                                   if(searchType == 'name')
                                                   {
                                                     this.suggestions.push(response.data.result[i].name);
                                                   }
                                                   else
-                                                    this.suggestions.push(response.data.result[i].location);
+                                                  {
+                                                    var entry = response.data.result[i].location;
+                                                    if(this.suggestions.indexOf(entry) < 0)
+                                                      this.suggestions.push(entry);
+                                                  }
+                                                  if(this.suggestions.length > 4)
+                                                    break;
                                               }
+                                              console.log(this.suggestions);
                                             }
                                           )
                                              .catch(error => {
