@@ -96,7 +96,7 @@
           </div>
 
     </form>
-  
+
 
   </div>
 
@@ -162,6 +162,8 @@
                                errs[e.param] = e.msg;
                            }
                               this.errors = errs;
+                              this.password = '';
+                              this.old_password = '';
                          })
                        },onFile(event){
                          this.files = event.target.files
@@ -184,6 +186,9 @@
                                               var param = e.param;
                                               errs[e.param] = e.msg;
                                           }
+                                          this.password = '';
+                                          this.old_password = '';
+
                                              this.errors = errs;
                          })
                        },onMode(event){
