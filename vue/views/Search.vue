@@ -14,7 +14,17 @@
         </div>
         <div class="field">
           <label class ="label" for="val">Search Value</label>
-          <input class="input" type="text" id="val" v-model="search_value">
+          <input class="input" type="text" id="val" v-model="search_value" v-on:keyup="suggest">
+
+          <div class = "w3-border">
+            <ul>
+              <li><div v-for = "suggestion in suggestions" @click = "search_value = suggestion; suggestions = []">
+                <a >{{suggestion}}</a>
+              </div></li>
+            </ul>
+          </div>
+
+
           <span class="help is-danger" v-if="err">{{msg}}</span>
         </div>
           <div>
@@ -73,6 +83,7 @@
                    elements:0,
                    err : false,
                    msg: '',
+                   suggestions: [],
                    getPath(photo){
                      if(photo && photo.data)
    return 'data:image/*;base64,'+(new Buffer(photo.data.data).toString('base64'));
@@ -88,7 +99,8 @@
                           onSubmit(){
                             axios.post('/search', querystring.stringify({
                                       search_type : this.search_type,
-                                      search_value : this.search_value
+                                      search_value : this.search_value,
+                                      limit: 0
                                     })).then(response => {
                                             this.count = response.data.count;
                                             this.start = response.data.start;
@@ -116,7 +128,8 @@
                             axios.post('/search', querystring.stringify({
                                       search_type : this.search_type,
                                       index : event.target.value,
-                                      search_value : this.search_value
+                                      search_value : this.search_value,
+                                      limit: 0
                                     })).then(response => {
                                             this.count = response.data.count;
                                             this.start = response.data.start;
@@ -130,7 +143,7 @@
                                               this.arenas.push(response.data.result[i]);
                                             }
                                             this.active = response.data.active;
-                                         
+
                                           }
                                     )
                                        .catch(error => {this.arenas = [];this.search_value = '';
@@ -141,6 +154,29 @@
                                        this.arenas=[''];
                                        this.elements ='';
                                        this.msg = error.response.data.error;
+                                     });
+                          },
+                          suggest(){
+                            this.suggestions = [];
+                            axios.post('/search', querystring.stringify({
+                                      search_type : this.search_type,
+                                      search_value : this.search_value,
+                                      limit: 1
+                                    })).then(response => {
+                                      var searchType = this.search_type;
+                                        for (var i = 0; i < 4; i++) {
+                                          if(response.data.result[i])
+                                            if(searchType == 'name')
+                                            {
+                                              this.suggestions.push(response.data.result[i].name);
+                                            }
+                                            else
+                                              this.suggestions.push(response.data.result[i].location);
+                                        }
+                                      }
+                                    )
+                                       .catch(error => {
+                                         console.log(error);
                                      });
                           }
                     }
