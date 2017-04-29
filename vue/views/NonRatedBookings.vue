@@ -6,36 +6,36 @@
         <th>Arena</th>
         <th v-if="type==='ServiceProvider'">Player</th>
         <th>Time</th>
-          <th>Rating</th>
-          <th>&nbsp</th>
-        </tr>
-        <!-- <div > -->
-          <tr v-for="(booking, index) in bookings">
-            <td>{{	booking.bookingArena }}</td>
-            <td v-if="type==='ServiceProvider'">{{ playerNames[index] }}</td>
-            <td>{{ dates[index] }}	 </td>
+        <th>Rating</th>
+        <th>&nbsp</th>
+      </tr>
+      <!-- <div > -->
+      <tr v-for="(booking, index) in bookings">
+        <td>{{	booking.bookingArena }}</td>
+        <td v-if="type==='ServiceProvider'">{{ playerNames[index] }}</td>
+        <td>{{ dates[index] }}	 </td>
 
-            <td>
-              <div class="block">
-                <span class="demonstration"></span>
-                <el-rate
-                v-model="value[index]"
-                :colors="['#99A9BF', '#F7BA2A', '#FF9900']">
-              </el-rate>
-            </div>
+        <td>
+          <div class="block">
+            <span class="demonstration"></span>
+            <el-rate
+            v-model="value[index]"
+            :colors="['#99A9BF', '#F7BA2A', '#FF9900']">
+          </el-rate>
+        </div>
 
-          </td>
-          <td>
-            <div class="control">
-              <button @click="editClicked(booking, index)" class="button is-primary">
-                Rate
-              </button>
-            </div>
-          </td>
-        </tr>
-      <!-- </div> -->
-    </table>
-  </div>
+      </td>
+      <td>
+        <div class="control">
+          <button @click="editClicked(booking, index)" class="button is-primary">
+            Rate
+          </button>
+        </div>
+      </td>
+    </tr>
+    <!-- </div> -->
+  </table>
+</div>
 
 </template>
 
@@ -54,7 +54,8 @@ export default{
       value: [],
       bookings : [],
       playerNames: [],
-      dates: []
+      dates: [],
+      type: this.$session.get('type')
     }
   },
 
@@ -67,20 +68,20 @@ export default{
     .catch(err => console.log(err));
   },
 
-  computed : {
-      type: function () { return window.type; }
-    },
-
   methods: {
 
     render(){
       this.playerNames = [];
       this.dates = [];
       this.value = [];
+
       for (var i = 0; i < this.bookings.length; i++) {
         var date = new Date(this.bookings[i].date);
+        var minDigit = "";
+          if(date.getMinutes() < 10)
+          minDigit = "0";
         this.dates.push(date.getFullYear() + "/" + (date.getMonth()+1) +
-        "/" + date.getDate() + "(" + date.getHours() + ":" + date.getMinutes()+')');
+        "/" + date.getDate() + "(" + date.getHours() + ":" + minDigit + date.getMinutes()+')');
         this.value.push(1);
         let playerID = this.bookings[i].playerID;
         axios.get('/getNameOfPlayer/' + playerID)

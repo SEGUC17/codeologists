@@ -56,54 +56,54 @@ export default{
     return {
       comment: '',
       comments : this.initialcomments,
-      type: window.type
-    }
-  },
-
-  mounted(){
-    //this.refresh();
-  },
-  props: ['initialMina','initialcomments'],
-
-  created(){
-    console.log(this.initialcomments);
-  },
-
-  methods: {
-
-    calcDate(date){
-      var comp = new Date(date);
-      var minDigit = "";
-      if(comp.getMinutes().length < 1)
-      minDigit = "0";
-
-      return comp.getFullYear() + "/" + (comp.getMonth()+1) +
-      "/" + comp.getDate() + "(" + comp.getHours() + ":" + minDigit + comp.getMinutes()+')';
+      type: this.$session.get('type')
+     }
     },
-    refresh(){
+
+    mounted(){
+      //this.refresh();
     },
-    saveChanges(){
-      axios.post('/arena/'+this.initialMina+'/comment', querystring.stringify({
-        "comment" : this.comment
-      }), {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        }
-      })
-      .then(res => {
-        this.comments=res.data;
-        this.comment='';
-        this.initialcomments=res.data;
-      })
-      .catch(err => {
-        alert(err);
-      });
-    }
-  },
-  computed:{
-    mina(){
-      return this.initialMina;
+    props: ['initialMina','initialcomments'],
+
+    created(){
+      console.log(this.initialcomments);
+    },
+
+    methods: {
+
+      calcDate(date){
+        var comp = new Date(date);
+        var minDigit = "";
+        if(comp.getMinutes() < 10)
+        minDigit = "0";
+
+        return comp.getFullYear() + "/" + (comp.getMonth()+1) +
+        "/" + comp.getDate() + "(" + comp.getHours() + ":" + minDigit + comp.getMinutes()+')';
+      },
+      refresh(){
+      },
+      saveChanges(){
+        axios.post('/arena/'+this.initialMina+'/comment', querystring.stringify({
+          "comment" : this.comment
+        }), {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          }
+        })
+        .then(res => {
+          this.comments=res.data;
+          this.comment='';
+          this.initialcomments=res.data;
+        })
+        .catch(err => {
+          alert(err);
+        });
+      }
+    },
+    computed:{
+      mina(){
+        return this.initialMina;
+      }
     }
   }
-}
-</script>
+  </script>
