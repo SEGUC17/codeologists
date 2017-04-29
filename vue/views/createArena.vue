@@ -183,10 +183,14 @@
           <td><el-button class = "button is-primary" @click="next" v-if = "active == 1">Back</el-button>
           </td>
           <td><div class="control" v-if = "active == 1">
-            <button class="button is-primary">Add Arena</button>
+            <button class="button is-primary">Add Arena</button>&nbsp&nbsp&nbsp
+            <input type="checkbox" id="checkbox" name="setUnavailable" @click="setUnavailable" :checked="setCheckbox">
+            <label for="checkbox">Check this to clone saturday's schedule to the rest of the week</label>
+          
           </div></td>
         </tr>
       </table>
+         
   </form>
 
 <br>
@@ -201,6 +205,7 @@
   export default{
     data() {
       return {
+        setCheckbox:false,
         form: new Form({
           name: '',
           address: '',
@@ -247,6 +252,42 @@
       this.currentDay = 0;
     },
     methods: {
+      setUnavailable(){
+        if(this.setCheckbox==true)
+          this.setCheckbox=false;
+        else
+          this.setCheckbox=true;
+
+        if(this.setCheckbox==true){
+          var i;
+          for(i=0;i<48;i++){
+            if(this.schedule[0][i]== -1){
+             this.schedule[1][i] = -1;
+             this.schedule[2][i] = -1;
+             this.schedule[3][i] = -1;
+             this.schedule[4][i] = -1;
+             this.schedule[5][i] = -1;
+             this.schedule[6][i] = -1;
+
+           }
+            
+        }
+      }
+        else{
+          for(i=0;i<48;i++){
+            if(this.schedule[0][i]== -1){
+             this.schedule[1][i] = 0;
+             this.schedule[2][i] = 0;
+             this.schedule[3][i] = 0;
+             this.schedule[4][i] = 0;
+             this.schedule[5][i] = 0;
+             this.schedule[6][i] = 0;
+
+           }
+            
+        }       
+        }
+      },
       create(){
         var arr = new Array(7);
         for (var i = 0; i < 7; i++) {
