@@ -20,8 +20,9 @@
         <div class="field">
           <br><br>
         <label class="label">Arena Name:</label>
+        <span class="help is-info">Arena Name can not contain spaces</span
         <p class="control">
-          <input class="input "type="text" placeholder="Arena name" v-model = "form.name" required="true"> <br>
+          <input class="input "type="text" placeholder="Arena name" onkeypress='return event.charCode !=32' v-model = "form.name" required="true"> <br>
         </p>
         </div>
 
