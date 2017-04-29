@@ -12,6 +12,7 @@ var gameController = require('../controllers/gameController');
 var serviceProviderController = require('../controllers/serviceProviderController');
 var visitorController = require('../controllers/visitorController');
 var Player = require('../models/Player');
+var Arena = require('../models/Arena');
 var RegisteredUser = require('../models/RegisteredUser');
 var systemController =require('../controllers/systemController');
 var passport = require('./passportConfig');
@@ -36,6 +37,16 @@ function ensureAuthenticated(req, res, next) {
 
 router.get('/', function (req, res) {
     return res.render('index');
+});
+
+router.get('/topArenas',function(req,res){
+    Arena.find({}).sort({avg_rating : -1}).limit(8).exec(function(err,data){
+        if(err){
+            return res.status(400).json(err);
+        }else{
+            return res.json(data);
+        }
+    });
 });
 
 router.get('/findUser/:user', function (req, res) {
