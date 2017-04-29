@@ -40,11 +40,11 @@ router.get('/', function (req, res) {
 });
 
 router.get('/topArenas',function(req,res){
-    Arena.find({}).sort({avg_rating : -1}).limit(8).exec(function(err,data){
+    Arena.find({}).sort({avg_rating : -1}).limit(8).exec(function(err,top_arenas){
         if(err){
             return res.status(400).json(err);
         }else{
-            return res.json(data);
+            return res.json(top_arenas);
         }
     });
 });
@@ -96,11 +96,7 @@ router.get('/newPlayer', function (req, res) {
 });
 
 router.post('/signup', upload.any(), function (req, res) {
-    if (req.body.type == 'player') {
-        visitorController.createPlayer(req, res);
-    }
-    else
-        visitorController.createServiceProvider(req, res);
+    visitorController.createUser(req,res);
 
 });
 
@@ -122,12 +118,8 @@ router.post('/login', passport.authenticate('local'), function (req, res) {
 });
 
 router.get('/logout', function (req, res) {
-    if (req.user) {
         req.logout();
         res.json({ success: "You have been logged out successfully" });
-    }
-    else
-        res.status(400).json({ error: "Cannot logout if you are not logged in" });
 });
 
 router.get('/myArenas', ensureAuthenticated, serviceProviderController.myArenas);
@@ -192,7 +184,7 @@ router.post('/createGame', ensureAuthenticated, gameController.createGame);
 
 /*
 to do :add ensure authenticated
-to do : once a paymnent has been made accept the booking 
+to do : once a paymnent has been made accept the booking
 */
 router.post('/charge', ensureAuthenticated, systemController.chargeMoney);
 
