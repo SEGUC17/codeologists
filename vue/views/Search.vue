@@ -14,7 +14,17 @@
         </div>
         <div class="field">
           <label class ="label" for="val">Search Value</label>
-          <input class="input" type="text" id="val" v-model="search_value">
+          <input class="input" type="text" id="val" v-model="search_value" v-on:keyup="suggest">
+
+          <div class = "w3-border">
+            <ul>
+              <li><div v-for = "suggestion in suggestions" @click = "search_value = suggestion; suggestions = []" class="w3-hover-grey">
+                {{suggestion}}
+              </div></li>
+            </ul>
+          </div>
+
+
           <span class="help is-danger" v-if="err">{{msg}}</span>
         </div>
           <div>
@@ -31,8 +41,7 @@
           <article class="media">
     <figure class="media-left">
       <p class="image is-128x128">
-        <img v-if="arenas.photos" :src="getPath(arenas.photos[0])" alt="Image">
-        <img v-else src="/field-big.jpg" alt="Image">
+        <img :src="getPath(arenas[n].photos[0])" alt="Image">
       </p>
     </figure>
     <div class="media-content">
@@ -41,11 +50,14 @@
           <strong>Name:</strong><small>  {{arenas[n].name}}</small> <br>
           <strong>Price:</strong><small>  {{arenas[n].price}}</small> <br>
           <strong>Location:</strong><small>  {{arenas[n].location}}</small> <br>
+          <hr style="background-color: #fff border-top: 2px dotted #8c8b8b">
+
           <br>
         </p>
         </div>
       </div>
     </article>
+
     </div>
         <nav class="pagination is-centered">
                       <ul class="pagination-list">
@@ -73,10 +85,12 @@
                    elements:0,
                    err : false,
                    msg: '',
+                   suggestions: [],
                    getPath(photo){
-                     if(photo && photo.data)
-   return 'data:image/*;base64,'+(new Buffer(photo.data.data).toString('base64'));
-}
+           																	if(photo && photo.data)
+           												return 'data:image/*;base64,'+(new Buffer(photo.data.data).toString('base64'));
+           												return 'field-big.jpg';
+           											}
               };
             },
             created(){
@@ -88,7 +102,8 @@
                           onSubmit(){
                             axios.post('/search', querystring.stringify({
                                       search_type : this.search_type,
-                                      search_value : this.search_value
+                                      search_value : this.search_value,
+                                      limit: 0
                                     })).then(response => {
                                             this.count = response.data.count;
                                             this.start = response.data.start;
@@ -116,7 +131,8 @@
                             axios.post('/search', querystring.stringify({
                                       search_type : this.search_type,
                                       index : event.target.value,
-                                      search_value : this.search_value
+                                      search_value : this.search_value,
+                                      limit: 0
                                     })).then(response => {
                                             this.count = response.data.count;
                                             this.start = response.data.start;
@@ -130,7 +146,7 @@
                                               this.arenas.push(response.data.result[i]);
                                             }
                                             this.active = response.data.active;
-                                         
+
                                           }
                                     )
                                        .catch(error => {this.arenas = [];this.search_value = '';
@@ -141,6 +157,36 @@
                                        this.arenas=[''];
                                        this.elements ='';
                                        this.msg = error.response.data.error;
+                                     });
+                          },
+                          suggest(){
+                            this.suggestions = [];
+                            axios.post('/search', querystring.stringify({
+                                      search_type : this.search_type,
+                                      search_value : this.search_value,
+                                      limit: 1
+                                    })).then(response => {
+                                      var searchType = this.search_type;
+                                        for (var i = 0; i < response.data.result.length; i++) {
+                                          if(response.data.result[i])
+                                            if(searchType == 'name')
+                                            {
+                                              this.suggestions.push(response.data.result[i].name);
+                                            }
+                                            else
+                                            {
+                                              var entry = response.data.result[i].location;
+                                              if(this.suggestions.indexOf(entry) < 0)
+                                                this.suggestions.push(entry);
+                                            }
+
+                                            if(this.suggestions.length > 4)
+                                              break;
+                                        }
+                                      }
+                                    )
+                                       .catch(error => {
+                                         console.log(error);
                                      });
                           }
                     }

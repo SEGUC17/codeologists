@@ -25,8 +25,8 @@ function validateEmail(email) {
 }
 
 /*
-playerController.compute: 
-takes the result from search method then compute the paging attributes and send them with *the result 
+playerController.compute:
+takes the result from search method then compute the paging attributes and send them with *the result
 *@param result : result passed from the search function
 *@param req : the req passed from the search function
 *@param res : the res passed from the search function
@@ -74,19 +74,20 @@ var bookWeekly = function (req, res) {
 
 let playerController = {
 
- /* 
+ /*
 playerController.search:
 retrieve and view arenas matched the attribute value selected by the user after eliminating *the arenas in which the user is blacklisted
 *@param search_type : the type of the search; price or name or location
 *@param search_value : the required value of the search type
 *@param req.user._id: the player’s id to find out if he is in blacklist of certain arena’s servic *provider
-*@param result : the final array of arenas the player can see after eliminating those who is blacklisted in 
+*@param result : the final array of arenas the player can see after eliminating those who is blacklisted in
 */
 
   search:function(req,res){
               var search_type = req.body.search_type;
               var search_value = req.body.search_value;
               var result =[];
+              var limit = req.body.limit;
               req.checkBody('search_value','search_value is empty!...enter a value').notEmpty();
               if(req.validationErrors())
                   return res.status(400).json({error:"search_value is empty!...enter a value."});
@@ -128,73 +129,138 @@ retrieve and view arenas matched the attribute value selected by the user after 
                  }
               });
               } else if (search_type == "location") {
-                        Arena.find({ location: search_value }, function (err, doc) {
-                          if (err)
-                           res.status(500).json({error: err.message});
-                          else {
-                            async.each(doc, function (currentArena, callback){
-                                      var boolean = true;
-                                      ServiceProvider.findById(currentArena.service_provider,function(err,provider){
-                                        if(err)
-                                        res.status(500).json({error : "internal error happened"});
-                                        else{
-                                        for (var i = 0; i < provider.blacklist.length; i++) {
-                                          if(provider.blacklist[i] == req.user._id)
-                                              boolean = false;
-                                        }
-                                        if(boolean)
-                                            result.push(currentArena);
-                                        }
-                                          callback();
-                                      });
+                  if(limit == 0)
+                  {
+                    Arena.find({ location: {'$regex' : '.*' + search_value + '.*'}}, function (err, doc) {
+                      if (err)
+                       res.status(500).json({error: err.message});
+                      else {
+                        async.each(doc, function (currentArena, callback){
+                                  var boolean = true;
+                                  ServiceProvider.findById(currentArena.service_provider,function(err,provider){
+                                    if(err)
+                                    res.status(500).json({error : "internal error happened"});
+                                    else{
+                                    for (var i = 0; i < provider.blacklist.length; i++) {
+                                      if(provider.blacklist[i] == req.user._id)
+                                          boolean = false;
+                                    }
+                                    if(boolean)
+                                        result.push(currentArena);
+                                    }
+                                      callback();
+                                  });
 
-                                   },function(){
-                                     compute(req,res,result);
-                                   });
+                               },function(){
+                                 compute(req,res,result);
+                               });
+                 }
+                    });
+                  }
+                  else
+                  {
+                    Arena.find({ location: {'$regex' : '.*' + search_value + '.*'}}, function (err, doc) {
+                      if (err)
+                       res.status(500).json({error: err.message});
+                      else {
+                        async.each(doc, function (currentArena, callback){
+                                  var boolean = true;
+                                  ServiceProvider.findById(currentArena.service_provider,function(err,provider){
+                                    if(err)
+                                    res.status(500).json({error : "internal error happened"});
+                                    else{
+                                    for (var i = 0; i < provider.blacklist.length; i++) {
+                                      if(provider.blacklist[i] == req.user._id)
+                                          boolean = false;
+                                    }
+                                    if(boolean)
+                                        result.push(currentArena);
+                                    }
+                                      callback();
+                                  });
+
+                               },function(){
+                                 compute(req,res,result);
+                               });
 
 
 
-                     }
-                        });
+                 }
+               });
+                  }
               } else {
-                        Arena.find({ name: search_value }, function (err, doc) {
-                          if (err)
-                           res.status(500).json({error: err.message});
-                          else {
-                            async.each(doc, function (currentArena, callback){
-                                      var boolean = true;
-                                      ServiceProvider.findById(currentArena.service_provider,function(err,provider){
-                                        if(err)
-                                        res.status(500).json({error : "internal error happened"});
-                                        else{
-                                        for (var i = 0; i < provider.blacklist.length; i++) {
-                                          if(provider.blacklist[i] == req.user._id)
-                                              boolean = false;
-                                        }
-                                        if(boolean)
-                                            result.push(currentArena);
-                                        }
-                                          callback();
-                                      });
+                        if(limit == 0)
+                        {
+                          Arena.find({ name: {'$regex' : '.*' + search_value + '.*'}}, function (err, doc) {
+                            if (err)
+                             res.status(500).json({error: err.message});
+                            else {
+                              async.each(doc, function (currentArena, callback){
+                                        var boolean = true;
+                                        ServiceProvider.findById(currentArena.service_provider,function(err,provider){
+                                          if(err)
+                                          res.status(500).json({error : "internal error happened"});
+                                          else{
+                                          for (var i = 0; i < provider.blacklist.length; i++) {
+                                            if(provider.blacklist[i] == req.user._id)
+                                                boolean = false;
+                                          }
+                                          if(boolean)
+                                              result.push(currentArena);
+                                          }
+                                            callback();
+                                        });
 
-                                   },function(){
-                                     compute(req,res,result);
-                                   });
+                                     },function(){
+                                       compute(req,res,result);
+                                     });
 
 
 
-                     }
-                        });
+                       }
+                          });
+                        }
+                        else
+                        {
+                          Arena.find({ name: {'$regex' : '.*' + search_value + '.*'}}, function (err, doc) {
+                            if (err)
+                             res.status(500).json({error: err.message});
+                            else {
+                              async.each(doc, function (currentArena, callback){
+                                        var boolean = true;
+                                        ServiceProvider.findById(currentArena.service_provider,function(err,provider){
+                                          if(err)
+                                          res.status(500).json({error : "internal error happened"});
+                                          else{
+                                          for (var i = 0; i < provider.blacklist.length; i++) {
+                                            if(provider.blacklist[i] == req.user._id)
+                                                boolean = false;
+                                          }
+                                          if(boolean)
+                                              result.push(currentArena);
+                                          }
+                                            callback();
+                                        });
+
+                                     },function(){
+                                       compute(req,res,result);
+                                     });
+
+
+
+                       }
+                     }).limit(4);
+                        }
               }
   },
 
   bookWeekly: bookWeekly,
 
-/* 
+/*
 playerController.edit_profile_page:
 prepare the edit profile page ,retrieve the player’s record from DB to be able to fill the *fields to be changed.
 *@param req.user.username : the user’s username to fetch his record
-*@param result : the user’s record from db 
+*@param result : the user’s record from db
 *@param date : the user’s birthdate after being formatted according to the html format
 */
 
@@ -211,9 +277,9 @@ prepare the edit profile page ,retrieve the player’s record from DB to be able
   },
 
  /* playerController.edit_profile_info:
- using the username retrieve his record from DB and then checking for exceptions using *express-validator then match the password from the user with the password from the db if it *correct we edit the record from the db with the new info from the user and save it again. 
+ using the username retrieve his record from DB and then checking for exceptions using *express-validator then match the password from the user with the password from the db if it *correct we edit the record from the db with the new info from the user and save it again.
 *@param req.user.username : the user’s username to fetch his record
-*@param req.body.name : the user’s updated name 
+*@param req.body.name : the user’s updated name
 *@param req,body.phone_number:the user’s updated phone_number
 *@param req.body.new_password : the user’s new password
 *@param req.body.old_password: the user’s current password
@@ -226,16 +292,19 @@ prepare the edit profile page ,retrieve the player’s record from DB to be able
 */
 
   edit_profile_info: function (req, res) { //accepting new info and update the DB record
+    var result_err = [];
     Player.findOne({ username: req.user.username }, function (err, result) {
       if (err)
           res.status(500).json({error: err.message});
       else {
+
        req.checkBody('name', 'Name is required.').notEmpty();
          req.checkBody('old_password', 'Password is required.').notEmpty();
          req.checkBody('email', 'Email wrong format').isEmail();
          req.checkBody('email', 'Email is required.').notEmpty();
          req.checkBody('location', 'Location is required.').notEmpty();
          req.checkBody('phone_number', 'Phone number is required.').notEmpty();
+           req.checkBody('phone_number','not a number.').isNumeric();
 
          var errors = req.validationErrors();
 
@@ -255,6 +324,7 @@ prepare the edit profile page ,retrieve the player’s record from DB to be able
                     res.status(500).json({error: err.message});
                 else {
                   result.password = hash;
+
                   result.email = req.body.email;
                   result.phone_number = req.body.phone_number;
                   if (req.files[0]) {
@@ -264,8 +334,18 @@ prepare the edit profile page ,retrieve the player’s record from DB to be able
                   result.birthdate = req.body.birthdate;
                   result.save(function (err) {
                     if (err) {
-                        res.status(500).json({error: err.message});
-                      return;
+                      if(err.code == 11000){
+                        var errors = [];
+                        var field = err.message.split('index: ')[1];
+                         field = field.split(' dup key')[0];
+                         field = field.substring(0, field.lastIndexOf('_'));
+                             if(field == 'phone_number')
+                               errors.push({param: 'phone_number',msg:'phone number already in use'});
+                              else
+                                errors.push({param: 'email',msg:'email already in use'});
+                      return res.status(400).json({errors,result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate())});
+                    } else
+                        return res.status(500).json({error : 'internal error'});
                     } else {
                       res.json({ message: "information updated successfully", result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate()) });
                       return;
@@ -285,8 +365,18 @@ prepare the edit profile page ,retrieve the player’s record from DB to be able
               result.birthdate = req.body.birthdate;
               result.save(function (err) {
                 if (err) {
-                    res.status(500).json({error: err.message});
-                  return;
+                    if(err.code == 11000){
+                      var errors = [];
+                      var field = err.message.split('index: ')[1];
+                       field = field.split(' dup key')[0];
+                       field = field.substring(0, field.lastIndexOf('_'));
+                           if(field == 'phone_number')
+                             errors.push({param: 'phone_number',msg:'phone number already in use'});
+                            else
+                             errors.push({param: 'email',msg:'email already in use'});
+                    return res.status(400).json({errors,result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate())});
+                  } else
+                      return res.status(500).json({error : 'internal error'});
                 } else {
                   res.json({ message: "information updated successfully", result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate()) });
                   return;
@@ -313,7 +403,7 @@ playerController.myNotifications:
 @param req.user.username :the current user
 @return :returns the list  of   the notifications belonging to  the current user
 */
-  
+
   myNotifications:function(req,res){
     var currentuser = req.user.username;
    Player.findOne({ username: currentuser }, function (err,player) {

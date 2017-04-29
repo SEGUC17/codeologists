@@ -29,7 +29,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.resolve(__dirname, 'views'));
 mongoose.connect(db_url);
 app.use(express.static(path.resolve(__dirname, './public')));
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: false , limit: 300*1024}));
 app.use(validator());
 app.use(cookieParser());
 

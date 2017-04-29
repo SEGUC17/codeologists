@@ -227,8 +227,8 @@
 		},
 
 		computed: {
-  			user: function () { return window.user; },
-  			type: function () { return window.type; }
+  			user: function () { return this.$session.get('user'); },
+  			type: function () { return this.$session.get('type'); }
 		},
 
 		methods: {

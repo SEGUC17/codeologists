@@ -39,7 +39,8 @@
     "stripe": "^4.18.0",
     "vue": "^2.2.6",
     "vue-bulma-rating": "^1.0.1",
-    "vue-router": "^2.4.0"
+    "vue-router": "^2.4.0",
+    "vue-session": "^0.9.4"
   },
   "devDependencies": {
     "laravel-mix": "^0.10.0"

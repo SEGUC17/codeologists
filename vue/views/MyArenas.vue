@@ -24,6 +24,7 @@
 	      </el-card>
 	      <br><br>
     	</div>
+
 	</div>
 
 </template>
@@ -31,28 +32,28 @@
 
 <script>
 
-	export default {
-		data() {
-			return {
-				arenas: []
-			}
+export default {
+	data() {
+		return {
+			arenas: []
+		}
+	},
+
+	created() {
+		axios.get('/myArenas')
+		.then(res => this.arenas = res.data)
+		.catch(err => console.log(err));
+	},
+
+	methods: {
+		editClicked(arena) {
+			Event.$emit('edit-arena', arena);
 		},
 
-		created() {
-			axios.get('/myArenas')
-				.then(res => this.arenas = res.data)
-				.catch(err => console.log(err));
-		},
-
-		methods: {
-			editClicked(arena) {
-				Event.$emit('edit-arena', arena);
-			},
-
-			getUrl(arena){
-				return "/editSchedule/"+arena.name;
-			}
+		getUrl(arena){
+			return "/editSchedule/"+arena.name;
 		}
 	}
+}
 
 </script>
