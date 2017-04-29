@@ -86,8 +86,9 @@ Creates and inserts a new user into the database (a player or a service provider
             
 		}
 		RegisteredUser.findOne({ username: req.body.username }, function (err, user) {
-			if (user)
+			if (user){
 				return res.status(400).json([{param: 'username' ,msg:'Username already used'}]);
+			}
 			else {
 
 				hasher(req.body.password).hash(function (error, hash) {
@@ -147,8 +148,19 @@ Creates and inserts a new user into the database (a player or a service provider
 
 
 					newUser.save(function (err, player) {
-						if (err)
-							res.status(500).json({ error: err });
+						if (err){
+							if(err.code == 11000){
+		                        var errors = [];
+		                        var field = err.message.split('index: ')[1];
+		                        field = field.split(' dup key')[0];
+		                        field = field.substring(0, field.lastIndexOf('_'));
+	                            if(field == 'phone_number')
+	                            	errors.push({param: 'phone_number',msg:'Phone number already in use'});
+	                            else
+	                            	errors.push({param: 'email',msg:'Email already in use'});
+	                            res.json(400,errors);
+							}
+						}
 						else {
 
 							res.json({ success: "New user created" });

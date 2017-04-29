@@ -58,13 +58,14 @@
 				<span class="help is-danger" v-if="form.errors.has('birthdate')" v-text="form.errors.get('birthdate')"></span>
 			</div>
 			<div class="field"  v-if="form.type=='service'">
-				<label  class="label">Mode</label>
+				<label  class="label">Mode : Whether to accept arena bookings automatically or not</label>
 				<input type="checkbox" name="mode" class="checkbox" v-model="form.mode">
 			</div>
 			<div class="field">
 				<label  class="label">Profile picture</label>
-				<img :src="form.profile_pic" class="w3-circle">
-				<input type="file" name="profile_pic" class="input" placeholder="Profile picture" @change="onFileChange">
+				<img :src="form.profile_pic" class="w3-circle" height="360" width="360">
+				<input type="file" name="profile_pic" class="input" placeholder="Profile picture" @change="onFileChange" accept="image/*">
+				<span class="help is-danger" v-if="pictureError" v-text="pictureError"></span>
 			</div>
 			<div class="field">
 				<a :class="loading" @click="signup">Sign Up!</a>
@@ -98,7 +99,8 @@
 				loginData:{
 					username:'',
 					password:''
-				}
+				},
+				pictureError:''
 			}
 		},
 		methods : {
@@ -122,10 +124,18 @@
 				});
 			},
 			onFileChange(e) {
+			  this.pictureError = '';
 		      var files = e.target.files || e.dataTransfer.files;
 		      if (!files.length)
 		        return;
-		      this.createImage(files[0]);
+		      if(files[0].size<300*1024)
+		      	this.createImage(files[0]);
+		      else
+		      {
+		      	this.pictureError = 'Profile picture size cannot exceed 300 KB';
+		      	this.form.profile_pic = '/default-user-image.png';
+		      }
+		      //console.log(this.form.errors);
 		    },
 		    createImage(file) {
 		      var image = new Image();
