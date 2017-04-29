@@ -305,6 +305,8 @@ prepare the edit profile page ,retrieve the player’s record from DB to be able
          req.checkBody('location', 'Location is required.').notEmpty();
          req.checkBody('phone_number', 'Phone number is required.').notEmpty();
            req.checkBody('phone_number','not a number.').isNumeric();
+           if(req.body.new_password)
+           req.checkBody('new_password', 'Password length is less than 8').isLength({min :8});
 
          var errors = req.validationErrors();
 
