@@ -4,14 +4,14 @@
 
   <!-- The Grid -->
   <div class="w3-row-padding">
-  
+
     <!-- Left Column -->
     <div class="w3-third">
-    
+
       <div class="w3-white w3-text-grey w3-card-4 w3-margin-bottom">
         <div class="w3-display-container">
           <img :src="getPath(profileUser.profile_pic)" style="width:100%" alt="Avatar">
-          
+
         </div>
         <br>
         <div class="w3-container">
@@ -39,14 +39,14 @@
         <h2 class="w3-text-grey w3-padding-16">Black List</h2>
         <blacklist></blacklist>
         <br>
-        
+
       </div>
 
       <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="profileUser.type=='ServiceProvider'">
         <h2 class="w3-text-grey w3-padding-16">White List</h2>
         <whitelist></whitelist>
         <br>
-        
+
       </div>
 
     <!-- End Left Column -->
@@ -54,19 +54,22 @@
 
     <!-- Right Column -->
     <div class="w3-twothird">
-    
+
       <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="profileUser.type=='ServiceProvider'">
-        <h2 class="w3-text-grey w3-padding-16">My Arenas</h2>
-        <router-link tag="li" to="/createArena"><a>Create New Arena</a></router-link>
+        <p  class="w3-padding-16" ></p>
+        <router-link tag="el-button" to="/createArena"><a>Create New Arena</a></router-link>
         <br>
+        <br>
+
+        <h2 class="w3-text-grey">My Arenas: </h2>
         <arenas></arenas>
-        
+
       </div>
 
       <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="profileUser.type=='ServiceProvider'">
         <h2 class="w3-text-grey w3-padding-16">Booking Requests</h2>
         <router-link tag="li" to="/ViewPendingBookings"><a>View Bookings</a></router-link>
-        
+
       </div>
 
       <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="profileUser.type=='Player'">
@@ -77,30 +80,30 @@
       <div class="w3-container w3-card-2 w3-white w3-margin-bottom">
         <h2 class="w3-text-grey w3-padding-16">Pending Ratings</h2>
         <rating></rating>
-        
+
       </div>
 
       <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="profileUser.type=='Player'">
         <h2 class="w3-text-grey w3-padding-16">Game Requests</h2>
         <router-link class="nav-item" to="/myrequests"><a>My requests</a></router-link>
-        
+
       </div>
 
       <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="profileUser.type=='Player'">
         <h2 class="w3-text-grey w3-padding-16">Notifications</h2>
         <router-link class="nav-item" to="/notifications"><a>Notifications</a></router-link>
-        
+
       </div>
 
 
-      
+
 
     <!-- End Right Column -->
     </div>
-    
+
   <!-- End Grid -->
   </div>
-  
+
   <!-- End Page Container -->
 </div>
 
@@ -148,5 +151,5 @@
       arenas
     }
   }
-  
+
 </script>

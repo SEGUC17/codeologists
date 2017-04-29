@@ -270,8 +270,10 @@
         .then(res => {
           if(res.error)
             alert(res.error);
-          else
+          else{
                alert('arena added');
+     						this.$router.push('/myArenas');
+             }
         })
         .catch(err => {
           if(err.error)
