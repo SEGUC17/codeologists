@@ -1,6 +1,7 @@
 var Arena = require('../models/Arena');
 var Player = require('../models/Player');
 var ServiceProvider = require('../models/ServiceProvider');
+var RegisteredUser = require('../models/RegisteredUser');
 var hasher = require('password-hash-and-salt');
 
 function validateEmail(email) {
@@ -60,7 +61,7 @@ Creates and inserts a new user into the database (a player or a service provider
 
 @return _
 */
-	createPlayer: function (req, res) {
+	createUser: function (req, res) {
 		if(req.body.password=='')
 		{
 
@@ -71,14 +72,20 @@ Creates and inserts a new user into the database (a player or a service provider
             req.checkBody('email', 'Email is required.').notEmpty();
             req.checkBody('location', 'Location is required.').notEmpty();
             req.checkBody('phone_number', 'Phone number is required.').notEmpty();
-            req.checkBody('birthdate', 'Birthdate is required.').notEmpty();
+            req.checkBody('phone_number', 'Phone number is not correct.').isNumeric();
+            if(req.body.type=='player'){
+            	req.checkBody('birthdate', 'Birthdate is required.').notEmpty();
+            	req.checkBody('birthdate', 'Birthdate no in correct format').isDate();
+            }
+            else
+            	req.checkBody('mode', 'Mode is required.').notEmpty();
             var errors = req.validationErrors();
 
            
             return res.status(400).json(errors);
             
 		}
-		Player.findOne({ username: req.body.username }, function (err, user) {
+		RegisteredUser.findOne({ username: req.body.username }, function (err, user) {
 			if (user)
 				return res.status(400).json([{param: 'username' ,msg:'Username already used'}]);
 			else {
@@ -88,84 +95,7 @@ Creates and inserts a new user into the database (a player or a service provider
 						return res.status(500).json({ error: error.message });
 
 
-					req.checkBody('name', 'Name is required.').notEmpty();
-		            req.checkBody('username', 'Username is required.').notEmpty();
-		            req.checkBody('password', 'Password is required.').notEmpty();
-		            req.checkBody('email', 'Email is required.').notEmpty();
-		            req.checkBody('email', 'Email not in correct format').isEmail();
-		            req.checkBody('location', 'Location is required.').notEmpty();
-		            req.checkBody('phone_number', 'Phone number is required.').notEmpty();
-		            req.checkBody('birthdate', 'Birthdate is required.').notEmpty();
-		            req.checkBody('birthdate', 'Birthdate no in correct format').isDate();
-
-		            var errors = req.validationErrors();
-
-		            if (errors) {
-		                return res.status(400).json(errors);
-		            }
-
-					var player = new Player();
-					player.name = req.body.name;
-					player.username = req.body.username;
-					player.email = req.body.email;
-					player.phone_number = req.body.phone_number;
-					player.location = req.body.location;
-
-
-					if (req.body.profile_pic.charAt(0)!='/')
-						player.profile_pic.data = req.body.profile_pic;
-
-					player.birthdate = req.body.birthdate;
-					player.ratings_count = 0;
-
-					// Store hash (incl. algorithm, iterations, and salt)
-					player.password = hash;
-
-
-
-					player.save(function (err, player) {
-						if (err)
-							res.status(500).json({ error: err });
-						else {
-
-							res.json({ success: "New player created" });
-						}
-					});
-
-
-				});
-
-			}
-		});
-	},
-
-	createServiceProvider: function (req, res) {
-		if(req.body.password=='')
-		{
-
-			req.checkBody('name', 'Name is required.').notEmpty();
-            req.checkBody('username', 'Username is required.').notEmpty();
-            req.checkBody('password', 'Password is required.').notEmpty();
-            req.checkBody('email', 'Email is required.').isEmail();
-            req.checkBody('email', 'Email is required.').notEmpty();
-            req.checkBody('location', 'Location is required.').notEmpty();
-            req.checkBody('phone_number', 'Phone number is required.').notEmpty();
-            req.checkBody('mode', 'Mode is required.').notEmpty();
-            var errors = req.validationErrors();
-
-            return res.status(400).json(errors);
-            
-		}
-		ServiceProvider.findOne({ username: req.body.username }, function (err, user) {
-			if (user)
-				res.status(400).json({ error: 'Username already used' });
-			else {
-
-				hasher(req.body.password).hash(function (error, hash) {
-					if (error)
-						res.status(400).json({ error: error.message });
-
-
+					console.log(req.body.mode);
 
 					req.checkBody('name', 'Name is required.').notEmpty();
 		            req.checkBody('username', 'Username is required.').notEmpty();
@@ -174,45 +104,60 @@ Creates and inserts a new user into the database (a player or a service provider
 		            req.checkBody('email', 'Email not in correct format').isEmail();
 		            req.checkBody('location', 'Location is required.').notEmpty();
 		            req.checkBody('phone_number', 'Phone number is required.').notEmpty();
-		            req.checkBody('mode', 'Mode is required.').notEmpty();
-		       
+		            req.checkBody('phone_number', 'Phone number is not correct.').isNumeric();
+		            if(req.body.type=='player'){
+			            req.checkBody('birthdate', 'Birthdate is required.').notEmpty();
+			            req.checkBody('birthdate', 'Birthdate no in correct format').isDate();
+					}
+					else
+						req.checkBody('mode', 'Mode is required.').notEmpty();
+
 		            var errors = req.validationErrors();
 
 		            if (errors) {
 		                return res.status(400).json(errors);
 		            }
 
+					var newUser;
+					if(req.body.type=='player')
+						newUser = new Player();
+					else
+						newUser = new ServiceProvider();
+					newUser.name = req.body.name;
+					newUser.username = req.body.username;
+					newUser.email = req.body.email;
+					newUser.phone_number = req.body.phone_number;
+					newUser.location = req.body.location;
 
-					var service = new ServiceProvider();
-					service.name = req.body.name;
-					service.username = req.body.username;
 					
-					service.email = req.body.email;
-					service.phone_number = req.body.phone_number;
-					service.location = req.body.location;
-
-
 
 					if (req.body.profile_pic.charAt(0)!='/')
-						service.profile_pic.data = req.body.profile_pic;
-					service.mode = req.body.mode ? true : false;
-
-					// Store hash (incl. algorithm, iterations, and salt)
-					service.password = hash;
-
+						newUser.profile_pic.data = req.body.profile_pic;
+					if(req.body.type=='player'){
+						newUser.ratings_count = 0;
+						newUser.birthdate = req.body.birthdate;
+					}
+					else
+						newUser.mode = req.body.mode ? true : false;
 					
 
-					service.save(function (err, service) {
+					// Store hash (incl. algorithm, iterations, and salt) 
+					newUser.password = hash;
+
+
+
+					newUser.save(function (err, player) {
 						if (err)
 							res.status(500).json({ error: err });
 						else {
 
-							res.json({ success: "New service provider created" });
+							res.json({ success: "New user created" });
 						}
 					});
 
 
 				});
+
 			}
 		});
 	},
