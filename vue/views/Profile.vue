@@ -35,61 +35,71 @@
         </div>
       </div>
 
-      <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="profileUser.type=='ServiceProvider'">
-        <h2 class="w3-text-grey w3-padding-16">Black List</h2>
-        <blacklist></blacklist>
-        <br>
-        
-      </div>
-
-      <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="profileUser.type=='ServiceProvider'">
-        <h2 class="w3-text-grey w3-padding-16">White List</h2>
-        <whitelist></whitelist>
-        <br>
-        
-      </div>
-
     <!-- End Left Column -->
     </div>
 
     <!-- Right Column -->
     <div class="w3-twothird">
+
+      <div class="tabs is-centered is-medium">
+      <ul>
+
+        <li :class="{'is-active' : selectedTab=='ratings'}"><a @click="selectedTab='ratings'">Pending Ratings</a></li>
+
+        <li v-if="profileUser.type=='ServiceProvider'" :class="{'is-active' : selectedTab=='arenas'}"><a @click="selectedTab='arenas'">My Arenas</a></li>
+
+        <li v-if="profileUser.type=='ServiceProvider'" :class="{'is-active' : selectedTab=='bookings_SP'}"><a @click="selectedTab='bookings_SP'">Booking Requests</a></li>
+
+        <li v-if="profileUser.type=='ServiceProvider'" :class="{'is-active' : selectedTab=='lists'}"><a @click="selectedTab='lists'">B/W Lists</a></li>
+
+        <li v-if="profileUser.type=='Player'" :class="{'is-active' : selectedTab=='bookings_P'}"><a @click="selectedTab='bookings_P'">My Bookings</a></li>
+
+        <li v-if="profileUser.type=='Player'" :class="{'is-active' : selectedTab=='games'}"><a @click="selectedTab='games'">Game Requests</a></li>
+
+        <li v-if="profileUser.type=='Player'" :class="{'is-active' : selectedTab=='notifications'}"><a @click="selectedTab='notifications'">Notifications</a></li>
+
+      </ul>
+    </div>
     
-      <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="profileUser.type=='ServiceProvider'">
-        <h2 class="w3-text-grey w3-padding-16">My Arenas</h2>
+      <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="selectedTab=='arenas'">
         <router-link tag="li" to="/createArena"><a>Create New Arena</a></router-link>
         <br>
         <arenas></arenas>
         
       </div>
 
-      <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="profileUser.type=='ServiceProvider'">
-        <h2 class="w3-text-grey w3-padding-16">Booking Requests</h2>
-        <router-link tag="li" to="/ViewPendingBookings"><a>View Bookings</a></router-link>
+      <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="selectedTab=='bookings_SP'">
+        <pendingBookings></pendingBookings>
         
       </div>
 
-      <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="profileUser.type=='Player'">
-        <h2 class="w3-text-grey w3-padding-16">My Bookings</h2>
+      <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="selectedTab=='bookings_P'">
         <bookings></bookings>
       </div>
 
-      <div class="w3-container w3-card-2 w3-white w3-margin-bottom">
-        <h2 class="w3-text-grey w3-padding-16">Pending Ratings</h2>
+      <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="selectedTab=='ratings'">
         <rating></rating>
         
       </div>
 
-      <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="profileUser.type=='Player'">
-        <h2 class="w3-text-grey w3-padding-16">Game Requests</h2>
-        <router-link class="nav-item" to="/myrequests"><a>My requests</a></router-link>
+      <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="selectedTab=='games'">
+        <games></games>
         
       </div>
 
-      <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="profileUser.type=='Player'">
-        <h2 class="w3-text-grey w3-padding-16">Notifications</h2>
-        <router-link class="nav-item" to="/notifications"><a>Notifications</a></router-link>
+      <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="selectedTab=='notifications'">
+        <notifications></notifications>
         
+      </div>
+
+      <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="selectedTab=='lists'">
+        <whitelist></whitelist>
+
+      </div>
+
+      <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="selectedTab=='lists'">
+        <blacklist></blacklist>
+
       </div>
 
 
@@ -107,24 +117,28 @@
 </template>
 
 <script >
-  import rating from './NonRatedBookings.vue';
+  import rating from './NonRatedBookings';
   import bookings from './delete_booking';
   import mode from './changeMode';
   import blacklist from './Blacklist';
   import whitelist from './Whitelist';
   import arenas from './MyArenas';
+  import pendingBookings from './ViewPendingBookings';
+  import games from './Myrequests';
+  import notifications from './Notifications';
   export default {
     data() {
       return {
-        profileUser : ''
+        profileUser : '',
+        selectedTab : 'ratings'
       }
     },
     computed : {
-      user: function () { return window.user; },
-      type: function () { return window.type; }
+      user: function () { return this.$session.get('user'); },
+      type: function () { return this.$session.get('type'); }
     },
     created() {
-      axios.get('/findUser/'+window.user)
+      axios.get('/findUser/'+this.$session.get('user'))
         .then(res =>{
           this.profileUser=res.data;
         })
@@ -145,7 +159,10 @@
       mode,
       blacklist,
       whitelist,
-      arenas
+      arenas,
+      pendingBookings,
+      notifications,
+      games
     }
   }
   

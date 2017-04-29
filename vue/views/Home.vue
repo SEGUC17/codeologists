@@ -7,22 +7,18 @@
 			  		<h1 class="w3-text-white">Choose location</h1>
 			  		<div class="box" style="opacity: 0.65;">
 			  			<div class="w3-dropdown-hover">
-							<button class="w3-button w3-black">Your Location</button>
-							<div class="w3-dropdown-content w3-bar-block w3-border">
+							<button class="w3-button w3-black" >{{this.location}}</button>
+							<div class="w3-dropdown-content w3-bar-block w3-border" >
 								<a v-for="loc in locations" class="w3-bar-item w3-button" @click="setLocation(loc)">{{loc}}</a>
 							</div>
 						</div>
 
-						<button class="w3-button w3-red" @click="view_by_location">
+						<button class="w3-button w3-red" @click="view_by_location" :disabled="this.check " >
 							<router-link to="/viewArenas">
 	    						<a>Show Arenas</a>
 	    					</router-link>
 						</button>
-
-
 			  		</div>
-
-
 			  </div>
 		</div>
     <hr>
@@ -66,6 +62,7 @@
 
  	</div>
 
+
 </template>
 
 
@@ -73,8 +70,6 @@
 	export default {
 		data() {
 			return {
-
-				statuses: [],
 				location : '',
 				locations : ['El rehab','Nasr City','Agouza'],
 				top_arenas : [],
@@ -89,7 +84,6 @@
 		},
 
 		created() {
-			this.statuses.push({ user: "Omar", content: "Hello" });
 			axios.get('/topArenas')
 			.then(response => {this.top_arenas = response.data})
 			.catch(error => alert(error));

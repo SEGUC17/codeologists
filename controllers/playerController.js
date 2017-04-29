@@ -87,6 +87,7 @@ retrieve and view arenas matched the attribute value selected by the user after 
               var search_type = req.body.search_type;
               var search_value = req.body.search_value;
               var result =[];
+              var limit = req.body.limit;
               req.checkBody('search_value','search_value is empty!...enter a value').notEmpty();
               if(req.validationErrors())
                   return res.status(400).json({error:"search_value is empty!...enter a value."});
@@ -128,63 +129,128 @@ retrieve and view arenas matched the attribute value selected by the user after 
                  }
               });
               } else if (search_type == "location") {
-                        Arena.find({ location: search_value }, function (err, doc) {
-                          if (err)
-                           res.status(500).json({error: err.message});
-                          else {
-                            async.each(doc, function (currentArena, callback){
-                                      var boolean = true;
-                                      ServiceProvider.findById(currentArena.service_provider,function(err,provider){
-                                        if(err)
-                                        res.status(500).json({error : "internal error happened"});
-                                        else{
-                                        for (var i = 0; i < provider.blacklist.length; i++) {
-                                          if(provider.blacklist[i] == req.user._id)
-                                              boolean = false;
-                                        }
-                                        if(boolean)
-                                            result.push(currentArena);
-                                        }
-                                          callback();
-                                      });
+                  if(limit == 0)
+                  {
+                    Arena.find({ location: {'$regex' : '.*' + search_value + '.*'}}, function (err, doc) {
+                      if (err)
+                       res.status(500).json({error: err.message});
+                      else {
+                        async.each(doc, function (currentArena, callback){
+                                  var boolean = true;
+                                  ServiceProvider.findById(currentArena.service_provider,function(err,provider){
+                                    if(err)
+                                    res.status(500).json({error : "internal error happened"});
+                                    else{
+                                    for (var i = 0; i < provider.blacklist.length; i++) {
+                                      if(provider.blacklist[i] == req.user._id)
+                                          boolean = false;
+                                    }
+                                    if(boolean)
+                                        result.push(currentArena);
+                                    }
+                                      callback();
+                                  });
 
-                                   },function(){
-                                     compute(req,res,result);
-                                   });
+                               },function(){
+                                 compute(req,res,result);
+                               });
+                 }
+                    });
+                  }
+                  else
+                  {
+                    Arena.find({ location: {'$regex' : '.*' + search_value + '.*'}}, function (err, doc) {
+                      if (err)
+                       res.status(500).json({error: err.message});
+                      else {
+                        async.each(doc, function (currentArena, callback){
+                                  var boolean = true;
+                                  ServiceProvider.findById(currentArena.service_provider,function(err,provider){
+                                    if(err)
+                                    res.status(500).json({error : "internal error happened"});
+                                    else{
+                                    for (var i = 0; i < provider.blacklist.length; i++) {
+                                      if(provider.blacklist[i] == req.user._id)
+                                          boolean = false;
+                                    }
+                                    if(boolean)
+                                        result.push(currentArena);
+                                    }
+                                      callback();
+                                  });
+
+                               },function(){
+                                 compute(req,res,result);
+                               });
 
 
 
-                     }
-                        });
+                 }
+               });
+                  }
               } else {
-                        Arena.find({ name: search_value }, function (err, doc) {
-                          if (err)
-                           res.status(500).json({error: err.message});
-                          else {
-                            async.each(doc, function (currentArena, callback){
-                                      var boolean = true;
-                                      ServiceProvider.findById(currentArena.service_provider,function(err,provider){
-                                        if(err)
-                                        res.status(500).json({error : "internal error happened"});
-                                        else{
-                                        for (var i = 0; i < provider.blacklist.length; i++) {
-                                          if(provider.blacklist[i] == req.user._id)
-                                              boolean = false;
-                                        }
-                                        if(boolean)
-                                            result.push(currentArena);
-                                        }
-                                          callback();
-                                      });
+                        if(limit == 0)
+                        {
+                          Arena.find({ name: {'$regex' : '.*' + search_value + '.*'}}, function (err, doc) {
+                            if (err)
+                             res.status(500).json({error: err.message});
+                            else {
+                              async.each(doc, function (currentArena, callback){
+                                        var boolean = true;
+                                        ServiceProvider.findById(currentArena.service_provider,function(err,provider){
+                                          if(err)
+                                          res.status(500).json({error : "internal error happened"});
+                                          else{
+                                          for (var i = 0; i < provider.blacklist.length; i++) {
+                                            if(provider.blacklist[i] == req.user._id)
+                                                boolean = false;
+                                          }
+                                          if(boolean)
+                                              result.push(currentArena);
+                                          }
+                                            callback();
+                                        });
 
-                                   },function(){
-                                     compute(req,res,result);
-                                   });
+                                     },function(){
+                                       compute(req,res,result);
+                                     });
 
 
 
-                     }
-                        });
+                       }
+                          });
+                        }
+                        else
+                        {
+                          Arena.find({ name: {'$regex' : '.*' + search_value + '.*'}}, function (err, doc) {
+                            if (err)
+                             res.status(500).json({error: err.message});
+                            else {
+                              async.each(doc, function (currentArena, callback){
+                                        var boolean = true;
+                                        ServiceProvider.findById(currentArena.service_provider,function(err,provider){
+                                          if(err)
+                                          res.status(500).json({error : "internal error happened"});
+                                          else{
+                                          for (var i = 0; i < provider.blacklist.length; i++) {
+                                            if(provider.blacklist[i] == req.user._id)
+                                                boolean = false;
+                                          }
+                                          if(boolean)
+                                              result.push(currentArena);
+                                          }
+                                            callback();
+                                        });
+
+                                     },function(){
+                                       compute(req,res,result);
+                                     });
+
+
+
+                       }
+                     }).limit(4);
+                        }
               }
   },
 
