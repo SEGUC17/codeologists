@@ -606,8 +606,18 @@ using the username retrieve his record from DB and then checking for exceptions 
                                             result.mode = false;
                                         result.save(function (err) {
                                             if (err) {
-                                                res.status(500).json({error:err.message});
-                                                return;
+                                              if(err.code == 11000){
+                                                var errors = [];
+                                                var field = err.message.split('index: ')[1];
+                                                 field = field.split(' dup key')[0];
+                                                 field = field.substring(0, field.lastIndexOf('_'));
+                                                     if(field == 'phone_number')
+                                                       errors.push({param: 'phone_number',msg:'phone number already in use'});
+                                                      else
+                                                        errors.push({param: 'email',msg:'email already in use'});
+                                              return res.status(400).json({errors,result});
+                                            } else
+                                                return res.status(500).json({error : 'internal error'});
                                             } else {
                                                 res.json({ message: "information updated successfully", result });
                                                 return;
@@ -628,8 +638,18 @@ using the username retrieve his record from DB and then checking for exceptions 
                                         result.mode = false;
                                     result.save(function (err) {
                                         if (err) {
-                                            res.status(500).json({error : err.message});
-                                            return;
+                                          if(err.code == 11000){
+                                            var errors = [];
+                                            var field = err.message.split('index: ')[1];
+                                             field = field.split(' dup key')[0];
+                                             field = field.substring(0, field.lastIndexOf('_'));
+                                                 if(field == 'phone_number')
+                                                   errors.push({param: 'phone_number',msg:'phone number already in use'});
+                                                  else
+                                                    errors.push({param: 'email',msg:'email already in use'});
+                                          return res.status(400).json({errors,result});
+                                        } else
+                                            return res.status(500).json({error : 'internal error'});
                                         } else {
                                             res.json({ message: "information updated successfully", result });
                                             return;

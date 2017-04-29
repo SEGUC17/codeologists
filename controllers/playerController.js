@@ -226,10 +226,12 @@ prepare the edit profile page ,retrieve the player’s record from DB to be able
 */
 
   edit_profile_info: function (req, res) { //accepting new info and update the DB record
+    var result_err = [];
     Player.findOne({ username: req.user.username }, function (err, result) {
       if (err)
           res.status(500).json({error: err.message});
       else {
+
        req.checkBody('name', 'Name is required.').notEmpty();
          req.checkBody('old_password', 'Password is required.').notEmpty();
          req.checkBody('email', 'Email wrong format').isEmail();
@@ -256,6 +258,7 @@ prepare the edit profile page ,retrieve the player’s record from DB to be able
                     res.status(500).json({error: err.message});
                 else {
                   result.password = hash;
+
                   result.email = req.body.email;
                   result.phone_number = req.body.phone_number;
                   if (req.files[0]) {
@@ -265,8 +268,18 @@ prepare the edit profile page ,retrieve the player’s record from DB to be able
                   result.birthdate = req.body.birthdate;
                   result.save(function (err) {
                     if (err) {
-                        res.status(500).json({error: err.message});
-                      return;
+                      if(err.code == 11000){
+                        var errors = [];
+                        var field = err.message.split('index: ')[1];
+                         field = field.split(' dup key')[0];
+                         field = field.substring(0, field.lastIndexOf('_'));
+                             if(field == 'phone_number')
+                               errors.push({param: 'phone_number',msg:'phone number already in use'});
+                              else
+                                errors.push({param: 'email',msg:'email already in use'});
+                      return res.status(400).json({errors,result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate())});
+                    } else
+                        return res.status(500).json({error : 'internal error'});
                     } else {
                       res.json({ message: "information updated successfully", result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate()) });
                       return;
@@ -286,8 +299,18 @@ prepare the edit profile page ,retrieve the player’s record from DB to be able
               result.birthdate = req.body.birthdate;
               result.save(function (err) {
                 if (err) {
-                    res.status(500).json({error: err.message});
-                  return;
+                    if(err.code == 11000){
+                      var errors = [];
+                      var field = err.message.split('index: ')[1];
+                       field = field.split(' dup key')[0];
+                       field = field.substring(0, field.lastIndexOf('_'));
+                           if(field == 'phone_number')
+                             errors.push({param: 'phone_number',msg:'phone number already in use'});
+                            else
+                             errors.push({param: 'email',msg:'email already in use'});
+                    return res.status(400).json({errors,result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate())});
+                  } else
+                      return res.status(500).json({error : 'internal error'});
                 } else {
                   res.json({ message: "information updated successfully", result, date: date_calc(result.birthdate.getFullYear(), result.birthdate.getMonth() + 1, result.birthdate.getDate()) });
                   return;

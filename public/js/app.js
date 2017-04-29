@@ -13962,6 +13962,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
           errs[e.param] = e.msg;
         }
         _this2.errors = errs;
+        _this2.password = '';
+        _this2.old_password = '';
       });
     },
     onFile: function onFile(event) {
@@ -13989,6 +13991,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
           var param = e.param;
           errs[e.param] = e.msg;
         }
+        _this3.password = '';
+        _this3.old_password = '';
+
         _this3.errors = errs;
       });
     },
