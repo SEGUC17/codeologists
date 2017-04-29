@@ -9,7 +9,8 @@
      </div>
      <div class="field">
        <label  class="label">New Password</label>
-       <input type="password" name="new_password" class="input" placeholder="new Password" v-model="password">
+       <input type="password" name="new_password" class="input" placeholder="new Password" v-model="password" @keydown="delete errors['new_password']">
+         <span class="help is-danger" v-if="errors.hasOwnProperty('new_password')" v-text="errors['new_password']"></span>
      </div>
      <div class="field">
        <label  class="label">Email</label>
@@ -33,6 +34,7 @@
      <div class="field">
        <label  class="label">Profile picture</label>
        <input type="file" name="profile_pic" class="input" placeholder="Profile picture" v-on:change="onFile" multiple>
+        <span class="help is-danger" v-if="image_size" >image size too large...your maximum limit is 300KB</span>
      </div>
      <div class="field">
        <label  class="label">Current Password</label>
@@ -56,7 +58,8 @@
       </div>
       <div class="field">
         <label  class="label">New Password</label>
-        <input type="password" name="new_password" class="input" placeholder="new Password" v-model="password">
+        <input type="password" name="new_password" class="input" placeholder="new Password" v-model="password" @keydown="delete errors['new_password']">
+        <span class="help is-danger" v-if="errors.hasOwnProperty('new_password')" v-text="errors['new_password']"></span>
       </div>
       <div class="field">
         <label  class="label">Email</label>
@@ -71,6 +74,7 @@
       <div class="field">
         <label  class="label">Profile picture</label>
         <input type="file" name="profile_pic" class="input" placeholder="Profile picture" v-on:change="onFile" multiple>
+          <span class="help is-danger" v-if="image_size" >image size too large...your maximum limit is 300KB</span>
       </div>
           <div v-if ="user.mode" class="field">
             <label class="label"for="on">AutoAccept_mode_on</label>
@@ -115,6 +119,7 @@
                     type_provider: false,
                     errors:[],
                     success: false,
+                    image_size : false,
                     getPath(photo){
                       if(photo && photo.data)
     return 'data:image/*;base64,'+(new Buffer(photo.data.data).toString('base64'));
@@ -166,7 +171,15 @@
                               this.old_password = '';
                          })
                        },onFile(event){
-                         this.files = event.target.files
+                          var files = event.target.files || e.dataTransfer.files;
+                          if(! files.length)
+                          return;
+                          if(files[0].size < 300*1024){
+                         this.files = files;
+                         this.image_size = false;
+                       }
+                         else
+                         this.image_size = true;
                        },onSubmit_serviceProvider(){
                          var dataForm = new FormData();
                          dataForm.append('name',this.user.name);
