@@ -54,7 +54,8 @@ export default{
       value: [],
       bookings : [],
       playerNames: [],
-      dates: []
+      dates: [],
+      type: this.$session.get('type')
     }
   },
 
@@ -79,8 +80,13 @@ export default{
       this.value = [];
       for (var i = 0; i < this.bookings.length; i++) {
         var date = new Date(this.bookings[i].date);
+        var minDigit = "";
+        if(date.getMinutes() < 10)
+        minDigit = "0";
+
+        console.log(minDigit + " aho ");
         this.dates.push(date.getFullYear() + "/" + (date.getMonth()+1) +
-        "/" + date.getDate() + "(" + date.getHours() + ":" + date.getMinutes()+')');
+        "/" + date.getDate() + "(" + date.getHours() + ":" + minDigit + date.getMinutes()+')');
         this.value.push(1);
         let playerID = this.bookings[i].playerID;
         axios.get('/getNameOfPlayer/' + playerID)

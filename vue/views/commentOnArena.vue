@@ -56,7 +56,7 @@ export default{
     return {
       comment: '',
       comments : this.initialcomments,
-      type: window.type
+      type: this.$session.get('type')
     }
   },
 
@@ -74,7 +74,7 @@ export default{
     calcDate(date){
       var comp = new Date(date);
       var minDigit = "";
-      if(comp.getMinutes().length < 1)
+      if(comp.getMinutes() < 10)
       minDigit = "0";
 
       return comp.getFullYear() + "/" + (comp.getMonth()+1) +
