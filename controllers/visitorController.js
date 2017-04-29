@@ -11,7 +11,7 @@ function validateEmail(email) {
 
 /*
 visitorController.compute:
-takes the result from search method then compute the paging attributes and send them with *the result 
+takes the result from search method then compute the paging attributes and send them with *the result
 @param result : result passed from the search function
 @param req : the req passed from the search function
 @param res : the res passed from the search function
@@ -81,9 +81,9 @@ Creates and inserts a new user into the database (a player or a service provider
             	req.checkBody('mode', 'Mode is required.').notEmpty();
             var errors = req.validationErrors();
 
-           
+
             return res.status(400).json(errors);
-            
+
 		}
 		RegisteredUser.findOne({ username: req.body.username }, function (err, user) {
 			if (user)
@@ -129,7 +129,7 @@ Creates and inserts a new user into the database (a player or a service provider
 					newUser.phone_number = req.body.phone_number;
 					newUser.location = req.body.location;
 
-					
+
 
 					if (req.body.profile_pic.charAt(0)!='/')
 						newUser.profile_pic.data = req.body.profile_pic;
@@ -139,9 +139,9 @@ Creates and inserts a new user into the database (a player or a service provider
 					}
 					else
 						newUser.mode = req.body.mode ? true : false;
-					
 
-					// Store hash (incl. algorithm, iterations, and salt) 
+
+					// Store hash (incl. algorithm, iterations, and salt)
 					newUser.password = hash;
 
 
@@ -272,9 +272,9 @@ A function that gets all the details of an arena chosen by the user.
 		})
 	},
 
- /* 
+ /*
 visitorController.search:
-retrieve and view arenas matched the attribute value selected by the visitor after 
+retrieve and view arenas matched the attribute value selected by the visitor after
 @param search_type : the type of the search; price or name or location
 @param search_value : the required value of the search type
 @param result : the final array of arenas the visitor can see
@@ -282,6 +282,7 @@ retrieve and view arenas matched the attribute value selected by the visitor aft
 
 
 	filter: function (req, res) {
+		var limit = req.body.limit;
 		var search_type = req.body.search_type;
 		var search_value = req.body.search_value;
 		 req.checkBody('search_value','search_value is empty!...enter a value').notEmpty();
@@ -302,21 +303,47 @@ retrieve and view arenas matched the attribute value selected by the visitor aft
 				}
 			});
 		} else if (search_type == "location") {
-			Arena.find({ location: search_value }, function (err, doc) {
-				if (err)
-					res.status(500).json({error: err.message});
-				else {
-					compute(req, res, doc);
-				}
-			});
+			if(limit == 0)
+			{
+				Arena.find({ location: {'$regex' : '.*' + search_value + '.*'}}, function (err, doc) {
+					if (err)
+						res.status(500).json({error: err.message});
+					else {
+						compute(req, res, doc);
+					}
+				});
+			}
+			else
+			{
+				Arena.find({ location: {'$regex' : '.*' + search_value + '.*'}}, { location: 1, name: 1},function (err, doc) {
+					if (err)
+						res.status(500).json({error: err.message});
+					else {
+						compute(req, res, doc);
+					}
+				});
+			}
 		} else {
-			Arena.find({ name: search_value }, function (err, doc) {
-				if (err)
-					res.status(500).json({error: err.message});
-				else {
-					compute(req, res, doc);
-				}
-			});
+			if(limit == 0)
+			{
+				Arena.find({ name: {'$regex' : '.*' + search_value + '.*'}}, function (err, doc) {
+					if (err)
+						res.status(500).json({error: err.message});
+					else {
+						compute(req, res, doc);
+					}
+				});
+			}
+			else
+			{
+				Arena.find({ name: {'$regex' : '.*' + search_value + '.*'}}, { location: 1, name: 1}, function (err, doc) {
+					if (err)
+						res.status(500).json({error: err.message});
+					else {
+						compute(req, res, doc);
+					}
+				}).limit(4);
+			}
 		}
 	}
 };
