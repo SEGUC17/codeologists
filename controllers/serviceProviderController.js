@@ -22,7 +22,7 @@ function IndexAPI(req,res){
 }
 
 /*
-serviceProviderController.getScheduleIndices : 
+serviceProviderController.getScheduleIndices :
 A function that gives the indices in our schedule of some specific day
 @param : month1 :the month of the date
 @param : day1 : the day of the date
@@ -63,7 +63,7 @@ let serviceProviderController =
         getScheduleIndices: getScheduleIndices,
         getTimeFromIndex: getTimeFromIndex,
 /*
-serviceProviderController.getTheMode ; 
+serviceProviderController.getTheMode ;
 A function that gets the auto-accept-mode of some service provider
 @param : service provider id
 @return : a boolean of whether the auto-accept-mode is on or off
@@ -80,7 +80,7 @@ A function that gets the auto-accept-mode of some service provider
                 {
                     res.json(400,{ error : 'You are not logged in'});
                 }
-                ServiceProvider.findOne({ username: username }, function (err, user) 
+                ServiceProvider.findOne({ username: username }, function (err, user)
                 {
                         if (!err && user)
                             res.json(200,{ mode : user.mode});
@@ -90,7 +90,7 @@ A function that gets the auto-accept-mode of some service provider
                             return;
                         }
                 });
-            }   
+            }
                 },
 
 /*
@@ -153,13 +153,13 @@ A function that enables the provider to enable his auto accept mode on
                 }
             });
         },
- 
+
  /*
 serviceProviderController.showblacklist:
 retrieve the service provider's blacklist from the DB using his username to display it on the front-end
 @param: -
 @output: blacklist array
-*/       
+*/
     showblacklist: function(req, res) {
 
         var serviceProviderUsername = req.user.username;
@@ -191,7 +191,7 @@ retrieve the service provider's blacklist from the DB using his username to disp
 
 /*
 serviceProviderController.add_to_blacklist:
-adds a certain player to a serviceprovider's blacklist using the player's username 
+adds a certain player to a serviceprovider's blacklist using the player's username
 @param: player to be blacklisted username
 @output: -
 */
@@ -293,7 +293,7 @@ adds a certain player to a serviceprovider's blacklist using the player's phone 
 
 /*
 serviceProviderController.remove_from_blacklist:
-removes a certain player from a serviceprovider's blacklist using the player's username 
+removes a certain player from a serviceprovider's blacklist using the player's username
 @param: player to be removed from blacklist username
 @output: -
 */
@@ -376,7 +376,7 @@ retrieve the service provider's whitelist from the DB using his username to disp
     },
 /*
 serviceProviderController.add_to_whitelist:
-adds a certain player to a serviceprovider's whitelist using the player's username 
+adds a certain player to a serviceprovider's whitelist using the player's username
 @param: player to be whitelisted username
 @output: -
 */
@@ -476,10 +476,10 @@ adds a certain player to a serviceprovider's whitelist using the player's phone 
     },
 
 /*
-serviceProviderController.remove_from_whitelist:            
-removes a certain player from a serviceprovider's whitelist using the player's username 
+serviceProviderController.remove_from_whitelist:
+removes a certain player from a serviceprovider's whitelist using the player's username
 @param: player to be removed from whitelist username
-@output: - 
+@output: -
 */
     remove_from_whitelist: function(req, res) {
 
@@ -535,7 +535,7 @@ removes a certain player from a serviceprovider's whitelist using the player's u
 serviceProviderController.edit_profile_page:
 prepare the edit profile page ,retrieve the player’s record from DB to be able to fill the *fields to be changed.
 *@param req.user.username : the user’s username to fetch his record
-*@param result : the user’s record from db 
+*@param result : the user’s record from db
 */
 
        edit_profile_page: function (req, res) { // prepar the edit profile page
@@ -552,9 +552,9 @@ prepare the edit profile page ,retrieve the player’s record from DB to be able
 
 /*
 serviceProviderController.edit_profile_info:
-using the username retrieve his record from DB and then checking for exceptions using *express-validator then match the password from the user with the password from the db if it *correct we edit the record from the db with the new info from the user and save it again. 
+using the username retrieve his record from DB and then checking for exceptions using *express-validator then match the password from the user with the password from the db if it *correct we edit the record from the db with the new info from the user and save it again.
 *@param req.user.username : the user’s username to fetch his record
-*@param req.body.name : the user’s updated name 
+*@param req.body.name : the user’s updated name
 *@param req,body.phone_number:the user’s updated phone_number
 *@param req.body.new_password : the user’s new password
 *@param req.body.old_password: the user’s current password
@@ -575,6 +575,8 @@ using the username retrieve his record from DB and then checking for exceptions 
                     req.checkBody('email', 'Email is required.').notEmpty();
                     req.checkBody('phone_number', 'Phone number is required.').notEmpty();
                     req.checkBody('phone_number','not a number.').isNumeric();
+                    if(req.body.new_password)
+                    req.checkBody('new_password', 'Password length is less than 8').isLength({min :8});
                     var errors = req.validationErrors();
 
                   if(errors)
@@ -606,8 +608,18 @@ using the username retrieve his record from DB and then checking for exceptions 
                                             result.mode = false;
                                         result.save(function (err) {
                                             if (err) {
-                                                res.status(500).json({error:err.message});
-                                                return;
+                                              if(err.code == 11000){
+                                                var errors = [];
+                                                var field = err.message.split('index: ')[1];
+                                                 field = field.split(' dup key')[0];
+                                                 field = field.substring(0, field.lastIndexOf('_'));
+                                                     if(field == 'phone_number')
+                                                       errors.push({param: 'phone_number',msg:'phone number already in use'});
+                                                      else
+                                                        errors.push({param: 'email',msg:'email already in use'});
+                                              return res.status(400).json({errors,result});
+                                            } else
+                                                return res.status(500).json({error : 'internal error'});
                                             } else {
                                                 res.json({ message: "information updated successfully", result });
                                                 return;
@@ -628,8 +640,18 @@ using the username retrieve his record from DB and then checking for exceptions 
                                         result.mode = false;
                                     result.save(function (err) {
                                         if (err) {
-                                            res.status(500).json({error : err.message});
-                                            return;
+                                          if(err.code == 11000){
+                                            var errors = [];
+                                            var field = err.message.split('index: ')[1];
+                                             field = field.split(' dup key')[0];
+                                             field = field.substring(0, field.lastIndexOf('_'));
+                                                 if(field == 'phone_number')
+                                                   errors.push({param: 'phone_number',msg:'phone number already in use'});
+                                                  else
+                                                    errors.push({param: 'email',msg:'email already in use'});
+                                          return res.status(400).json({errors,result});
+                                        } else
+                                            return res.status(500).json({error : 'internal error'});
                                         } else {
                                             res.json({ message: "information updated successfully", result });
                                             return;
