@@ -32,8 +32,7 @@
           <article class="media">
     <figure class="media-left">
       <p class="image is-128x128">
-        <img v-if="arenas.photos" :src="getPath(arenas.photos[0])" alt="Image">
-        <img v-else src="/field-big.jpg" alt="Image">
+        <img :src="getPath(arenas[n].photos[0])" alt="Image">
       </p>
     </figure>
     <div class="media-content">
@@ -79,9 +78,10 @@
                    err : false,
                    msg: '',
                    getPath(photo){
-                     if(photo && photo.data)
-   return 'data:image/*;base64,'+(new Buffer(photo.data.data).toString('base64'));
-}
+           																	if(photo && photo.data)
+           												return 'data:image/*;base64,'+(new Buffer(photo.data.data).toString('base64'));
+           												return 'field-big.jpg';
+           											}
               };
             },
             created(){

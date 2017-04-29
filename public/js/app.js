@@ -14877,6 +14877,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
 
 var querystring = __webpack_require__(6);
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -14895,6 +14897,7 @@ var querystring = __webpack_require__(6);
       msg: '',
       getPath: function getPath(photo) {
         if (photo && photo.data) return 'data:image/*;base64,' + new Buffer(photo.data.data).toString('base64');
+        return 'field-big.jpg';
       }
     };
   },
@@ -16576,7 +16579,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
 
 var querystring = __webpack_require__(6);
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -16595,6 +16597,7 @@ var querystring = __webpack_require__(6);
       msg: '',
       getPath: function getPath(photo) {
         if (photo && photo.data) return 'data:image/*;base64,' + new Buffer(photo.data.data).toString('base64');
+        return 'field-big.jpg';
       }
     };
   },
@@ -20342,21 +20345,20 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       staticClass: "media-left"
     }, [_c('p', {
       staticClass: "image is-128x128"
-    }, [(_vm.arenas[n].photos) ? _c('img', {
+    }, [_c('img', {
       attrs: {
         "src": _vm.getPath(_vm.arenas[n].photos[0]),
-        "alt": "Image"
-      }
-    }) : _c('img', {
-      attrs: {
-        "src": "/field-big.jpg",
         "alt": "Image"
       }
     })])]), _vm._v(" "), _c('div', {
       staticClass: "media-content"
     }, [_c('div', {
       staticClass: "content"
-    }, [_c('p', [_c('strong', [_vm._v("Name:")]), _c('small', [_vm._v("  " + _vm._s(_vm.arenas[n].name))]), _vm._v(" "), _c('br'), _vm._v(" "), _c('strong', [_vm._v("Price:")]), _c('small', [_vm._v("  " + _vm._s(_vm.arenas[n].price))]), _vm._v(" "), _c('br'), _vm._v(" "), _c('strong', [_vm._v("Location:")]), _c('small', [_vm._v("  " + _vm._s(_vm.arenas[n].location))]), _vm._v(" "), _c('br'), _vm._v(" "), _c('br')])])])])])
+    }, [_c('p', [_c('strong', [_vm._v("Name:")]), _c('small', [_vm._v("  " + _vm._s(_vm.arenas[n].name))]), _vm._v(" "), _c('br'), _vm._v(" "), _c('strong', [_vm._v("Price:")]), _c('small', [_vm._v("  " + _vm._s(_vm.arenas[n].price))]), _vm._v(" "), _c('br'), _vm._v(" "), _c('strong', [_vm._v("Location:")]), _c('small', [_vm._v("  " + _vm._s(_vm.arenas[n].location))]), _vm._v(" "), _c('br')]), _c('hr', {
+      staticStyle: {
+        "background-color": "#fff border-top: 2px dotted #8c8b8b"
+      }
+    }), _vm._v(" "), _c('br'), _vm._v(" "), _c('p')])])])])
   }), _vm._v(" "), _c('nav', {
     staticClass: "pagination is-centered"
   }, [_c('ul', {
@@ -21572,14 +21574,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       staticClass: "media-left"
     }, [_c('p', {
       staticClass: "image is-128x128"
-    }, [(_vm.arenas[n].photos) ? _c('img', {
+    }, [_c('img', {
       attrs: {
         "src": _vm.getPath(_vm.arenas[n].photos[0]),
-        "alt": "Image"
-      }
-    }) : _c('img', {
-      attrs: {
-        "src": "/field-big.jpg",
         "alt": "Image"
       }
     })])]), _vm._v(" "), _c('div', {
