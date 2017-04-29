@@ -13,7 +13,7 @@ import dayDetails2 from './views/dayDetails2';
 import reserveTime2 from './views/reserveTime2.vue';
 Vue.component('calender2', calender2);
 Vue.component('dayDetails2', dayDetails2);
-Vue.component('reservetime2',reserveTime2); 
+Vue.component('reservetime2',reserveTime2);
 
 window.Event = new Vue();
 
@@ -61,7 +61,7 @@ window.Form = class Form {
         for (let field in data) {
             this[field] = data[field];
         }
-        
+
         this.errors = new Errors();
     }
 
@@ -160,9 +160,9 @@ new Vue({
 
 
         redirect() {
-            
+
                //router.replace('/dayDetail/-1');
-           
+
         },
     },
     created(){
@@ -172,4 +172,3 @@ new Vue({
     components: {reserveTime,calender2, dayDetails2,reserveTime2 }
 
 });
-
