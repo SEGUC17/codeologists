@@ -21685,12 +21685,12 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "to": "/viewArenas"
     }
-  }, [_c('a', [_vm._v("Show Arenas")])])], 1)]), _vm._v("\n\nc\n\t\t\t  ")])]), _vm._v(" "), _c('div', {
-    staticClass: "container"
+  }, [_c('a', [_vm._v("Show Arenas")])])], 1)])])]), _vm._v(" "), _c('hr'), _vm._v(" "), _c('div', {
+    staticClass: "w3-container w3-card-2 w3-white w3-margin-bottom"
   }, [_c('div', {
-    staticClass: "heading w3-center"
+    staticClass: "heading w3-center w3-container w3-card-2 w3-white w3-margin-bottom"
   }, [_c('h1', {
-    staticClass: "title w3-text-blue"
+    staticClass: "title w3-text-red"
   }, [_vm._v("TOP ARENAS")]), _vm._v(" "), (_vm.top_arenas.length == 0) ? _c('h2', {
     staticClass: "title w3-text-blue"
   }, [_vm._v("NO arenas created yet")]) : _vm._e()]), _vm._v(" "), _c('div', {
@@ -21755,7 +21755,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         }
       }
     }, [_vm._v("view details")])], 1)])])
-  }))])])
+  }))]), _vm._v(" "), _c('hr')])
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {

@@ -22,13 +22,13 @@
 
 			  		</div>
 
-c
+
 			  </div>
 		</div>
-
-     <div class="container">
-       <div class="heading w3-center">
-				 <h1 class="title w3-text-blue">TOP ARENAS</h1>
+    <hr>
+     <div class="w3-container w3-card-2 w3-white w3-margin-bottom">
+       <div class="heading w3-center w3-container w3-card-2 w3-white w3-margin-bottom">
+				 <h1 class="title w3-text-red">TOP ARENAS</h1>
 				 <h2 v-if="top_arenas.length == 0" class="title w3-text-blue">NO arenas created yet</h2>
 				 </div>
            <div class="w3-row">
@@ -61,7 +61,7 @@ c
 							</div>
             </div>
 					</div>
-
+<hr>
      </div>
 
  	</div>
