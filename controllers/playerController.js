@@ -25,8 +25,8 @@ function validateEmail(email) {
 }
 
 /*
-playerController.compute: 
-takes the result from search method then compute the paging attributes and send them with *the result 
+playerController.compute:
+takes the result from search method then compute the paging attributes and send them with *the result
 *@param result : result passed from the search function
 *@param req : the req passed from the search function
 *@param res : the res passed from the search function
@@ -74,13 +74,13 @@ var bookWeekly = function (req, res) {
 
 let playerController = {
 
- /* 
+ /*
 playerController.search:
 retrieve and view arenas matched the attribute value selected by the user after eliminating *the arenas in which the user is blacklisted
 *@param search_type : the type of the search; price or name or location
 *@param search_value : the required value of the search type
 *@param req.user._id: the player’s id to find out if he is in blacklist of certain arena’s servic *provider
-*@param result : the final array of arenas the player can see after eliminating those who is blacklisted in 
+*@param result : the final array of arenas the player can see after eliminating those who is blacklisted in
 */
 
   search:function(req,res){
@@ -190,11 +190,11 @@ retrieve and view arenas matched the attribute value selected by the user after 
 
   bookWeekly: bookWeekly,
 
-/* 
+/*
 playerController.edit_profile_page:
 prepare the edit profile page ,retrieve the player’s record from DB to be able to fill the *fields to be changed.
 *@param req.user.username : the user’s username to fetch his record
-*@param result : the user’s record from db 
+*@param result : the user’s record from db
 *@param date : the user’s birthdate after being formatted according to the html format
 */
 
@@ -211,9 +211,9 @@ prepare the edit profile page ,retrieve the player’s record from DB to be able
   },
 
  /* playerController.edit_profile_info:
- using the username retrieve his record from DB and then checking for exceptions using *express-validator then match the password from the user with the password from the db if it *correct we edit the record from the db with the new info from the user and save it again. 
+ using the username retrieve his record from DB and then checking for exceptions using *express-validator then match the password from the user with the password from the db if it *correct we edit the record from the db with the new info from the user and save it again.
 *@param req.user.username : the user’s username to fetch his record
-*@param req.body.name : the user’s updated name 
+*@param req.body.name : the user’s updated name
 *@param req,body.phone_number:the user’s updated phone_number
 *@param req.body.new_password : the user’s new password
 *@param req.body.old_password: the user’s current password
@@ -236,6 +236,7 @@ prepare the edit profile page ,retrieve the player’s record from DB to be able
          req.checkBody('email', 'Email is required.').notEmpty();
          req.checkBody('location', 'Location is required.').notEmpty();
          req.checkBody('phone_number', 'Phone number is required.').notEmpty();
+           req.checkBody('phone_number','not a number.').isNumeric();
 
          var errors = req.validationErrors();
 
@@ -313,7 +314,7 @@ playerController.myNotifications:
 @param req.user.username :the current user
 @return :returns the list  of   the notifications belonging to  the current user
 */
-  
+
   myNotifications:function(req,res){
     var currentuser = req.user.username;
    Player.findOne({ username: currentuser }, function (err,player) {
