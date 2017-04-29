@@ -1,22 +1,30 @@
 <template>
+
 	<div>
-		<div v-for="arena in arenas">
-			<el-card class="box-card">
-				<div class="clearfix">
-					<p style="float: left;">{{arena.name}}</p>
-					<el-button style="float: right;">
-						<router-link :to="getUrl(arena)">
-							<a>Edit Current Schedule</a>
-						</router-link>
-					</el-button>
-					<el-button @click.native="editClicked(arena)" style="float: right;" class="w3-margin-right">
-						<router-link to="/editArena">
-							<a>Edit</a>
-						</router-link>
-					</el-button>
-				</div>
-			</el-card>
-		</div>
+		<div class="" v-for = "arena in arenas" style="padding-left: 5cm;">
+	      <el-card class="box-card">
+	        <div slot="header" class="clearfix ">
+	          <span style="line-height: 36px; font-size: 20px; font-weight: bold;">{{arena.name}}</span>
+	            <router-link :to="getUrl(arena)">
+		    		<el-button style="float: right;" type="danger">Edit Current Schedule</el-button>
+		    	</router-link>
+	        </div>
+	        <div>
+	          <table>
+	            <tr style="font-size: 18px">
+	              <td>Location: {{arena.location}}</td>
+	              <td>
+	              	<router-link to="/editArena" v-on:click.native="editClicked(arena)">
+		    			<el-button style="float: right;" type="danger" >Edit</el-button>
+		    		</router-link>
+	              </td>
+	            </tr>
+	          </table>
+	        </div>
+	      </el-card>
+	      <br><br>
+    	</div>
+
 	</div>
 
 </template>

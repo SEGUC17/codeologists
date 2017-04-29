@@ -78,8 +78,10 @@ export default{
       for (var i = 0; i < this.bookings.length; i++) {
         var date = new Date(this.bookings[i].date);
         var minDigit = "";
+
           if(date.getMinutes() < 10)
           minDigit = "0";
+
         this.dates.push(date.getFullYear() + "/" + (date.getMonth()+1) +
         "/" + date.getDate() + "(" + date.getHours() + ":" + minDigit + date.getMinutes()+')');
         this.value.push(1);

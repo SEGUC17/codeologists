@@ -58,7 +58,30 @@
             </div>
 					</div>
 <hr>
-     </div>
+     
+		<br>
+
+		<div class="w3-container content has-text-centered">
+			<h1 style="font-family: Chalkboard SE"><font size="8"><b><font color="red">HOW</font> IT WORKS</b></font></h1>
+				<div class="columns">
+	 				<div class="column is-3">	
+	  					<img src="search.jpg" height="1000" width="1000">
+	  					<h1 style="font-family: Chalkboard SE"><font size="5"color="red"><b>FIND ARENA</b></font></h1>
+	  				</div>
+
+	  				<div class="column is-3">
+						<img src="book2.jpeg">
+						<br>
+						<h1 style="font-family: Chalkboard SE"><font size="5"color="red"><b>BOOK SLOT</b></font></h1>
+	  				</div>
+
+	  				<div class="column is-3">
+						<img src="play.png" height="550" width ="215">
+						<h1 style="font-family: Chalkboard SE"><font size="5" color="red"><b>ENJOY THE GAME!</b></font></h1>
+	  				</div>
+				</div>
+		</div>
+	</div>
 
 
 </template>
@@ -69,7 +92,7 @@
 		data() {
 			return {
 				check: true,
-				location : '',
+				location : 'your location',
 				locations : ['El rehab','Nasr City','Agouza'],
 				top_arenas : [],
 				getPath(photo){
