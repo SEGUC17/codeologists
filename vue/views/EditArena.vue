@@ -102,7 +102,7 @@
 
 		<div v-if="selectedTab=='schedule'">
 
-		<div class="w3-center">
+		<!-- <div class="w3-center">
 			<div class="w3-half">
 				<div class="w3-dropdown-hover">
 					<button class="w3-button w3-black w3-hover-red">Choose Day</button>
@@ -114,6 +114,16 @@
 
 			<h3 class="w3-half w3-text-red">{{days[currentDay]}}</h3>
 
+		</div> -->
+
+		<div class="tabs">
+			<ul>
+				<li v-for="i in 7" :class="{'black-tab' : i-1==currentDay}">
+	              <a @click="selectDay(i-1)">
+	                <h6 :class="{'white-text': i-1==currentDay}">{{days[i-1]}}</h6>
+	              </a>
+	            </li>
+			</ul>
 		</div>
 
 
