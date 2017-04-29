@@ -105,6 +105,22 @@
 		},
 		methods : {
 			signup(){
+				var errors = [];
+				if(!/^[a-zA-Z ]*$/.test(this.form.name)){
+					this.form.errors.record({name:'Name cannot contain special characters'});
+						return;
+				}
+				if(!/^[a-zA-Z0-9_.-]*$/.test(this.form.username)){
+					this.form.errors.record({username:'Username can only contain 0-9/a-z/A-Z/_/./-'});
+					return;
+				}
+				if(!/^[a-zA-Z0-9_.-]*$/.test(this.form.location)){
+					this.form.errors.record({location:'Location can only contain 0-9/a-z/A-Z/_/./-'});
+					return;
+				}
+
+				
+
 				this.loading='button is-primary w3-xlarge is-loading';
 				this.loginData = {username:this.form.username,password:this.form.password};
 				this.form.submit('post','/signup')
