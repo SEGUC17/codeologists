@@ -60,8 +60,6 @@
 <hr>
      </div>
 
- 	</div>
-
 
 </template>
 
@@ -70,6 +68,7 @@
 	export default {
 		data() {
 			return {
+				check: true,
 				location : '',
 				locations : ['El rehab','Nasr City','Agouza'],
 				top_arenas : [],
@@ -91,6 +90,7 @@
 
 		methods : {
 			setLocation(loc){
+				this.check = false;
 				this.location=loc;
 			},
 
