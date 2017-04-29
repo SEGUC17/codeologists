@@ -1,6 +1,7 @@
 var Arena = require('../models/Arena');
 var Player = require('../models/Player');
 var ServiceProvider = require('../models/ServiceProvider');
+var RegisteredUser = require('../models/RegisteredUser');
 var hasher = require('password-hash-and-salt');
 
 function validateEmail(email) {
@@ -10,7 +11,7 @@ function validateEmail(email) {
 
 /*
 visitorController.compute:
-takes the result from search method then compute the paging attributes and send them with *the result 
+takes the result from search method then compute the paging attributes and send them with *the result
 @param result : result passed from the search function
 @param req : the req passed from the search function
 @param res : the res passed from the search function
@@ -60,7 +61,7 @@ Creates and inserts a new user into the database (a player or a service provider
 
 @return _
 */
-	createPlayer: function (req, res) {
+	createUser: function (req, res) {
 		if(req.body.password=='')
 		{
 
@@ -71,16 +72,23 @@ Creates and inserts a new user into the database (a player or a service provider
             req.checkBody('email', 'Email is required.').notEmpty();
             req.checkBody('location', 'Location is required.').notEmpty();
             req.checkBody('phone_number', 'Phone number is required.').notEmpty();
-            req.checkBody('birthdate', 'Birthdate is required.').notEmpty();
+            req.checkBody('phone_number', 'Phone number is not correct.').isNumeric();
+            if(req.body.type=='player'){
+            	req.checkBody('birthdate', 'Birthdate is required.').notEmpty();
+            	req.checkBody('birthdate', 'Birthdate no in correct format').isDate();
+            }
+            else
+            	req.checkBody('mode', 'Mode is required.').notEmpty();
             var errors = req.validationErrors();
 
-           
+
             return res.status(400).json(errors);
-            
+
 		}
-		Player.findOne({ username: req.body.username }, function (err, user) {
-			if (user)
+		RegisteredUser.findOne({ username: req.body.username }, function (err, user) {
+			if (user){
 				return res.status(400).json([{param: 'username' ,msg:'Username already used'}]);
+			}
 			else {
 
 				hasher(req.body.password).hash(function (error, hash) {
@@ -88,15 +96,23 @@ Creates and inserts a new user into the database (a player or a service provider
 						return res.status(500).json({ error: error.message });
 
 
+					console.log(req.body.mode);
+
 					req.checkBody('name', 'Name is required.').notEmpty();
 		            req.checkBody('username', 'Username is required.').notEmpty();
 		            req.checkBody('password', 'Password is required.').notEmpty();
+		            req.checkBody('password', 'Password must be at least 8 characters').isLength({min:8});
 		            req.checkBody('email', 'Email is required.').notEmpty();
 		            req.checkBody('email', 'Email not in correct format').isEmail();
 		            req.checkBody('location', 'Location is required.').notEmpty();
 		            req.checkBody('phone_number', 'Phone number is required.').notEmpty();
-		            req.checkBody('birthdate', 'Birthdate is required.').notEmpty();
-		            req.checkBody('birthdate', 'Birthdate no in correct format').isDate();
+		            req.checkBody('phone_number', 'Phone number is not correct.').isNumeric();
+		            if(req.body.type=='player'){
+			            req.checkBody('birthdate', 'Birthdate is required.').notEmpty();
+			            req.checkBody('birthdate', 'Birthdate no in correct format').isDate();
+					}
+					else
+						req.checkBody('mode', 'Mode is required.').notEmpty();
 
 		            var errors = req.validationErrors();
 
@@ -104,115 +120,57 @@ Creates and inserts a new user into the database (a player or a service provider
 		                return res.status(400).json(errors);
 		            }
 
-					var player = new Player();
-					player.name = req.body.name;
-					player.username = req.body.username;
-					player.email = req.body.email;
-					player.phone_number = req.body.phone_number;
-					player.location = req.body.location;
+					var newUser;
+					if(req.body.type=='player')
+						newUser = new Player();
+					else
+						newUser = new ServiceProvider();
+					newUser.name = req.body.name;
+					newUser.username = req.body.username;
+					newUser.email = req.body.email;
+					newUser.phone_number = req.body.phone_number;
+					newUser.location = req.body.location;
+
 
 
 					if (req.body.profile_pic.charAt(0)!='/')
-						player.profile_pic.data = req.body.profile_pic;
+						newUser.profile_pic.data = req.body.profile_pic;
+					if(req.body.type=='player'){
+						newUser.ratings_count = 0;
+						newUser.birthdate = req.body.birthdate;
+					}
+					else
+						newUser.mode = req.body.mode ? true : false;
 
-					player.birthdate = req.body.birthdate;
-					player.ratings_count = 0;
 
 					// Store hash (incl. algorithm, iterations, and salt)
-					player.password = hash;
+					newUser.password = hash;
 
 
 
-					player.save(function (err, player) {
-						if (err)
-							res.status(500).json({ error: err });
+					newUser.save(function (err, player) {
+						if (err){
+							if(err.code == 11000){
+		                        var errors = [];
+		                        var field = err.message.split('index: ')[1];
+		                        field = field.split(' dup key')[0];
+		                        field = field.substring(0, field.lastIndexOf('_'));
+	                            if(field == 'phone_number')
+	                            	errors.push({param: 'phone_number',msg:'Phone number already in use'});
+	                            else
+	                            	errors.push({param: 'email',msg:'Email already in use'});
+	                            res.json(400,errors);
+							}
+						}
 						else {
 
-							res.json({ success: "New player created" });
+							res.json({ success: "New user created" });
 						}
 					});
 
 
 				});
 
-			}
-		});
-	},
-
-	createServiceProvider: function (req, res) {
-		if(req.body.password=='')
-		{
-
-			req.checkBody('name', 'Name is required.').notEmpty();
-            req.checkBody('username', 'Username is required.').notEmpty();
-            req.checkBody('password', 'Password is required.').notEmpty();
-            req.checkBody('email', 'Email is required.').isEmail();
-            req.checkBody('email', 'Email is required.').notEmpty();
-            req.checkBody('location', 'Location is required.').notEmpty();
-            req.checkBody('phone_number', 'Phone number is required.').notEmpty();
-            req.checkBody('mode', 'Mode is required.').notEmpty();
-            var errors = req.validationErrors();
-
-            return res.status(400).json(errors);
-            
-		}
-		ServiceProvider.findOne({ username: req.body.username }, function (err, user) {
-			if (user)
-				res.status(400).json({ error: 'Username already used' });
-			else {
-
-				hasher(req.body.password).hash(function (error, hash) {
-					if (error)
-						res.status(400).json({ error: error.message });
-
-
-
-					req.checkBody('name', 'Name is required.').notEmpty();
-		            req.checkBody('username', 'Username is required.').notEmpty();
-		            req.checkBody('password', 'Password is required.').notEmpty();
-		            req.checkBody('email', 'Email is required.').notEmpty();
-		            req.checkBody('email', 'Email not in correct format').isEmail();
-		            req.checkBody('location', 'Location is required.').notEmpty();
-		            req.checkBody('phone_number', 'Phone number is required.').notEmpty();
-		            req.checkBody('mode', 'Mode is required.').notEmpty();
-		       
-		            var errors = req.validationErrors();
-
-		            if (errors) {
-		                return res.status(400).json(errors);
-		            }
-
-
-					var service = new ServiceProvider();
-					service.name = req.body.name;
-					service.username = req.body.username;
-					
-					service.email = req.body.email;
-					service.phone_number = req.body.phone_number;
-					service.location = req.body.location;
-
-
-
-					if (req.body.profile_pic.charAt(0)!='/')
-						service.profile_pic.data = req.body.profile_pic;
-					service.mode = req.body.mode ? true : false;
-
-					// Store hash (incl. algorithm, iterations, and salt)
-					service.password = hash;
-
-					
-
-					service.save(function (err, service) {
-						if (err)
-							res.status(500).json({ error: err });
-						else {
-
-							res.json({ success: "New service provider created" });
-						}
-					});
-
-
-				});
 			}
 		});
 	},
@@ -327,9 +285,9 @@ A function that gets all the details of an arena chosen by the user.
 		})
 	},
 
- /* 
+ /*
 visitorController.search:
-retrieve and view arenas matched the attribute value selected by the visitor after 
+retrieve and view arenas matched the attribute value selected by the visitor after
 @param search_type : the type of the search; price or name or location
 @param search_value : the required value of the search type
 @param result : the final array of arenas the visitor can see
@@ -337,6 +295,7 @@ retrieve and view arenas matched the attribute value selected by the visitor aft
 
 
 	filter: function (req, res) {
+		var limit = req.body.limit;
 		var search_type = req.body.search_type;
 		var search_value = req.body.search_value;
 		 req.checkBody('search_value','search_value is empty!...enter a value').notEmpty();
@@ -357,21 +316,47 @@ retrieve and view arenas matched the attribute value selected by the visitor aft
 				}
 			});
 		} else if (search_type == "location") {
-			Arena.find({ location: search_value }, function (err, doc) {
-				if (err)
-					res.status(500).json({error: err.message});
-				else {
-					compute(req, res, doc);
-				}
-			});
+			if(limit == 0)
+			{
+				Arena.find({ location: {'$regex' : '.*' + search_value + '.*'}}, function (err, doc) {
+					if (err)
+						res.status(500).json({error: err.message});
+					else {
+						compute(req, res, doc);
+					}
+				});
+			}
+			else
+			{
+				Arena.find({ location: {'$regex' : '.*' + search_value + '.*'}}, { location: 1, name: 1},function (err, doc) {
+					if (err)
+						res.status(500).json({error: err.message});
+					else {
+						compute(req, res, doc);
+					}
+				});
+			}
 		} else {
-			Arena.find({ name: search_value }, function (err, doc) {
-				if (err)
-					res.status(500).json({error: err.message});
-				else {
-					compute(req, res, doc);
-				}
-			});
+			if(limit == 0)
+			{
+				Arena.find({ name: {'$regex' : '.*' + search_value + '.*'}}, function (err, doc) {
+					if (err)
+						res.status(500).json({error: err.message});
+					else {
+						compute(req, res, doc);
+					}
+				});
+			}
+			else
+			{
+				Arena.find({ name: {'$regex' : '.*' + search_value + '.*'}}, { location: 1, name: 1}, function (err, doc) {
+					if (err)
+						res.status(500).json({error: err.message});
+					else {
+						compute(req, res, doc);
+					}
+				}).limit(4);
+			}
 		}
 	}
 };

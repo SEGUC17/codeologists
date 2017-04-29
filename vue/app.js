@@ -13,7 +13,7 @@ import dayDetails2 from './views/dayDetails2';
 import reserveTime2 from './views/reserveTime2.vue';
 Vue.component('calender2', calender2);
 Vue.component('dayDetails2', dayDetails2);
-Vue.component('reservetime2',reserveTime2); 
+Vue.component('reservetime2',reserveTime2);
 
 window.Event = new Vue();
 
@@ -61,7 +61,7 @@ window.Form = class Form {
         for (let field in data) {
             this[field] = data[field];
         }
-        
+
         this.errors = new Errors();
     }
 
@@ -120,22 +120,27 @@ new Vue({
 
     el: '#app',
 
-	router,
+    router,
 
     data:{
-        showLogin:false,
-        user : false,
-        type : 'visitor',
+        showLogin:false
     },
-
+    computed:{
+        user:function(){return this.$session.get('user');},
+        type: function () {
+            return this.$session.get('type');
+        }
+    },
     mounted(){
         window.user=false;
         window.type='visitor';
         Event.$on('loggedIn', data => {
-            window.user = data.user;
-            window.type = data.type;
-            this.user = data.user;
-            this.type = data.type;
+            this.$session.start();
+            this.$session.set('user',data.user);
+            this.$session.set('type',data.type);
+            // this.user = data.user;
+            // this.type = data.type;
+            location.reload();
             this.showLogin = false;
         })
     },
@@ -143,10 +148,10 @@ new Vue({
     methods:{
         logout(){
             axios.get('/logout').then(res =>{
-                window.user=false;
-                window.type='visitor';
-                this.user = false;
-                this.type = 'visitor';
+                // this.user = false;
+                // this.type = 'visitor';
+                this.$session.destroy();
+                location.reload();
                 this.$router.push('/');
             }).catch(err => {
                 console.log(err);
@@ -160,9 +165,9 @@ new Vue({
 
 
         redirect() {
-            
+
                //router.replace('/dayDetail/-1');
-           
+
         },
     },
     created(){
@@ -172,4 +177,3 @@ new Vue({
     components: {reserveTime,calender2, dayDetails2,reserveTime2 }
 
 });
-

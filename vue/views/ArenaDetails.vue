@@ -145,7 +145,7 @@
 				arena: {},
 				photos:{},
 				arenaId:'',
-				value5 : 1,
+				value5 : 0,
 			};
 		},
 
@@ -154,12 +154,12 @@
 			Event.$on('view_details_of_arena', arena => {
 				this.arena = arena;
 				this.photos = arena.photos;
-				this.arenaId=arena._id;	
-				this.value5=arena.avg_rating;	
+				this.arenaId=arena._id;
+				this.value5=arena.avg_rating.toFixed(2);
 
 			});
 
-			
+
 		},
 
 		components : {
@@ -176,12 +176,13 @@
 				document.getElementById("img01").src = element;
 				document.getElementById("modal01").style.display = "block";
 			},
-			
+
 		},
 
 		computed: {
             user: function () { return window.user; },
             type: function () { return window.type; },
+
             getUrl() {
             	return "/schedule/"+this.arena.name;
             }
@@ -222,6 +223,3 @@ div.gallery {
 }
 
 </style>
-
-
-

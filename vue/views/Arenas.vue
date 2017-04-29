@@ -2,13 +2,12 @@
 <div>
 
 <div class="is-grouped w3-container">
-        
+
         <div v-for="arena in arenas">
           <article class="media">
     <figure class="media-left">
       <p class="image is-128x128">
-        <img v-if="arena.photos" :src="getPath(arena.photos[0])" alt="Image">
-        <img v-else src="/1.jpg" alt="Image">
+        <img :src="getPath(arena.photos[0])" alt="Image">
       </p>
     </figure>
     <div class="media-content">
@@ -25,7 +24,7 @@
       </div>
     </article>
     </div>
-       
+
    </div>
 
 </div>
@@ -57,16 +56,16 @@
 
           },
 
-          getPath(photo) {
-            if(photo && photo.data)
-                  return 'data:image/*;base64,' + (new Buffer(photo.data.data).toString('base64'));
-                return '';
-          }
+          getPath(photo){
+  																	if(photo && photo.data)
+  												return 'data:image/*;base64,'+(new Buffer(photo.data.data).toString('base64'));
+  												return 'field-big.jpg';
+  											}
         },
 
-        computed: {
-            user: function () { return window.user; },
-            type: function () { return window.type; }
+        computed : {
+          user: function () { return this.$session.get('user'); },
+          type: function () { return this.$session.get('type'); }
         }
 
   }
