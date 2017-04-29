@@ -4,14 +4,14 @@
 
   <!-- The Grid -->
   <div class="w3-row-padding">
-  
+
     <!-- Left Column -->
     <div class="w3-third">
-    
+
       <div class="w3-white w3-text-grey w3-card-4 w3-margin-bottom">
         <div class="w3-display-container">
           <img :src="getPath(profileUser.profile_pic)" style="width:100%" alt="Avatar">
-          
+
         </div>
         <br>
         <div class="w3-container">
@@ -62,15 +62,20 @@
     </div>
     
       <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="selectedTab=='arenas'">
-        <router-link tag="li" to="/createArena"><a>Create New Arena</a></router-link>
+        <p  class="w3-padding-16" ></p>
+        <router-link tag="el-button" to="/createArena"><a>Create New Arena</a></router-link>
         <br>
+        <br>
+
+        <h2 class="w3-text-grey">My Arenas: </h2>
         <arenas></arenas>
-        
+
       </div>
+
 
       <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="selectedTab=='bookings_SP'">
         <pendingBookings></pendingBookings>
-        
+
       </div>
 
       <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="selectedTab=='bookings_P'">
@@ -79,8 +84,9 @@
 
       <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="selectedTab=='ratings'">
         <rating></rating>
-        
+
       </div>
+
 
       <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="selectedTab=='games'">
         <games></games>
@@ -89,7 +95,7 @@
 
       <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="selectedTab=='notifications'">
         <notifications></notifications>
-        
+
       </div>
 
       <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="selectedTab=='lists'">
@@ -103,14 +109,14 @@
       </div>
 
 
-      
+
 
     <!-- End Right Column -->
     </div>
-    
+
   <!-- End Grid -->
   </div>
-  
+
   <!-- End Page Container -->
 </div>
 
@@ -165,5 +171,5 @@
       games
     }
   }
-  
+
 </script>

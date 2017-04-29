@@ -278,12 +278,15 @@
                 this.form.thursday = arr[5];
                 this.form.friday = arr[6];
 
+
                 this.form.submit('post', '/createArena')
                     .then(res => {
                         if (res.error)
                             alert(res.error);
-                        else
+                        else{
                             alert('arena added');
+                            this.$router.push('/myArenas');
+                            }
                     })
                     .catch(err => {
                         if (err.error)
@@ -314,4 +317,5 @@
             }
         }
     }
+
 </script>
