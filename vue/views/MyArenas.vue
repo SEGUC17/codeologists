@@ -9,7 +9,7 @@
 							<a>Edit Current Schedule</a>
 						</router-link>
 					</el-button>
-					<el-button @click="editClicked(arena)" style="float: right;" class="w3-margin-right">
+					<el-button @click.native="editClicked(arena)" style="float: right;" class="w3-margin-right">
 						<router-link to="/editArena">
 							<a>Edit</a>
 						</router-link>
