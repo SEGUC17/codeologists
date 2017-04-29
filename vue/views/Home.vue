@@ -58,8 +58,7 @@
             </div>
 					</div>
 <hr>
-     </div>
-
+     
 		<br>
 
 		<div class="w3-container content has-text-centered">
@@ -82,6 +81,7 @@
 	  				</div>
 				</div>
 		</div>
+	</div>
 
 
 </template>
@@ -92,7 +92,7 @@
 		data() {
 			return {
 				check: true,
-				location : '',
+				location : 'your location',
 				locations : ['El rehab','Nasr City','Agouza'],
 				top_arenas : [],
 				getPath(photo){
