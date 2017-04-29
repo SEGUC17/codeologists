@@ -2859,7 +2859,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/dayDetails.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/dayDetails.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] dayDetails.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -2897,7 +2897,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/dayDetails2.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/dayDetails2.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] dayDetails2.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -3234,7 +3234,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/components/calender.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/components/calender.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] calender.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -3272,7 +3272,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/components/calender2.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/components/calender2.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] calender2.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -3306,7 +3306,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/Blacklist.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/Blacklist.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] Blacklist.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -3340,7 +3340,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/Home.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/Home.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] Home.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -3374,7 +3374,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/MyArenas.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/MyArenas.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] MyArenas.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -3412,7 +3412,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/NonRatedBookings.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/NonRatedBookings.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] NonRatedBookings.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -3446,7 +3446,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/Whitelist.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/Whitelist.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] Whitelist.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -3484,7 +3484,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/changeMode.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/changeMode.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] changeMode.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -3518,7 +3518,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/commentOnArena.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/commentOnArena.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] commentOnArena.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -3552,7 +3552,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/delete_booking.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/delete_booking.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] delete_booking.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -3590,7 +3590,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/reserveTime.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/reserveTime.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] reserveTime.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -3628,7 +3628,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/reserveTime2.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/reserveTime2.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] reserveTime2.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -3654,7 +3654,7 @@ module.exports = Component.exports
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(process) {/**
-  * vue-router v2.5.1
+  * vue-router v2.4.0
   * (c) 2017 Evan You
   * @license MIT
   */
@@ -3729,12 +3729,6 @@ var View = {
       if (matched.instances[name] !== vm) {
         matched.instances[name] = val;
       }
-    }
-
-    // also regiseter instance in prepatch hook
-    // in case the same component instance is reused across different routes
-    ;(data.hook || (data.hook = {})).prepatch = function (_, vnode) {
-      matched.instances[name] = vnode.componentInstance;
     };
 
     // resolve props
@@ -3990,8 +3984,10 @@ var Link = {
     exact: Boolean,
     append: Boolean,
     replace: Boolean,
-    activeClass: String,
-    exactActiveClass: String,
+    activeClass: {
+      type: String,
+      default: 'router-link-active'
+    },
     event: {
       type: eventTypes,
       default: 'click'
@@ -4009,27 +4005,15 @@ var Link = {
 
     var classes = {};
     var globalActiveClass = router.options.linkActiveClass;
-    var globalExactActiveClass = router.options.linkExactActiveClass;
-    // Support global empty active class
-    var activeClassFallback = globalActiveClass == null
-            ? 'router-link-active'
-            : globalActiveClass;
-    var exactActiveClassFallback = globalExactActiveClass == null
-            ? 'router-link-exact-active'
-            : globalExactActiveClass;
-    var activeClass = this.activeClass == null
-            ? activeClassFallback
-            : this.activeClass;
-    var exactActiveClass = this.exactActiveClass == null
-            ? exactActiveClassFallback
-            : this.exactActiveClass;
+    var activeClass = globalActiveClass == null
+      ? this.activeClass
+      : globalActiveClass;
     var compareTarget = location.path
       ? createRoute(null, location, null, router)
       : route;
 
-    classes[exactActiveClass] = isSameRoute(current, compareTarget);
     classes[activeClass] = this.exact
-      ? classes[exactActiveClass]
+      ? isSameRoute(current, compareTarget)
       : isIncludedRoute(current, compareTarget);
 
     var handler = function (e) {
@@ -4231,6 +4215,127 @@ function parsePath (path) {
 
 function cleanPath (path) {
   return path.replace(/\/\//g, '/')
+}
+
+/*  */
+
+function createRouteMap (
+  routes,
+  oldPathMap,
+  oldNameMap
+) {
+  var pathMap = oldPathMap || Object.create(null);
+  var nameMap = oldNameMap || Object.create(null);
+
+  routes.forEach(function (route) {
+    addRouteRecord(pathMap, nameMap, route);
+  });
+
+  return {
+    pathMap: pathMap,
+    nameMap: nameMap
+  }
+}
+
+function addRouteRecord (
+  pathMap,
+  nameMap,
+  route,
+  parent,
+  matchAs
+) {
+  var path = route.path;
+  var name = route.name;
+  if (process.env.NODE_ENV !== 'production') {
+    assert(path != null, "\"path\" is required in a route configuration.");
+    assert(
+      typeof route.component !== 'string',
+      "route config \"component\" for path: " + (String(path || name)) + " cannot be a " +
+      "string id. Use an actual component instead."
+    );
+  }
+
+  var record = {
+    path: normalizePath(path, parent),
+    components: route.components || { default: route.component },
+    instances: {},
+    name: name,
+    parent: parent,
+    matchAs: matchAs,
+    redirect: route.redirect,
+    beforeEnter: route.beforeEnter,
+    meta: route.meta || {},
+    props: route.props == null
+      ? {}
+      : route.components
+        ? route.props
+        : { default: route.props }
+  };
+
+  if (route.children) {
+    // Warn if route is named and has a default child route.
+    // If users navigate to this route by name, the default child will
+    // not be rendered (GH Issue #629)
+    if (process.env.NODE_ENV !== 'production') {
+      if (route.name && route.children.some(function (child) { return /^\/?$/.test(child.path); })) {
+        warn(
+          false,
+          "Named Route '" + (route.name) + "' has a default child route. " +
+          "When navigating to this named route (:to=\"{name: '" + (route.name) + "'\"), " +
+          "the default child route will not be rendered. Remove the name from " +
+          "this route and use the name of the default child route for named " +
+          "links instead."
+        );
+      }
+    }
+    route.children.forEach(function (child) {
+      var childMatchAs = matchAs
+        ? cleanPath((matchAs + "/" + (child.path)))
+        : undefined;
+      addRouteRecord(pathMap, nameMap, child, record, childMatchAs);
+    });
+  }
+
+  if (route.alias !== undefined) {
+    if (Array.isArray(route.alias)) {
+      route.alias.forEach(function (alias) {
+        var aliasRoute = {
+          path: alias,
+          children: route.children
+        };
+        addRouteRecord(pathMap, nameMap, aliasRoute, parent, record.path);
+      });
+    } else {
+      var aliasRoute = {
+        path: route.alias,
+        children: route.children
+      };
+      addRouteRecord(pathMap, nameMap, aliasRoute, parent, record.path);
+    }
+  }
+
+  if (!pathMap[record.path]) {
+    pathMap[record.path] = record;
+  }
+
+  if (name) {
+    if (!nameMap[name]) {
+      nameMap[name] = record;
+    } else if (process.env.NODE_ENV !== 'production' && !matchAs) {
+      warn(
+        false,
+        "Duplicate named routes definition: " +
+        "{ name: \"" + name + "\", path: \"" + (record.path) + "\" }"
+      );
+    }
+  }
+}
+
+function normalizePath (path, parent) {
+  path = path.replace(/\/$/, '');
+  if (path[0] === '/') { return path }
+  if (parent == null) { return path }
+  return cleanPath(((parent.path) + "/" + path))
 }
 
 var index$1 = Array.isArray || function (arr) {
@@ -4671,6 +4776,24 @@ index.tokensToRegExp = tokensToRegExp_1;
 
 /*  */
 
+var regexpCache = Object.create(null);
+
+function getRouteRegex (path) {
+  var hit = regexpCache[path];
+  var keys, regexp;
+
+  if (hit) {
+    keys = hit.keys;
+    regexp = hit.regexp;
+  } else {
+    keys = [];
+    regexp = index(path, keys);
+    regexpCache[path] = { keys: keys, regexp: regexp };
+  }
+
+  return { keys: keys, regexp: regexp }
+}
+
 var regexpCompileCache = Object.create(null);
 
 function fillParams (
@@ -4689,156 +4812,6 @@ function fillParams (
     }
     return ''
   }
-}
-
-/*  */
-
-function createRouteMap (
-  routes,
-  oldPathList,
-  oldPathMap,
-  oldNameMap
-) {
-  // the path list is used to control path matching priority
-  var pathList = oldPathList || [];
-  var pathMap = oldPathMap || Object.create(null);
-  var nameMap = oldNameMap || Object.create(null);
-
-  routes.forEach(function (route) {
-    addRouteRecord(pathList, pathMap, nameMap, route);
-  });
-
-  // ensure wildcard routes are always at the end
-  for (var i = 0, l = pathList.length; i < l; i++) {
-    if (pathList[i] === '*') {
-      pathList.push(pathList.splice(i, 1)[0]);
-      l--;
-      i--;
-    }
-  }
-
-  return {
-    pathList: pathList,
-    pathMap: pathMap,
-    nameMap: nameMap
-  }
-}
-
-function addRouteRecord (
-  pathList,
-  pathMap,
-  nameMap,
-  route,
-  parent,
-  matchAs
-) {
-  var path = route.path;
-  var name = route.name;
-  if (process.env.NODE_ENV !== 'production') {
-    assert(path != null, "\"path\" is required in a route configuration.");
-    assert(
-      typeof route.component !== 'string',
-      "route config \"component\" for path: " + (String(path || name)) + " cannot be a " +
-      "string id. Use an actual component instead."
-    );
-  }
-
-  var normalizedPath = normalizePath(path, parent);
-  var record = {
-    path: normalizedPath,
-    regex: compileRouteRegex(normalizedPath),
-    components: route.components || { default: route.component },
-    instances: {},
-    name: name,
-    parent: parent,
-    matchAs: matchAs,
-    redirect: route.redirect,
-    beforeEnter: route.beforeEnter,
-    meta: route.meta || {},
-    props: route.props == null
-      ? {}
-      : route.components
-        ? route.props
-        : { default: route.props }
-  };
-
-  if (route.children) {
-    // Warn if route is named and has a default child route.
-    // If users navigate to this route by name, the default child will
-    // not be rendered (GH Issue #629)
-    if (process.env.NODE_ENV !== 'production') {
-      if (route.name && route.children.some(function (child) { return /^\/?$/.test(child.path); })) {
-        warn(
-          false,
-          "Named Route '" + (route.name) + "' has a default child route. " +
-          "When navigating to this named route (:to=\"{name: '" + (route.name) + "'\"), " +
-          "the default child route will not be rendered. Remove the name from " +
-          "this route and use the name of the default child route for named " +
-          "links instead."
-        );
-      }
-    }
-    route.children.forEach(function (child) {
-      var childMatchAs = matchAs
-        ? cleanPath((matchAs + "/" + (child.path)))
-        : undefined;
-      addRouteRecord(pathList, pathMap, nameMap, child, record, childMatchAs);
-    });
-  }
-
-  if (route.alias !== undefined) {
-    if (Array.isArray(route.alias)) {
-      route.alias.forEach(function (alias) {
-        var aliasRoute = {
-          path: alias,
-          children: route.children
-        };
-        addRouteRecord(pathList, pathMap, nameMap, aliasRoute, parent, record.path);
-      });
-    } else {
-      var aliasRoute = {
-        path: route.alias,
-        children: route.children
-      };
-      addRouteRecord(pathList, pathMap, nameMap, aliasRoute, parent, record.path);
-    }
-  }
-
-  if (!pathMap[record.path]) {
-    pathList.push(record.path);
-    pathMap[record.path] = record;
-  }
-
-  if (name) {
-    if (!nameMap[name]) {
-      nameMap[name] = record;
-    } else if (process.env.NODE_ENV !== 'production' && !matchAs) {
-      warn(
-        false,
-        "Duplicate named routes definition: " +
-        "{ name: \"" + name + "\", path: \"" + (record.path) + "\" }"
-      );
-    }
-  }
-}
-
-function compileRouteRegex (path) {
-  var regex = index(path);
-  if (process.env.NODE_ENV !== 'production') {
-    var keys = {};
-    regex.keys.forEach(function (key) {
-      warn(!keys[key.name], ("Duplicate param keys in route with path: \"" + path + "\""));
-      keys[key.name] = true;
-    });
-  }
-  return regex
-}
-
-function normalizePath (path, parent) {
-  path = path.replace(/\/$/, '');
-  if (path[0] === '/') { return path }
-  if (parent == null) { return path }
-  return cleanPath(((parent.path) + "/" + path))
 }
 
 /*  */
@@ -4877,7 +4850,7 @@ function normalizeLocation (
   var basePath = (current && current.path) || '/';
   var path = parsedPath.path
     ? resolvePath(parsedPath.path, basePath, append || next.append)
-    : basePath;
+    : (current && current.path) || '/';
 
   var query = resolveQuery(
     parsedPath.query,
@@ -4913,12 +4886,11 @@ function createMatcher (
   router
 ) {
   var ref = createRouteMap(routes);
-  var pathList = ref.pathList;
   var pathMap = ref.pathMap;
   var nameMap = ref.nameMap;
 
   function addRoutes (routes) {
-    createRouteMap(routes, pathList, pathMap, nameMap);
+    createRouteMap(routes, pathMap, nameMap);
   }
 
   function match (
@@ -4934,7 +4906,7 @@ function createMatcher (
       if (process.env.NODE_ENV !== 'production') {
         warn(record, ("Route with name '" + name + "' does not exist"));
       }
-      var paramNames = record.regex.keys
+      var paramNames = getRouteRegex(record.path).keys
         .filter(function (key) { return !key.optional; })
         .map(function (key) { return key.name; });
 
@@ -4956,11 +4928,9 @@ function createMatcher (
       }
     } else if (location.path) {
       location.params = {};
-      for (var i = 0; i < pathList.length; i++) {
-        var path = pathList[i];
-        var record$1 = pathMap[path];
-        if (matchRoute(record$1.regex, location.path, location.params)) {
-          return _createRoute(record$1, location, redirectedFrom)
+      for (var path in pathMap) {
+        if (matchRoute(path, location.params, location.path)) {
+          return _createRoute(pathMap[path], location, redirectedFrom)
         }
       }
     }
@@ -5073,11 +5043,14 @@ function createMatcher (
 }
 
 function matchRoute (
-  regex,
   path,
-  params
+  params,
+  pathname
 ) {
-  var m = path.match(regex);
+  var ref = getRouteRegex(path);
+  var regexp = ref.regexp;
+  var keys = ref.keys;
+  var m = pathname.match(regexp);
 
   if (!m) {
     return false
@@ -5086,11 +5059,9 @@ function matchRoute (
   }
 
   for (var i = 1, len = m.length; i < len; ++i) {
-    var key = regex.keys[i - 1];
+    var key = keys[i - 1];
     var val = typeof m[i] === 'string' ? decodeURIComponent(m[i]) : m[i];
-    if (key) {
-      params[key.name] = val;
-    }
+    if (key) { params[key.name] = val; }
   }
 
   return true
@@ -5340,12 +5311,7 @@ History.prototype.confirmTransition = function confirmTransition (route, onCompl
   var current = this.current;
   var abort = function (err) {
     if (err instanceof Error) {
-      if (this$1.errorCbs.length) {
-        this$1.errorCbs.forEach(function (cb) { cb(err); });
-      } else {
-        warn(false, 'uncaught error during route navigation:');
-        console.error(err);
-      }
+      this$1.errorCbs.forEach(function (cb) { cb(err); });
     }
     onAbort && onAbort(err);
   };
@@ -5387,13 +5353,7 @@ History.prototype.confirmTransition = function confirmTransition (route, onCompl
           // next(false) -> abort navigation, ensure current URL
           this$1.ensureURL(true);
           abort(to);
-        } else if (
-          typeof to === 'string' ||
-          (typeof to === 'object' && (
-            typeof to.path === 'string' ||
-            typeof to.name === 'string'
-          ))
-        ) {
+        } else if (typeof to === 'string' || typeof to === 'object') {
           // next('/') or next({ path: '/' }) -> redirect
           abort();
           if (typeof to === 'object' && to.replace) {
@@ -5414,11 +5374,10 @@ History.prototype.confirmTransition = function confirmTransition (route, onCompl
   runQueue(queue, iterator, function () {
     var postEnterCbs = [];
     var isValid = function () { return this$1.current === route; };
+    var enterGuards = extractEnterGuards(activated, postEnterCbs, isValid);
     // wait until async components are resolved before
     // extracting in-component enter guards
-    var enterGuards = extractEnterGuards(activated, postEnterCbs, isValid);
-    var queue = enterGuards.concat(this$1.router.resolveHooks);
-    runQueue(queue, iterator, function () {
+    runQueue(enterGuards, iterator, function () {
       if (this$1.pending !== route) {
         return abort()
       }
@@ -5515,10 +5474,8 @@ function extractUpdateHooks (updated) {
 }
 
 function bindGuard (guard, instance) {
-  if (instance) {
-    return function boundRouteGuard () {
-      return guard.apply(instance, arguments)
-    }
+  return function boundRouteGuard () {
+    return guard.apply(instance, arguments)
   }
 }
 
@@ -5572,65 +5529,70 @@ function poll (
 }
 
 function resolveAsyncComponents (matched) {
-  return function (to, from, next) {
-    var hasAsync = false;
-    var pending = 0;
-    var error = null;
+  var _next;
+  var pending = 0;
+  var error = null;
 
-    flatMapComponents(matched, function (def, _, match, key) {
-      // if it's a function and doesn't have cid attached,
-      // assume it's an async component resolve function.
-      // we are not using Vue's default async resolving mechanism because
-      // we want to halt the navigation until the incoming component has been
-      // resolved.
-      if (typeof def === 'function' && def.cid === undefined) {
-        hasAsync = true;
-        pending++;
+  flatMapComponents(matched, function (def, _, match, key) {
+    // if it's a function and doesn't have cid attached,
+    // assume it's an async component resolve function.
+    // we are not using Vue's default async resolving mechanism because
+    // we want to halt the navigation until the incoming component has been
+    // resolved.
+    if (typeof def === 'function' && def.cid === undefined) {
+      pending++;
 
-        var resolve = once(function (resolvedDef) {
-          // save resolved on async factory in case it's used elsewhere
-          def.resolved = typeof resolvedDef === 'function'
-            ? resolvedDef
-            : _Vue.extend(resolvedDef);
-          match.components[key] = resolvedDef;
-          pending--;
-          if (pending <= 0) {
-            next();
-          }
-        });
-
-        var reject = once(function (reason) {
-          var msg = "Failed to resolve async component " + key + ": " + reason;
-          process.env.NODE_ENV !== 'production' && warn(false, msg);
-          if (!error) {
-            error = reason instanceof Error
-              ? reason
-              : new Error(msg);
-            next(error);
-          }
-        });
-
-        var res;
-        try {
-          res = def(resolve, reject);
-        } catch (e) {
-          reject(e);
+      var resolve = once(function (resolvedDef) {
+        // save resolved on async factory in case it's used elsewhere
+        def.resolved = typeof resolvedDef === 'function'
+          ? resolvedDef
+          : _Vue.extend(resolvedDef);
+        match.components[key] = resolvedDef;
+        pending--;
+        if (pending <= 0 && _next) {
+          _next();
         }
-        if (res) {
-          if (typeof res.then === 'function') {
-            res.then(resolve, reject);
-          } else {
-            // new syntax in Vue 2.3
-            var comp = res.component;
-            if (comp && typeof comp.then === 'function') {
-              comp.then(resolve, reject);
-            }
+      });
+
+      var reject = once(function (reason) {
+        var msg = "Failed to resolve async component " + key + ": " + reason;
+        process.env.NODE_ENV !== 'production' && warn(false, msg);
+        if (!error) {
+          error = reason instanceof Error
+            ? reason
+            : new Error(msg);
+          if (_next) { _next(error); }
+        }
+      });
+
+      var res;
+      try {
+        res = def(resolve, reject);
+      } catch (e) {
+        reject(e);
+      }
+      if (res) {
+        if (typeof res.then === 'function') {
+          res.then(resolve, reject);
+        } else {
+          // new syntax in Vue 2.3
+          var comp = res.component;
+          if (comp && typeof comp.then === 'function') {
+            comp.then(resolve, reject);
           }
         }
       }
-    });
+    }
+  });
 
-    if (!hasAsync) { next(); }
+  return function (to, from, next) {
+    if (error) {
+      next(error);
+    } else if (pending <= 0) {
+      next();
+    } else {
+      _next = next;
+    }
   }
 }
 
@@ -5912,7 +5874,6 @@ var VueRouter = function VueRouter (options) {
   this.apps = [];
   this.options = options;
   this.beforeHooks = [];
-  this.resolveHooks = [];
   this.afterHooks = [];
   this.matcher = createMatcher(options.routes || [], this);
 
@@ -5998,15 +5959,11 @@ VueRouter.prototype.init = function init (app /* Vue component instance */) {
 };
 
 VueRouter.prototype.beforeEach = function beforeEach (fn) {
-  return registerHook(this.beforeHooks, fn)
-};
-
-VueRouter.prototype.beforeResolve = function beforeResolve (fn) {
-  return registerHook(this.resolveHooks, fn)
+  this.beforeHooks.push(fn);
 };
 
 VueRouter.prototype.afterEach = function afterEach (fn) {
-  return registerHook(this.afterHooks, fn)
+  this.afterHooks.push(fn);
 };
 
 VueRouter.prototype.onReady = function onReady (cb, errorCb) {
@@ -6085,21 +6042,13 @@ VueRouter.prototype.addRoutes = function addRoutes (routes) {
 
 Object.defineProperties( VueRouter.prototype, prototypeAccessors );
 
-function registerHook (list, fn) {
-  list.push(fn);
-  return function () {
-    var i = list.indexOf(fn);
-    if (i > -1) { list.splice(i, 1); }
-  }
-}
-
 function createHref (base, fullPath, mode) {
   var path = mode === 'hash' ? '#' + fullPath : fullPath;
   return base ? cleanPath(base + '/' + path) : path
 }
 
 VueRouter.install = install;
-VueRouter.version = '2.5.1';
+VueRouter.version = '2.4.0';
 
 if (inBrowser && window.Vue) {
   window.Vue.use(VueRouter);
@@ -14117,6 +14066,29 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
 	data: function data() {
@@ -14263,6 +14235,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
 //
 //
 //
@@ -17874,7 +17851,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/About.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/About.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] About.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -17912,7 +17889,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/ArenaDetails.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/ArenaDetails.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] ArenaDetails.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -17946,7 +17923,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/Arenas.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/Arenas.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] Arenas.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -17980,7 +17957,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/CreateGame.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/CreateGame.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] CreateGame.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -18014,7 +17991,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/EditArena.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/EditArena.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] EditArena.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -18048,7 +18025,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/EditPage.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/EditPage.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] EditPage.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -18082,7 +18059,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/Games.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/Games.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] Games.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -18116,7 +18093,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/Login.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/Login.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] Login.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -18150,7 +18127,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/LoginSignup.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/LoginSignup.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] LoginSignup.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -18184,7 +18161,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/Myrequests.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/Myrequests.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] Myrequests.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -18218,7 +18195,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/Notifications.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/Notifications.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] Notifications.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -18252,7 +18229,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/Profile.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/Profile.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] Profile.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -18286,7 +18263,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/Search.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/Search.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] Search.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -18320,7 +18297,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/Signup.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/Signup.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] Signup.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -18354,7 +18331,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/ViewPendingBookings.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/ViewPendingBookings.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] ViewPendingBookings.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -18388,7 +18365,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/createArena.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/createArena.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] createArena.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -18422,7 +18399,7 @@ var Component = __webpack_require__(0)(
   /* cssModules */
   null
 )
-Component.options.__file = "/media/mohamed/01D1BB1EEC665F00/Current Semester/[CSEN603]-Software Engineering/Projects/Sprint 3/codeologists/vue/views/playerSearch.vue"
+Component.options.__file = "/Users/mahmoudadel/Desktop/SE/codeologists/vue/views/playerSearch.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] playerSearch.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -19332,30 +19309,53 @@ if (false) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', _vm._l((_vm.arenas), function(arena) {
-    return _c('article', {
-      staticClass: "message"
+    return _c('div', {
+      staticStyle: {
+        "padding-left": "5cm"
+      }
+    }, [_c('el-card', {
+      staticClass: "box-card"
     }, [_c('div', {
-      staticClass: "message-header"
-    }, [_c('p', [_vm._v(_vm._s(arena.name))]), _vm._v(" "), _c('button', {
-      staticClass: "button is-primary"
-    }, [_c('router-link', {
+      staticClass: "clearfix ",
+      slot: "header"
+    }, [_c('span', {
+      staticStyle: {
+        "line-height": "36px",
+        "font-size": "20px",
+        "font-weight": "bold"
+      }
+    }, [_vm._v(_vm._s(arena.name))]), _vm._v(" "), _c('router-link', {
       attrs: {
         "to": _vm.getUrl(arena)
       }
-    }, [_c('a', [_vm._v("Edit Current Scheule")])])], 1), _vm._v(" "), _c('button', {
-      staticClass: "button is-primary",
-      on: {
+    }, [_c('el-button', {
+      staticStyle: {
+        "float": "right"
+      },
+      attrs: {
+        "type": "danger"
+      }
+    }, [_vm._v("Edit Current Schedule")])], 1)], 1), _vm._v(" "), _c('div', [_c('table', [_c('tr', {
+      staticStyle: {
+        "font-size": "18px"
+      }
+    }, [_c('td', [_vm._v("Location: " + _vm._s(arena.location))]), _vm._v(" "), _c('td', [_c('router-link', {
+      attrs: {
+        "to": "/editArena"
+      },
+      nativeOn: {
         "click": function($event) {
           _vm.editClicked(arena)
         }
       }
-    }, [_c('router-link', {
+    }, [_c('el-button', {
+      staticStyle: {
+        "float": "right"
+      },
       attrs: {
-        "to": "/editArena"
+        "type": "danger"
       }
-    }, [_c('a', [_vm._v("Edit")])])], 1)]), _vm._v(" "), _c('div', {
-      staticClass: "message-body"
-    }, [_vm._v(_vm._s(arena.location))])])
+    }, [_vm._v("Edit")])], 1)], 1)])])])]), _vm._v(" "), _c('br'), _c('br')], 1)
   }))
 },staticRenderFns: []}
 module.exports.render._withStripped = true
@@ -21616,7 +21616,72 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "to": "/viewArenas"
     }
-  }, [_c('a', [_vm._v("Show Arenas")])])], 1)])])])])
+  }, [_c('a', [_vm._v("Show Arenas")])])], 1)])])]), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
+    staticClass: "w3-container content has-text-centered"
+  }, [_c('h1', {
+    staticStyle: {
+      "font-family": "Chalkboard SE"
+    }
+  }, [_c('font', {
+    attrs: {
+      "size": "8"
+    }
+  }, [_c('b', [_c('font', {
+    attrs: {
+      "color": "red"
+    }
+  }, [_vm._v("HOW")]), _vm._v(" IT WORKS")], 1)])], 1), _vm._v(" "), _c('div', {
+    staticClass: "columns"
+  }, [_c('div', {
+    staticClass: "column is-3"
+  }, [_c('img', {
+    attrs: {
+      "src": "search.jpg",
+      "height": "1000",
+      "width": "1000"
+    }
+  }), _vm._v(" "), _c('h1', {
+    staticStyle: {
+      "font-family": "Chalkboard SE"
+    }
+  }, [_c('font', {
+    attrs: {
+      "size": "5",
+      "color": "red"
+    }
+  }, [_c('b', [_vm._v("FIND ARENA")])])], 1)]), _vm._v(" "), _c('div', {
+    staticClass: "column is-3"
+  }, [_c('img', {
+    attrs: {
+      "src": "book2.jpeg"
+    }
+  }), _vm._v(" "), _c('br'), _vm._v(" "), _c('h1', {
+    staticStyle: {
+      "font-family": "Chalkboard SE"
+    }
+  }, [_c('font', {
+    attrs: {
+      "size": "5",
+      "color": "red"
+    }
+  }, [_c('b', [_vm._v("BOOK SLOT")])])], 1)]), _vm._v(" "), _c('div', {
+    staticClass: "column is-3"
+  }, [_c('img', {
+    attrs: {
+      "src": "play.png",
+      "height": "550",
+      "width": "215"
+    }
+  }), _vm._v(" "), _c('h1', {
+    staticStyle: {
+      "font-family": "Chalkboard SE"
+    }
+  }, [_c('font', {
+    attrs: {
+      "size": "5",
+      "color": "red"
+    }
+  }, [_c('b', [_vm._v("ENJOY THE GAME!")])])], 1)])])])])
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
