@@ -1,107 +1,174 @@
 <template>
-
-<div v-if="shown">
-   Selected day: {{day}}
-   <a  v-on:click="hideMe">&#10799; </a>
-    <div class="Content">
-   <span class="tag is-primary" > Start Time</span>
-    <select v-model="startTime"  @change="nullifyEndTime()">
-    <option v-for="(freeSlot,index) in freeSlots" :key="index">{{freeSlot}}</option>
-   </select>
-   </div>
-
- <div v-if="startTime != null">
-    <span class="tag is-primary"> End Time</span>
-    <select v-model="endTime" >
-    <option v-if="startTime != null" v-for="n in (findIndex(maxAllowedEndTime) - findIndex(startTime))" :key="n">{{findTime(n+findIndex(startTime))}}</option>
-
-   </select>
-   </div> 
-
-
-
-   <div>
-   <span class="tag is-danger">Booked slots</span>
-   <table class="table is-bordered is-striped" id="unavailable">
-   <tr>
-    <th> <abbr title="Played">Start</abbr> </th>
-    <td v-for="reserved in reservedSlots"> {{reserved.start}}</td>
-    </tr>
-  <tr>
-    <th> <abbr>End</abbr></th>
-    <td v-for="reserved in reservedSlots">{{reserved.end}}</td>
-  </tr>
-   </table>
-</div>
-
-
-   
-   <div>
-   <span class="tag is-danger">Unavailable slots</span>
-   <table class="table is-bordered is-striped" id="unavailable">
-   <tr>
-    <th> <abbr>Start</abbr></th>
-    <td v-for="reserved in unavailableSlots"> {{reserved.start}}</td>
-        <td>&nbsp</td>
-                <td>&nbsp</td>
-</tr>
-  <tr>
-    <th> <abbr title="Played">End</abbr></th>
-    <td v-for="reserved in unavailableSlots">{{reserved.end}}</td>
-  </tr>
-   </table>
-</div>
-
-   <button class="button is-black is-focused" v-on:click="setUnavailable" v-if="startTime != null && endTime != null">Set unavailable  </button>
+    <div v-if="shown">
+            <a  v-on:click="hideMe">&#10799; </a>
+            <div>
+            <span class="tag is-primary is-medium">Click on a slot to either set it available or unavailable</span>
+            <span class="tag is-danger is-medium">note that black checked slots are booked, red checked slots are unavailable and green checked slots are available </span>
+            
+            <table class="table is-bordered">
+          <tr>
+            <td v-for="i in 12" @click="handleClick(i-1)" >
+              <div >
+                <a >
+                  <p>Start: {{findTime(i-1)}}</p><br>
+                  <p>End  : {{findTime(i)}}</p>
+                  <img v-if = "schedule[i-1] != 0 && schedule[i-1] != 3 && schedule[i-1] != -1" src="blacktick.png">
+                  <img v-if = "schedule[i-1] == 0" src="tick.png">
+                  <img v-if = "schedule[i-1] == 3" src="bluetick.png">
+                  <img v-if = "schedule[i-1] == -1" src="cross.png">
+                </a>
+            </div>
+            </td>
+          </tr>
+          
+          <tr>
+            <td v-for="i in 12" @click="handleClick(i+11)" >
+              <div >
+                <a >
+                  <p>Start: {{findTime(i+11)}}</p><br>
+                  <p>End  : {{findTime(i+12)}}</p>
+                  <img v-if = "schedule[i+11] != 0 && schedule[i+11] != 3 && schedule[i+11]!= -1" src="blacktick.png">
+                  <img v-if = "schedule[i+11] == 0" src="tick.png">
+                  <img v-if = "schedule[i+11] == 3" src="bluetick.png">
+                  <img v-if = "schedule[i+11] == -1" src="cross.png">
+                  </a>
+            </div>
+            </td>
+          </tr>
+          <tr>
+            <td v-for="i in 12" @click="handleClick(i+23)" >
+              <div >
+                <a >
+                  <p>Start: {{findTime(i+23)}}</p><br>
+                  <p>End  : {{findTime(i+24)}}</p>
+                  <img v-if = "schedule[i+23] != 0 && schedule[i+23] != 3 && schedule[i+23] != -1" src="blacktick.png">
+                  <img v-if = "schedule[i+23] == 0" src="tick.png">
+                  <img v-if = "schedule[i+23] == 3" src="bluetick.png">
+                  <img v-if = "schedule[i+23] == -1" src="cross.png">
+                </a>
+            </div>
+            </td>
+          </tr>
+          <tr>
+            <td v-for="i in 12"  @click="handleClick(i+35)">
+              <div >
+                <a >
+                  <p>Start: {{findTime(i+35)}}</p><br>
+                  <p>End  : {{findTime(i+36)}}</p>
+                  <img v-if = "schedule[i+35] != 0 && schedule[i+35] != 3 && schedule[i+35] != -1" src="blacktick.png">
+                  <img v-if = "schedule[i+35] == 0" src="tick.png">
+                  <img v-if = "schedule[i+35] == 3" src="bluetick.png">
+                  <img v-if = "schedule[i+35] == -1" src="cross.png">
+                </a>
+            </div>
+            </td>
+          </tr>
+          
+          </table>
+            </div>
+     
+           <button class="button is-black is-focused" v-on:click="setUnavailable" v-if="startTime != null && endTime != null">Set unavailable  </button>
    <button class="button is-black is-focused" v-on:click="setUnavailable2" v-if="startTime != null && endTime != null">Set available  </button>
-   <div id="error">
-    <label v-if="error">Sorry Could not complete your action</label>
-   </div>
-</div>
+    </div>
+        
 </template>
 <script>
-    export default{
-        data(){
-            return{
-                shown:true,
-                schedule:{},
-                startTime:null,
-                endTime:null,
-                day:null,
-                month:null,
-                error:false,
-                arenaName:null,
-            }
+//import Stripe from 'stripe';
+    export default {
+        data() {
+            return {
+                shown: true,
+                schedule: null,
+                startTime: null,
+                endTime: null,
+                day: null,
+                month: null,
+                error: false,
+                arenaName: null,
+                   }
         },
-        methods:{
-            hideMe:function(){
-                this.startTime=null;
+        methods: {
+            handleClick(index){
+                if(this.schedule[index] != 0 && this.schedule[index] !=3 && this.schedule[index] != -1)
+                {
+                    console.log("You can not use this as start/end index because it is already used");
+                }
+                else if(this.startTime == null)
+                {
+                    var x=this.findTime(index);
+                    this.startTime = x;
+                    this.schedule[index]=3;
+                    this.endTime = this.findTime(index+1);
+                }
+                else 
+                {
+                    //user is selecting 
+                    if(this.findIndex(this.startTime)<=index && this.checkAvailable(parseInt(this.findIndex(this.startTime)),parseInt(index)))
+                    {
+                        if(this.findIndex(this.startTime) == index && this.findIndex(this.endTime) == index+1){
+                            this.schedule[index] = 0;
+                            this.startTime = null;
+                            this.endTime = null;
+                            return;
+                        }
+                        var j=0;
+                        for( j=this.findIndex(this.startTime)+1;j<this.findIndex(this.endTime);j++)
+                        {
+                            this.schedule[j]=0;
+                        } 
+                        var i=0;
+                        for(i=this.findIndex(this.startTime)+1;i<=index;i++)
+                        {
+                            this.schedule[i] = 3;
+                        }
+                        if(i !=0)
+                        {
+                        var x= this.findTime(i);
+                        
+                        this.endTime = x;
+                        i=0;
+                        }
+                    }
+                }
+            },
+             checkAvailable(startIndex, endIndex) {
+                for (var counter = startIndex; counter <= endIndex; counter++) {
+                    if (this.schedule[counter] != 0  && this.schedule[counter] != 3 && this.schedule[counter] != -1){
+                        
+                        return false;
+                    }
+                }
+                return true;
+            },
+            hideMe: function () {
+                this.shown = false;
+                this.startTime = null;
                 this.endTime = null;
                 this.error = false;
-                this.shown =false;
             },
-            nullifyEndTime(){
-                 this.endTime =null;},
-            findTime(index)
-            {
-               
+            nullifyEndTime() {
+                this.endTime = null;
+                this.error = false;
+            },
+            findTime(index) {
+                
                 var hours = Math.floor(index / 2);
                 var min = '00';
                 if (index % 2 == 1)
-                min = '30';
-               if(hours<10)
-                return '0'+hours+':'+min;
+                    min = '30';
+                if (hours < 10)
+                    return '0' + hours + ':' + min;
                 else
-                return hours+':'+min;
+                    return hours + ':' + min;
             },
-            findIndex(time){
-               if(! time) return -1;
+            findIndex(time) {
+                if (!time) return -1;
                 var arr = time.split(':');
                 var min = parseInt(arr[1], 10)
-                var hours= parseInt(arr[0],10);
-               return Math.floor(min/30) + 2 *(hours);   
-             },
-             setUnavailable(){
+                var hours = parseInt(arr[0], 10);
+                return Math.floor(min / 30) + 2 * (hours);
+            },
+            setUnavailable(){
                  
                  axios.post('/sp/arena/'+this.arenaName,querystring.stringify(
                  {
@@ -124,7 +191,7 @@
                  ).catch(error => {this.error=true
                                     alert(error)    });
              },
-             setUnavailable2(){
+              setUnavailable2(){
                 axios.post('/sp/arena/'+this.arenaName,querystring.stringify(
                  {
                      day:this.day,
@@ -147,120 +214,70 @@
                                     console.log(error)
                                     alert(error)    });
              },
-             assignValues(data){
-                 //console.log("in assignValues ");
-                 this.shown= true;                
-                 if(!data)
-                 return;
-                 this.day = data.day;
-                 this.month = data.month;
-                 this.schedule =data.schedule;
-                 this.arenaName = data.arenaName;
-             },
-              updateSchedule(){
-                     //update schedule of dayDtails component
-                     Event.$emit('changed',{day:this.day,month:this.month});
-                     for(var i=this.findIndex(this.startTime);i<this.findIndex(this.endTime);i++)
-                     {
-                         this.schedule[i]=-1;
-                     }
-                     this.startTime=null;
-                     this.endTime = null;}
-        
+            assignValues(data) {
+                this.shown = true;
+                if (!data)
+                    return;
+                this.schedule = data.schedule;
+                this.day = data.day;
+                this.month = data.month;
+                this.arenaName = data.arenaName;
+                this.pricePerHour= data.price;
+            },
+            updateSchedule(data) {
+                //update schedule of dayDtails component
+                this.startTime = null;
+                this.endTime = null;
+                this.schedule = data.data;
+                Event.$emit('changed', { day: this.day, month: this.month, schedule: this.schedule });
+            },
         },
-        computed:{
-            freeSlots(){
+        computed: {
+            freeSlots() {
                 var freeSlotsArray = [];
-                for(var i=0;i<this.schedule.length;i++)
-                {
-                    if(this.schedule[i]==0 || this.schedule[i]== -1)
+                if (!this.schedule)
+                    return freeSlotsArray;
+                for (var i = 0; i < this.schedule.length; i++) {
+                    if (this.schedule[i] == 0)
                         freeSlotsArray.push(this.findTime(i));
                 }
                 return freeSlotsArray;
             },
-            unavailableSlots(){
+            reservedSlots() {
                 var bookedBlocks = [];
-                for(var i=0;i<this.schedule.length;i++)
-                {
-                    if(this.schedule[i] != 0)
-                    {
-                        var startOfBlock =i;
-                        while(this.schedule[i] == -1  && i<this.schedule.length)
-                        {
+                if (!this.schedule)
+                    return bookedBlocks;
+                for (var i = 0; i < this.schedule.length; i++) {
+                    if (this.schedule[i] != 0) {
+                        var startOfBlock = i;
+                        while (this.schedule[i] != 0 && i < this.schedule.length) {
                             i++;
                         }
-                        if(this.findTime(startOfBlock)!=this.findTime(i))
-                        bookedBlocks.push({"start":this.findTime(startOfBlock),"end":this.findTime(i)})
+                        bookedBlocks.push({ "start": this.findTime(startOfBlock), "end": this.findTime(i) })
                     }
                 }
                 return bookedBlocks;
             },
-            reservedSlots(){
-             var bookedBlocks = [];
-                for(var i=0;i<this.schedule.length;i++)
-                {
-                    if(this.schedule[i] != 0)
-                    {
-                        //console.log(i);
-                        var startOfBlock =i;
-                        while(this.schedule[i] != -1 && this.schedule[i] != 0 && i<this.schedule.length)
-                        {
-                            i++;
-                        }
-                        if(this.findTime(startOfBlock)!=this.findTime(i))
-                        bookedBlocks.push({"start":this.findTime(startOfBlock),"end":this.findTime(i)})
-                    }
-                }
-                return bookedBlocks;      
-            },
-            maxAllowedEndTime(){
-               var index =  this.findIndex(this.startTime);
-                while((this.schedule[index]==0 || this.schedule[index]==-1) && index<this.schedule.length)
-                {
+            maxAllowedEndIndex() {
+                var index = this.findIndex(this.startTime);
+                while ((this.schedule[index] == 0) && index < this.schedule.length) {
                     index++;
                 }
-                return this.findTime(index);
-            }
+                return index;
+            },
+            getPrice() {
+                return Math.floor((this.findIndex(this.endTime)-this.findIndex(this.startTime))*(this.pricePerHour)*2.5)
+            },
         },
-        created()
-        {   this.hideMe();
-            //Event.$emit('daydetailcreated');
-            Event.$on('hidedaydetails2',() => this.hideMe());
-            Event.$on('showagain2',(data) => this.assignValues(data));
+        created() {
+            this.hideMe();
+            Event.$on('hidedaydetails2', () => this.hideMe());
+            Event.$on('showagain2', (data) => this.assignValues(data));
             Event.$on('updatedBookings2',(eventData) => this.updateSchedule(eventData));
         }
-        
-        
     }
 </script>
+
 <style>
-    select {
-     -webkit-appearance: button;
-     -moz-appearance: button;
-     -webkit-user-select: none;
-     -moz-user-select: none;
-     -webkit-padding-end: 20px;
-     -moz-padding-end: 20px;
-     -webkit-padding-start: 2px;
-     -moz-padding-start: 2px;
-     background-color: #F07575; /* fallback color if gradients are not supported */
-     background-image: url(../images/select-arrow.png), -webkit-linear-gradient(top, #E5E5E5, #F4F4F4); /* For Chrome and Safari */
-     background-image: url(../images/select-arrow.png), -moz-linear-gradient(top, #E5E5E5, #F4F4F4); /* For old Fx (3.6 to 15) */
-     background-image: url(../images/select-arrow.png), -ms-linear-gradient(top, #E5E5E5, #F4F4F4); /* For pre-releases of IE 10*/
-     background-image: url(../images/select-arrow.png), -o-linear-gradient(top, #E5E5E5, #F4F4F4); /* For old Opera (11.1 to 12.0) */ 
-     background-image: url(../images/select-arrow.png), linear-gradient(to bottom, #E5E5E5, #F4F4F4); /* Standard syntax; must be last */
-     background-position: center right;
-     background-repeat: no-repeat;
-     border: 1px solid #AAA;
-     border-radius: 2px;
-     box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
-     color: #555;
-     font-size: inherit;
-     margin: 0;
-     overflow: hidden;
-     padding-top: 2px;
-     padding-bottom: 2px;
-     text-overflow: ellipsis;
-     white-space: nowrap;
- }
- </style>
+    
+</style>
