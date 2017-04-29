@@ -47,7 +47,7 @@
 										 <h6 style="color:black; text-align: left; padding-left: 0.5cm">({{arena.ratings_count}} votes)</h6>
 
 									 </div>
-									 <div  class="w3-container">
+									 <div  v-if="user" class="w3-container">
 										  <router-link style="font-size: 16px" class="button is-primary is-focused w3-red" @click.native="view_details(arena)" to="/arenaDetails" tag="button">view details</router-link>
 	 								</div>
 
@@ -58,13 +58,13 @@
             </div>
 					</div>
 <hr>
-     
+
 		<br>
 
 		<div class="w3-container content has-text-centered">
 			<h1 style="font-family: Chalkboard SE"><font size="8"><b><font color="red">HOW</font> IT WORKS</b></font></h1>
 				<div class="columns">
-	 				<div class="column is-3">	
+	 				<div class="column is-3">
 	  					<img src="search.jpg" height="1000" width="1000">
 	  					<h1 style="font-family: Chalkboard SE"><font size="5"color="red"><b>FIND ARENA</b></font></h1>
 	  				</div>
@@ -135,6 +135,8 @@
   				},view_details(arena){
 									Event.$emit('view_details_of_arena', arena);
 								}
+		},computed:{
+		  user: function () { return this.$session.get('user'); }
 		}
 	}
 
