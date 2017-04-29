@@ -1,35 +1,68 @@
 <template>
-    <div>
-        <div v-if="shown">
-
-            <a v-on:click="hideMe">&#10799; </a>
-            <div class="Content">
-                <span class="tag is-primary is-medium">Booking Start Time</span>
-                <select v-model="startTime" @change="nullifyEndTime()">
-   <option v-for="(freeSlot,index) in freeSlots" :key="index">{{freeSlot}}</option>
-   </select>
-            </div>
-            <div v-if="startTime != null">
-                <span class="tag is-primary is-medium">Booking End Time</span>
-                <select v-model="endTime">
-   <option v-if="startTime != null" v-for="n in (findIndex(maxAllowedEndTime) - findIndex(startTime))" :key="n">{{findTime(n+findIndex(startTime))}}</option>
-   </select>
-            </div>
+    <div v-if="shown">
+            <a  v-on:click="hideMe">&#10799; </a>
             <div>
-                <span class="tag is-danger is-large">Please Note that the arena is already booked/unavailable in the following times</span>
-                <table class="table is-bordered is-striped" id="unavailable">
-                    <tr>
-                        <th>Start </th>
-                        <td v-for="reserved in reservedSlots"> {{reserved.start}}</td>
-                    </tr>
-                    <tr>
-                        <th>End</th>
-                        <td v-for="reserved in reservedSlots">{{reserved.end}}</td>
-                    </tr>
-                </table>
+            <span class="tag is-primary is-medium">Click on a slot to book it</span>
+            <span class="tag is-danger is-medium">note that if you click on another slot you will book all the slots in between </span>
+            
+            <table class="table is-bordered">
+          <tr>
+            <td v-for="i in 12" @click="handleClick(i-1)" >
+              <div >
+                <a >
+                  <p>Start: {{findTime(i-1)}}</p><br>
+                  <p>End  : {{findTime(i)}}</p>
+                  <img v-if = "schedule[i-1] != 0 && schedule[i-1] != 3" src="cross.png">
+                  <img v-if = "schedule[i-1] == 0" src="tick.png">
+                  <img v-if = "schedule[i-1] == 3" src="bluetick.png">
+                </a>
             </div>
-            <button v-on:click="bookHours" v-if="startTime != null && endTime != null" class="button is-black">book</button>
-            <div v-if="this.startTime != null && this.endTime != null">
+            </td>
+          </tr>
+          
+          <tr>
+            <td v-for="i in 12" @click="handleClick(i+11)" >
+              <div >
+                <a >
+                  <p>Start: {{findTime(i+11)}}</p><br>
+                  <p>End  : {{findTime(i+12)}}</p>
+                  <img v-if = "schedule[i+11] != 0 && schedule[i+11] != 3" src="cross.png">
+                  <img v-if = "schedule[i+11] == 0" src="tick.png">
+                  <img v-if = "schedule[i+11] == 3" src="bluetick.png">
+                  </a>
+            </div>
+            </td>
+          </tr>
+          <tr>
+            <td v-for="i in 12" @click="handleClick(i+23)" >
+              <div >
+                <a >
+                  <p>Start: {{findTime(i+23)}}</p><br>
+                  <p>End  : {{findTime(i+24)}}</p>
+                  <img v-if = "schedule[i+23] != 0 && schedule[i+23] != 3" src="cross.png">
+                  <img v-if = "schedule[i+23] == 0" src="tick.png">
+                  <img v-if = "schedule[i+23] == 3" src="bluetick.png">
+                </a>
+            </div>
+            </td>
+          </tr>
+          <tr>
+            <td v-for="i in 12"  @click="handleClick(i+35)">
+              <div >
+                <a >
+                  <p>Start: {{findTime(i+35)}}</p><br>
+                  <p>End  : {{findTime(i+36)}}</p>
+                  <img v-if = "schedule[i+35] != 0 && schedule[i+35] != 3" src="cross.png">
+                  <img v-if = "schedule[i+35] == 0" src="tick.png">
+                  <img v-if = "schedule[i+35] == 3" src="bluetick.png">
+                </a>
+            </div>
+            </td>
+          </tr>
+          
+          </table>
+            </div>
+            <div  id="StripeForm" v-if="this.startTime != null && this.endTime != null">
                 <div id="stripe-form">
                     <form @submit.prevent="charge()" id="payment-form">
                         <div class="form-row">
@@ -56,14 +89,11 @@
             </div>
             
         </div>
-        <div id="error">
-            <label v-if="error">Sorry Could not complete your booking</label>
-        </div>
-
     </div>
-
+        
 </template>
 <script>
+//import Stripe from 'stripe';
     export default {
         data() {
             return {
@@ -80,13 +110,74 @@
                 expYear: null,
                 cvc: null,
                 stripeEmail: null,
-                pricePerHour:null
+                pricePerHour:null,
             }
         },
         methods: {
-            validate() {
-                console.log(Stripe.card.validateCardNumber(this.cardNumber) + ' ' + Stripe.card.validateExpiry(this.expMonth, this.expYear) + ' ' + Stripe.card.validateCVC(this.cvc));
+            handleClick(index){
+                if(this.schedule[index] != 0 && this.schedule[index] !=3)
+                {
+                    console.log("You can not use this as start/end index because it is already used");
+                }
+                else if(this.startTime == null)
+                {
+                    var x=this.findTime(index);
+                    this.startTime = x;
+                    this.schedule[index]=3;
+                    this.endTime = this.findTime(index+1);
+                }
+                else 
+                {
+                    //user is selecting 
+                    if(this.findIndex(this.startTime)<=index && this.checkAvailable(parseInt(this.findIndex(this.startTime)),parseInt(index)))
+                    {
+                        if(this.findIndex(this.startTime) == index && this.findIndex(this.endTime) == index+1){
+                            this.schedule[index] = 0;
+                            this.startTime = null;
+                            this.endTime = null;
+                            return;
+                        }
+                        var j=0;
+                        for( j=this.findIndex(this.startTime)+1;j<this.findIndex(this.endTime);j++)
+                        {
+                            this.schedule[j]=0;
+                        } 
+                       /* if(j==0){
+                            console.log("Please be here");
+                            this.schedule[this.findIndex(this.startTime)]=0;
+                            this.startTime = null;
+                            this.endTime = null;
+                        }
+                        */
+                        //update the schedule
+                        var i=0;
+                        for(i=this.findIndex(this.startTime)+1;i<=index;i++)
+                        {
+                            this.schedule[i] = 3;
+                        }
+                        if(i !=0)
+                        {
+                        var x= this.findTime(i);
+                        
+                        this.endTime = x;
+                        i=0;
+                        }
+                    }
+                }
 
+            },
+             checkAvailable(startIndex, endIndex) {
+                for (var counter = startIndex; counter <= endIndex; counter++) {
+                    if (this.schedule[counter] != 0  && this.schedule[counter] != 3 ){
+                        
+                        return false;
+                    }
+                }
+                return true;
+            },
+
+            validate() {
+                
                 return Stripe.card.validateCardNumber(this.cardNumber) && Stripe.card.validateExpiry(this.expMonth, this.expYear) && Stripe.card.validateCVC(this.cvc);
             },
             charge() {
@@ -137,7 +228,7 @@
                 this.error = false;
             },
             findTime(index) {
-
+                
                 var hours = Math.floor(index / 2);
                 var min = '00';
                 if (index % 2 == 1)
@@ -219,12 +310,12 @@
                 }
                 return bookedBlocks;
             },
-            maxAllowedEndTime() {
+            maxAllowedEndIndex() {
                 var index = this.findIndex(this.startTime);
                 while ((this.schedule[index] == 0) && index < this.schedule.length) {
                     index++;
                 }
-                return this.findTime(index);
+                return index;
             },
             getPrice() {
                 return Math.floor((this.findIndex(this.endTime)-this.findIndex(this.startTime))*(this.pricePerHour)*2.5)
@@ -243,39 +334,5 @@
 </script>
 
 <style>
-    select {
-        -webkit-appearance: button;
-        -moz-appearance: button;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -webkit-padding-end: 20px;
-        -moz-padding-end: 20px;
-        -webkit-padding-start: 2px;
-        -moz-padding-start: 2px;
-        background-color: #F07575;
-        /* fallback color if gradients are not supported */
-        background-image: url(../images/select-arrow.png), -webkit-linear-gradient(top, #E5E5E5, #F4F4F4);
-        /* For Chrome and Safari */
-        background-image: url(../images/select-arrow.png), -moz-linear-gradient(top, #E5E5E5, #F4F4F4);
-        /* For old Fx (3.6 to 15) */
-        background-image: url(../images/select-arrow.png), -ms-linear-gradient(top, #E5E5E5, #F4F4F4);
-        /* For pre-releases of IE 10*/
-        background-image: url(../images/select-arrow.png), -o-linear-gradient(top, #E5E5E5, #F4F4F4);
-        /* For old Opera (11.1 to 12.0) */
-        background-image: url(../images/select-arrow.png), linear-gradient(to bottom, #E5E5E5, #F4F4F4);
-        /* Standard syntax; must be last */
-        background-position: center right;
-        background-repeat: no-repeat;
-        border: 1px solid #AAA;
-        border-radius: 2px;
-        box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
-        color: #555;
-        font-size: inherit;
-        margin: 0;
-        overflow: hidden;
-        padding-top: 2px;
-        padding-bottom: 2px;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
+    
 </style>
