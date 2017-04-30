@@ -88,7 +88,7 @@
                         }, 1);
                     })
                     .catch(err => {
-                        this.$notify({title:"", message: err.response.data.error ,type:"warn"});
+                        this.$notify({title:"", message: err.response.data.error ,type:"error"});
                     });
             },
             addNewPlayer(listedPlayer) {
@@ -118,7 +118,7 @@
                         }, 1);
                         })
                         .catch(err => {
-                            this.$notify({title:"", message: err.response.data.error ,type:"warn"});
+                            this.$notify({title:"", message: err.response.data.error ,type:"warning"});
                         });
                 } else {
                     axios.post('/profile/blacklist/phone',
@@ -136,7 +136,7 @@
                         }, 1);
                         })
                         .catch(err => {
-                            this.$notify({title:"", message: err.response.data.error ,type:"warn"});
+                            this.$notify({title:"", message: err.response.data.error ,type:"warning"});
                         });
                 }
             }
