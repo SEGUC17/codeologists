@@ -219,7 +219,7 @@ body {font-family: Verdana,sans-serif;}
 .month {
     padding: 70px 25px;
     width: 100%;
-    background: #ff9800;
+    background: #00ccff;
 }
 .month ul {
     margin: 0;

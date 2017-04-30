@@ -4,7 +4,7 @@
 <calender v-if="!showNextMonth" :id="getCurrentMonth"  :monthName="getCurrentMonth" ><template slot="month">{{getCurrentMonth}}</template></calender>
 
 <calender :id="getNextMonth" v-if="showNextMonth && nextMonthHasDays"  :monthName="getNextMonth" ><template slot="month">{{getNextMonth}}</template></calender>
-
+<br>
 </div>
 </template>
 <script>

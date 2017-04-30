@@ -192,17 +192,19 @@ export default {
 }
 </script>
 <template>
-<div>
-<div >
-<div class="month">      
-  <ul>
-    <li class="prev" v-if="calMonth != ((new Date()).getMonth())"><a v-on:click="showPrev">&#10094; Back  </a></li>
-    <li class="next" v-if="calMonth == ((new Date()).getMonth())"><a v-on:click="showNext">  Next Month &#10095;</a></li>
-    <li style="text-align:center">
+<div class="w3-container">
+<br>
+<div class="w3-quarter">
+    <h1>&nbsp</h1>
+</div>
+<div class=" w3-half w3-card">
+<div class="month w3-display-container">      
+    <div class="w3-display-left" v-if="calMonth != ((new Date()).getMonth())"><a style="color:black" v-on:click="showPrev"><b> &#10094; Back  </b></a></div>
+    <div class="w3-display-right w3-text-white" v-if="calMonth == ((new Date()).getMonth())"><a style="color:black" v-on:click="showNext"><b> Next &#10095 </b> </a></div>
+    <div class="w3-display-middle w3-text-white">
       <slot name="month" ></slot><br>
       <span style="font-size:18px"><p v-text="year" ></p></span>
-    </li>
-  </ul>
+    </div>
 </div>
 <ul class="weekdays">
   <li>Mo</li>
@@ -229,7 +231,7 @@ body {font-family: Verdana,sans-serif;}
 .month {
     padding: 70px 25px;
     width: 100%;
-    background: #ff9800;
+    background: #00ccff;
 
 }
 
