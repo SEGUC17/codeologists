@@ -82,7 +82,7 @@
 
 							<!-- player profile -->
 
-							<router-link v-if="user" class="nav-item" to="/games"><a>Available Games</a></router-link>
+							<router-link v-if="type=='Player'" class="nav-item" to="/games"><a>Available Games</a></router-link>
 
 							<router-link v-if="!user" class="nav-item" to="/Search">Search</router-link>
 
