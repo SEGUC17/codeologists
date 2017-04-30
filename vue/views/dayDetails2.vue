@@ -2,7 +2,6 @@
     <div v-if="shown">
             <a  v-on:click="hideMe">&#10799; </a>
             <div>
-            <span class="tag is-primary is-medium">Click on a slot to either set it available or unavailable</span>
             <span class="tag is-danger is-medium">note that black checked slots are booked, red checked slots are unavailable and green checked slots are available </span>
             
             <table class="table is-bordered">
@@ -10,8 +9,7 @@
             <td v-for="i in 12" @click="handleClick(i-1)" >
               <div >
                 <a >
-                  <p>Start: {{findTime(i-1)}}</p><br>
-                  <p>End  : {{findTime(i)}}</p>
+                  <p>{{findTime(i-1)}} - {{findTime(i)}}</p>
                   <img v-if = "schedule[i-1] != 0 && schedule[i-1] != 3 && schedule[i-1] != -1" src="blacktick.png">
                   <img v-if = "schedule[i-1] == 0" src="tick.png">
                   <img v-if = "schedule[i-1] == 3" src="bluetick.png">
@@ -25,8 +23,7 @@
             <td v-for="i in 12" @click="handleClick(i+11)" >
               <div >
                 <a >
-                  <p>Start: {{findTime(i+11)}}</p><br>
-                  <p>End  : {{findTime(i+12)}}</p>
+                   <p>{{findTime(i+11)}} - {{findTime(i+12)}}</p>
                   <img v-if = "schedule[i+11] != 0 && schedule[i+11] != 3 && schedule[i+11]!= -1" src="blacktick.png">
                   <img v-if = "schedule[i+11] == 0" src="tick.png">
                   <img v-if = "schedule[i+11] == 3" src="bluetick.png">
@@ -39,8 +36,7 @@
             <td v-for="i in 12" @click="handleClick(i+23)" >
               <div >
                 <a >
-                  <p>Start: {{findTime(i+23)}}</p><br>
-                  <p>End  : {{findTime(i+24)}}</p>
+                   <p>{{findTime(i+23)}} - {{findTime(i+24)}}</p>
                   <img v-if = "schedule[i+23] != 0 && schedule[i+23] != 3 && schedule[i+23] != -1" src="blacktick.png">
                   <img v-if = "schedule[i+23] == 0" src="tick.png">
                   <img v-if = "schedule[i+23] == 3" src="bluetick.png">
@@ -53,8 +49,7 @@
             <td v-for="i in 12"  @click="handleClick(i+35)">
               <div >
                 <a >
-                  <p>Start: {{findTime(i+35)}}</p><br>
-                  <p>End  : {{findTime(i+36)}}</p>
+                   <p>{{findTime(i+35)}} - {{findTime(i+36)}}</p>
                   <img v-if = "schedule[i+35] != 0 && schedule[i+35] != 3 && schedule[i+35] != -1" src="blacktick.png">
                   <img v-if = "schedule[i+35] == 0" src="tick.png">
                   <img v-if = "schedule[i+35] == 3" src="bluetick.png">

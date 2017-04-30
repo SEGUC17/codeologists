@@ -1,10 +1,24 @@
 <template>
-
-
-<div id="list" class="columns is-mobile">
-    <div class="column is-half is-offset-one-quarter">
-
-      <input v-model="PlayerInfo" v-on:keyup.enter="onSubmit" placeholder="add a player" style='width:100%'>
+<div>
+<div class="tile is-parent">
+  <div class="tile is-vertical is-12">
+    <div class="tile">
+      <div class="tile is-parent is-vertical">
+        <article class="tile is-child notification is-primary">
+          <p class="title"> </p>
+          <p class="subtitle"> <font face="Ubuntu"> You can add a player to a white/black list by specifying either his username or phone number</font></p>
+        </article>
+    </div>
+</div>
+</div>
+</div>
+<div id="list" class="w3-container">
+    <div style="rcorners1" class="column is-half is-offset-one-quarter">
+      <label class=" w3-card-2 w3-white w3-margin-bottom">
+      <font face="Ubuntu">White list</font>
+    </label>
+    <br></br>
+      <input class="input" v-model="PlayerInfo" v-on:keyup.enter="onSubmit" placeholder="add a player" style='width:70%'>
         
         <div v-for="(player, index) in players" v-bind:key="player" >
             <br>
@@ -32,8 +46,22 @@
  </div>
 
 </div>
+</div>
 </template>
 
+
+<style >
+
+#rcorners1 {
+    border-radius: 25px;
+    background: #73AD21;
+    padding: 20px; 
+    width: 120px;
+    height: 50px; 
+}
+
+
+</style>
 
 
 
@@ -57,7 +85,7 @@
                     this.showPlayers(res.data.players)
                 })
                 .catch(err => {
-                    alert("please login")
+                    //alert("please login")
                 })
         },
         methods: {
@@ -84,11 +112,11 @@
                     .then(res => {
                         this.players.splice(index, 1);
                         setTimeout(function() {
-                            alert(res.data.message);
+                            this.$notify({title:"", message: res.data.message ,type:"success"});
                         }, 1);
                     })
                     .catch(err => {
-                        alert(err.response.data.error)
+                        this.$notify({title:"", message: err.response.data.error ,type:"warn"});
                     });
             },
             addNewPlayer(listedPlayer) {
@@ -113,12 +141,12 @@
                             })
                         .then(res => {
                             this.addNewPlayer(res.data.listedPlayer)
-                            setTimeout(function() {
-                                alert(res.data.message);
-                            }, 1);
+                           setTimeout(function() {
+                            this.$notify({title:"", message: res.data.message ,type:"success"});
+                        }, 1);
                         })
                         .catch(err => {
-                            alert(err.response.data.error)
+                            this.$notify({title:"", message: err.response.data.error ,type:"warn"});
                         });
                 } else {
                     axios.post('/profile/whitelist/phone',
@@ -132,11 +160,11 @@
                         .then(res => {
                             this.addNewPlayer(res.data.listedPlayer)
                             setTimeout(function() {
-                                alert(res.data.message);
-                            }, 1);
+                            this.$notify({title:"", message: res.data.message ,type:"success"});
+                        }, 1);
                         })
                         .catch(err => {
-                            alert(err.response.data.error)
+                            this.$notify({title:"", message: err.response.data.error ,type:"warn"});
                         });
                 }
             }
