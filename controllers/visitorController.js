@@ -101,6 +101,7 @@ Creates and inserts a new user into the database (a player or a service provider
 					req.checkBody('name', 'Name is required.').notEmpty();
 		            req.checkBody('username', 'Username is required.').notEmpty();
 		            req.checkBody('password', 'Password is required.').notEmpty();
+		            req.checkBody('password', 'Password must be at least 8 characters').isLength({min:8});
 		            req.checkBody('email', 'Email is required.').notEmpty();
 		            req.checkBody('email', 'Email not in correct format').isEmail();
 		            req.checkBody('location', 'Location is required.').notEmpty();
