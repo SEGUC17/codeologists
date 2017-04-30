@@ -38,7 +38,7 @@
       axios.get('/viewPlayerBookings')
       .then(res => this.bookings=res.data)
       .catch(err => {
-        alert(err.response.data.error),
+        this.$notify({title:"", message: err.response.data.error ,type:"error"});
         this.$router.push('/');
     });
     },
@@ -77,22 +77,22 @@
           axios.post('/cancelBooking/'+booking._id,querystring.stringify({arena: booking.arena}),{headers : { "Content-Type": "application/x-www-form-urlencoded" }})
               .then(response => {
                 if(response.error)
-                {alert(response.error);}
+                  {this.$notify({title:"", message: response.error ,type:"error"});}
                 else {
-                  alert('Successfully deleted');
+                  this.$notify({title:"", message: "Successfully deleted!" ,type:"success"});
                   axios.get('/viewPlayerBookings')
                   .then(res => this.bookings=res.data)
-                  .catch(err => alert(err.response.data.error));
+                  .catch(err => this.$notify({title:"", message: err.response.data.error ,type:"error"}));
                 }
               })
               .catch(err => {
                 if(err.response.data.error)
-                  alert(err.response.data.error)
+                  this.$notify({title:"", message: err.response.data.error ,type:"error"});
                 else
                   if(err.message)
-                    alert(err.message);
+                    this.$notify({title:"", message: err.message ,type:"error"});
                   else {
-                    alert(err);
+                    this.$notify({title:"", message: err ,type:"error"});
                   }
               });
         }
