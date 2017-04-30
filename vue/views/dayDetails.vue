@@ -266,7 +266,22 @@
                         {
                             "Content-Type": "application/x-www-form-urlencoded"
                         }
-                    }).then((data) => this.updateSchedule(data)).catch(error => this.error = true);
+                    }).then((data) => {
+                        this.$notify({
+                            title:" Booking submitted Successfully",
+                            message:"if your booking has not appeared on the schedule,then the arena owner/manager is yet to confirm your booking",
+                            type:'success',
+                            duration:'1000',
+                        })
+                        this.updateSchedule(data);
+                    }).catch(error => {
+                        this.$notify({
+                            title:"Sorry, encountered an error",
+                            message:data.data.error,
+                            type:'error',
+                            duration:'0'
+                        })
+                    });
             },
             assignValues(data) {
                 this.shown = true;
