@@ -82,7 +82,7 @@
 
 							<!-- player profile -->
 
-							<router-link v-if="user" class="nav-item" to="/games"><a>Available Games</a></router-link>
+							<router-link v-if="type=='Player'" class="nav-item" to="/games"><a>Available Games</a></router-link>
 
 							<router-link v-if="!user" class="nav-item" to="/Search">Search</router-link>
 
@@ -90,10 +90,11 @@
 
 							<router-link v-if="user" class="nav-item" to="/profile">{{user}}</router-link>
 
-
-							<a v-if="user" class="button is-info is-inverted" @click="logout">
-								<span>Logout</span>
-							</a>
+							<router-link class="nav-item" to="/">
+								<a v-if="user" class="button is-info is-inverted" @click="logout">
+									<span>Logout</span>
+								</a>
+							</router-link>
 
 
 							<router-link v-if="!user" class="nav-item" to="/login-signup/login">

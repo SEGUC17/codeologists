@@ -52,7 +52,6 @@
           view_details(arena){
 
             Event.$emit('view_details_of_arena', arena);
-            console.log(arena);
 
           },
 

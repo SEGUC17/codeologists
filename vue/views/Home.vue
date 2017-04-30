@@ -4,16 +4,16 @@
 			  <img src="image/1.jpg" alt="Lights" style="width: 100%" >
 			  <div class="w3-display-middle w3-large">
 
-			  		<h1 class="w3-text-white">Choose location</h1>
-			  		<div class="box" style="opacity: 0.65;">
+			  		<h3><font size="6"><font color="white">Choose Location</font></font></h3>
+			  		<div class="box">
 			  			<div class="w3-dropdown-hover">
-							<button class="w3-button w3-black" >{{this.location}}</button>
+							<button class="w3-button w3-black" style="width: 300px">{{this.location}}</button>
 							<div class="w3-dropdown-content w3-bar-block w3-border" >
 								<a v-for="loc in locations" class="w3-bar-item w3-button" @click="setLocation(loc)">{{loc}}</a>
 							</div>
 						</div>
 
-						<button class="w3-button w3-red" @click="view_by_location" :disabled="this.check " >
+						<button class="w3-button w3-red w3-text-black" @click="view_by_location" :disabled="this.check " >
 							<router-link to="/viewArenas">
 	    						<a>Show Arenas</a>
 	    					</router-link>
@@ -22,10 +22,11 @@
 			  </div>
 		</div>
     <hr>
-     <div class="w3-container w3-card-2 w3-white w3-margin-bottom">
-       <div class="heading w3-center w3-container w3-card-2 w3-white w3-margin-bottom">
-				 <h1 class="title w3-text-red">TOP ARENAS</h1>
-				 <h2 v-if="top_arenas.length == 0" class="title w3-text-blue">NO arenas created yet</h2>
+     <div class="w3-container w3-white w3-margin-bottom ">
+       <br>		<div class="has-text-centered">
+					 <h1 style="font-family: Chalkboard SE"><font size="8"><b><font color="red">TOP</font> ARENAS</b></font></h1>
+					 <h2 v-if="top_arenas.length == 0" class="title w3-text-blue">NO arenas created yet</h2>
+				 <br>
 				 </div>
            <div class="w3-row">
   				 		<div v-for="arena in top_arenas" class="w3-container w3-quarter">
