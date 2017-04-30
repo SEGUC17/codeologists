@@ -64,18 +64,25 @@
 			createGame(){
 				this.form.submit('post','/createGame')
 				.then(res => {
-					alert('Game added successfully');
+					this.$notify({
+	                    title: 'Done',
+	                   	message: 'You have successfully created the game',
+	                    type: 'success'
+	                });
 					this.$router.push('/');
 				})
 				.catch(err => {
-					alert(err.error);
+					this.$notify.error({
+                      title: 'Error',
+                      message: err.error
+                    });
 				});
 			}
 		},
 
         computed: {
-            user: function () { return window.user; },
-            type: function () { return window.type; }
+            user: function () { return this.$session.get('user'); },
+            type: function () { return this.$session.get('type'); }
         }
 	}
 </script>

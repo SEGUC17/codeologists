@@ -502,8 +502,8 @@ A function that enables the service provider to accept a pending booking
                                             {
                                                 if (!err && arenaa) 
                                                 {
-                                                    var notification = 'Unfortunately,your booking on day ' + (currentBooking.bookDay) + ' on month ' +
-                                                        (currentBooking.bookMonth) + ' for ' + (arenaa.name) + ' from '
+                                                    var notification = 'Unfortunately,your booking on' + (currentBooking.bookDay) + ' / ' +
+                                                        (currentBooking.bookMonth) + ' in Arena : ' + (arenaa.name) + ' from '
                                                         + serviceProviderController.getTimeFromIndex(start1) + ' to ' 
                                                         + serviceProviderController.getTimeFromIndex(end1) + ' has been rejected';
                                                     Player.findOne({ _id: currentBooking.player }, function (err, playerr) 
@@ -626,8 +626,8 @@ A function that enables the service provider to reject a pending booking
                 var weekIndex = indices.weekIndex;
                 var start = curBooking.start_index;
                 var end = curBooking.end_index;
-                var notification = 'Unfortunately,your booking on day ' + (curBooking.bookDay) + ' on month ' +
-                    (curBooking.bookMonth) + ' for ' + (arenaa.name) + ' from '
+                var notification = 'Unfortunately,your booking on ' + (curBooking.bookDay) + ' / ' +
+                    (curBooking.bookMonth) + ' in Arena : ' + (arenaa.name) + ' from '
                     + serviceProviderController.getTimeFromIndex(start) + ' to ' + 
                     serviceProviderController.getTimeFromIndex(end) + ' has been rejected';
  
