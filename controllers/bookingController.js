@@ -61,7 +61,9 @@ function viewBookings(req, res) {
                 else if (serviceProvider) {
                     if (serviceProvider.username == req.user.username) {
                         //find all pending requests where the request time is greater than today, the arena is the current arena  and have not been accepted
-                        Booking.find({ accepted: false, arena: foundArena.name }).$where('(new Date(new Date().getFullYear(),this.bookMonth,this.bookDay))>(new Date())').exec(function (err, bookingArr) {
+                        Booking.find({ accepted: false, arena: foundArena.name })
+                        .$where('(new Date(new Date().getFullYear(),this.bookMonth,this.bookDay,Math.floor(this.start_index/2),((this.start_index%2)*30),0,0))>(new Date())')
+                        .exec(function (err, bookingArr) {
                             //TODO: render a view (will be done in Sprint 2 ISA)
                             if (err) {
                                 res.json({ err: "Error finding pending requests" });
@@ -189,7 +191,9 @@ var viewPlayerBookings = function (req, res){
    }
    else {
 
-      Booking.find({player : req.user._id},function(err,arenas){
+      Booking.find({player : req.user._id})
+      .$where('(new Date(new Date().getFullYear(),this.bookMonth,this.bookDay,Math.floor(this.start_index/2),((this.start_index%2)*30),0,0))>(new Date())')
+      .exec(function(err,arenas){
           if(err){
               return res.json({error : err.message});
           }else{

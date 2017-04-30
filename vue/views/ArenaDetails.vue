@@ -174,7 +174,7 @@
 				this.arena = arena;
 				this.photos = arena.photos;
 				this.arenaId=arena._id;
-				this.value5=arena.avg_rating;
+				this.value5=arena.avg_rating.toFixed(2);
 
 			});
 
@@ -206,6 +206,7 @@
 		computed: {
             user: function () { return window.user; },
             type: function () { return window.type; },
+
             getUrl() {
             	return "/schedule/"+this.arena.name;
             }

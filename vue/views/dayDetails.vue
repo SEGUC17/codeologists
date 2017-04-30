@@ -59,7 +59,7 @@
             </div>
             </td>
           </tr>
-          
+          <button class="button is-black is-inverted is-large" @click="bookHours()" :disabled="startTime == null || endTime==null">Play !</button>
           </table>
             </div>
             <div  id="StripeForm" v-if="this.startTime != null && this.endTime != null">
@@ -115,6 +115,10 @@
         },
         methods: {
             handleClick(index){
+                if(index <= ((new Date()).getHours())*2)
+                {
+                    return console.log("You can not book in the past");
+                }
                 if(this.schedule[index] != 0 && this.schedule[index] !=3)
                 {
                     console.log("You can not use this as start/end index because it is already used");
@@ -131,6 +135,7 @@
                     //user is selecting 
                     if(this.findIndex(this.startTime)<=index && this.checkAvailable(parseInt(this.findIndex(this.startTime)),parseInt(index)))
                     {
+                        
                         if(this.findIndex(this.startTime) == index && this.findIndex(this.endTime) == index+1){
                             this.schedule[index] = 0;
                             this.startTime = null;
