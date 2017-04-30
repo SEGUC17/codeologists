@@ -115,7 +115,7 @@
         },
         methods: {
             handleClick(index){
-                if(index <= ((new Date()).getHours())*2)
+                if(index <= ((new Date()).getHours())*2  && (new Date()).getMonth()==this.month && this.day == (new Date().getDate()))
                 {
                     return console.log("You can not book in the past");
                 }
