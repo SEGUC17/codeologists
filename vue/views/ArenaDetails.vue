@@ -111,10 +111,28 @@
 <!-- end of regulations -->
 
 
-	<div class="w3-row-padding">
+	<!-- <div class="w3-row-padding">
 		<div class="w3-third" v-for="photo in photos">
 			<img :src="getPath(photo)" style="width:100%" @click="dispalyImage(getPath(photo))" alt="arena image">
 		</div>
+	</div> -->
+<br><br>
+	<div class="w3-quarter " style="padding: 180px 0; text-align: center;">
+		<a v-if="display_photo > 0">
+			<img @click="minusOne" src="Back-48.png" alt="">
+		</a>
+  </div>
+
+		<div class = "w3-half">
+			<figure class="image is-3by2">
+				<img :src="getPath(photos[display_photo])" style="width:100%" @click="dispalyImage(getPath(photos[display_photo]))" alt="arena image">
+			</figure>
+		</div>
+
+	<div class="w3-quarter" style="padding: 180px 0; text-align: center;">
+		<a v-if="display_photo < photos.length-1">
+			<img src="Forward-48.png" @click="addOne" alt="">
+		</a>
 	</div>
 
 	<!-- Modal for full size images on click-->
@@ -124,7 +142,7 @@
 		</div>
 	</div>
 
-
+<br><br>
 		<!-- Tawfik comments -->
 		<comments :initialMina="this.arenaId" :initialcomments="this.arena.comments"></comments>
 
@@ -146,6 +164,7 @@
 				photos:{},
 				arenaId:'',
 				value5 : 0,
+				display_photo: 0,
 			};
 		},
 
@@ -176,7 +195,12 @@
 				document.getElementById("img01").src = element;
 				document.getElementById("modal01").style.display = "block";
 			},
-
+			addOne(){
+				this.display_photo = this.display_photo+1;
+			},
+			minusOne(){
+				this.display_photo = this.display_photo-1;
+			}
 		},
 
 		computed: {
