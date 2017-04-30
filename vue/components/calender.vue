@@ -4,10 +4,10 @@ export default {
     {
         getData(){
         
-        axios.get('/arena/'+this.arenaName+'/getSchedule').then((res) => this.updateSchedule(res.data)).catch(error => this.errors = (error.data));
+        axios.get('/arena/'+this.arenaName+'/getSchedule').then((res) => this.updateSchedule(res.data)).catch(error => {this.$notify({title:"sorry internal sever error",message:error.data.error,type:"error"})});
         axios.get('/arena/'+this.arenaName+'/getPrice').then(res => {
             this.pricePerHour = res.data.price;
-        }).catch((err) => window.alert('Error'));
+        }).catch((err) => {this.$notify({title:"sorry internal sever error",message:err.data.error,type:"error"})});
 
         },
         showPrev(){
