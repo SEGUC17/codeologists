@@ -22,10 +22,11 @@
 			  </div>
 		</div>
     <hr>
-     <div class="w3-container w3-card-2 w3-white w3-margin-bottom">
-       <div class="heading w3-center w3-container w3-card-2 w3-white w3-margin-bottom">
-				 <h1 class="title w3-text-red">TOP ARENAS</h1>
-				 <h2 v-if="top_arenas.length == 0" class="title w3-text-blue">NO arenas created yet</h2>
+     <div class="w3-container w3-white w3-margin-bottom ">
+       <br>		<div class="has-text-centered">
+					 <h1 style="font-family: Chalkboard SE"><font size="8"><b><font color="red">TOP</font> ARENAS</b></font></h1>
+					 <h2 v-if="top_arenas.length == 0" class="title w3-text-blue">NO arenas created yet</h2>
+				 <br>
 				 </div>
            <div class="w3-row">
   				 		<div v-for="arena in top_arenas" class="w3-container w3-quarter">

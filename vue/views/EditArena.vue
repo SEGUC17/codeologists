@@ -89,7 +89,7 @@
 			<input id="new_image" type="file" class="form-control" name="new_image" accept="image/*" @change="onFile" multiple><br>
 			<br>
 			<div class="control">
-				<button class="button is-primary">Add</button>
+				<button class="button is-primary" :disabled="files==''">Add</button>
 			</div>
 		</form>
 		<br>
@@ -102,19 +102,16 @@
 
 		<div v-if="selectedTab=='schedule'">
 
-		<div class="w3-center">
-			<div class="w3-half">
-				<div class="w3-dropdown-hover">
-					<button class="w3-button w3-black w3-hover-red">Choose Day</button>
-					<div class="w3-dropdown-content w3-bar-block w3-border">
-						<a v-for="i in 7" class="w3-bar-item w3-button" @click="selectDay(i-1)">{{days[i-1]}}</a>
-					</div>
-				</div>
-			</div>
+		<div class="tabs ">
+          <ul>
+			<li v-for="i in 7" :class="{'black-tab' : currentDay==i-1}">
+              <a @click="selectDay(i-1)">
+                <h6 :class="{'white-text': currentDay==i-1}">{{days[i-1]}}</h6>
+              </a>
+            </li>
 
-			<h3 class="w3-half w3-text-red">{{days[currentDay]}}</h3>
-
-		</div>
+          </ul>
+        </div>
 
 
 		<table v-for="j in 7" v-if="j-1==currentDay" class="table is-bordered">
@@ -235,9 +232,19 @@
 			saveChanges() {
 				this.form.submit('post', '/editarenainfo/' + this.form._id)
 					.then(arena => {
-						this.$router.push('/myArenas');
+						this.$notify({
+				          title: 'Success',
+				          message: 'The arena info is updated successfully',
+				          type: 'success'
+				        });
+						this.$router.push('/profile');
 					})
 					.catch(err => {
+						this.$notify({
+				          title: 'Error',
+				          message: error,
+				          type: 'error'
+				        });
 					});
 			},
 
@@ -246,9 +253,19 @@
 				dataForm.append('new_image', this.files[0]);
 				axios.post('/addarenaimage/' + this.form._id, dataForm)
 					.then(arena => {
-						this.$router.push('/myArenas');
+						this.$notify({
+				          title: 'Success',
+				          message: 'The new image is successfully added',
+				          type: 'success'
+				        });
+						this.$router.push('/profile');
 					})
 					.catch(err => {
+						this.$notify({
+				          title: 'Error',
+				          message: error,
+				          type: 'error'
+				        });
 					});
 			},
 
@@ -290,9 +307,19 @@
 							x.push(i + "," + j);
 				axios.post('/editdefaultschedule/' + this.form._id, querystring.stringify({ schedule: x }), { headers: { "Content-Type": "application/x-www-form-urlencoded" } })
 					.then(arena => {
-						this.$router.push('/myArenas');
+						this.$notify({
+				          title: 'Success',
+				          message: 'The arena schedule is updated successfully',
+				          type: 'success'
+				        });
+						this.$router.push('/profile');
 					})
-					.catch(err => {
+					.catch(error => {
+						this.$notify({
+				          title: 'Error',
+				          message: error,
+				          type: 'error'
+				        });
 					});
 			}
 
