@@ -35,9 +35,10 @@
 			</div>
 		</form>
 	</div>
-	
 
-	<div class="w3-quarter"></div>
+	<div class="w3-quarter" >
+		
+	</div>
 
 </div>
 </template>
