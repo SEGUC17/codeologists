@@ -6453,96 +6453,28 @@ new Vue({
 /* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(global, module, setImmediate, process) {(function (global, factory) {
-     true ? factory(exports) :
-    typeof define === 'function' && define.amd ? define(['exports'], factory) :
-    (factory((global.async = global.async || {})));
+/* WEBPACK VAR INJECTION */(function(setImmediate, process, global, module) {(function (global, factory) {
+   true ? factory(exports) :
+  typeof define === 'function' && define.amd ? define(['exports'], factory) :
+  (factory((global.async = global.async || {})));
 }(this, (function (exports) { 'use strict';
 
-/**
- * A faster alternative to `Function#apply`, this function invokes `func`
- * with the `this` binding of `thisArg` and the arguments of `args`.
- *
- * @private
- * @param {Function} func The function to invoke.
- * @param {*} thisArg The `this` binding of `func`.
- * @param {Array} args The arguments to invoke `func` with.
- * @returns {*} Returns the result of `func`.
- */
-function apply(func, thisArg, args) {
-  switch (args.length) {
-    case 0: return func.call(thisArg);
-    case 1: return func.call(thisArg, args[0]);
-    case 2: return func.call(thisArg, args[0], args[1]);
-    case 3: return func.call(thisArg, args[0], args[1], args[2]);
-  }
-  return func.apply(thisArg, args);
-}
-
-/* Built-in method references for those with the same name as other `lodash` methods. */
-var nativeMax = Math.max;
-
-/**
- * A specialized version of `baseRest` which transforms the rest array.
- *
- * @private
- * @param {Function} func The function to apply a rest parameter to.
- * @param {number} [start=func.length-1] The start position of the rest parameter.
- * @param {Function} transform The rest array transform.
- * @returns {Function} Returns the new function.
- */
-function overRest$1(func, start, transform) {
-  start = nativeMax(start === undefined ? (func.length - 1) : start, 0);
-  return function() {
-    var args = arguments,
-        index = -1,
-        length = nativeMax(args.length - start, 0),
-        array = Array(length);
-
-    while (++index < length) {
-      array[index] = args[start + index];
+function slice(arrayLike, start) {
+    start = start|0;
+    var newLen = Math.max(arrayLike.length - start, 0);
+    var newArr = Array(newLen);
+    for(var idx = 0; idx < newLen; idx++)  {
+        newArr[idx] = arrayLike[start + idx];
     }
-    index = -1;
-    var otherArgs = Array(start + 1);
-    while (++index < start) {
-      otherArgs[index] = args[index];
-    }
-    otherArgs[start] = transform(array);
-    return apply(func, this, otherArgs);
-  };
-}
-
-/**
- * This method returns the first argument it receives.
- *
- * @static
- * @since 0.1.0
- * @memberOf _
- * @category Util
- * @param {*} value Any value.
- * @returns {*} Returns `value`.
- * @example
- *
- * var object = { 'a': 1 };
- *
- * console.log(_.identity(object) === object);
- * // => true
- */
-function identity(value) {
-  return value;
-}
-
-// Lodash rest function without function.toString()
-// remappings
-function rest(func, start) {
-    return overRest$1(func, start, identity);
+    return newArr;
 }
 
 var initialParams = function (fn) {
-    return rest(function (args /*..., callback*/) {
+    return function (/*...args, callback*/) {
+        var args = slice(arguments);
         var callback = args.pop();
         fn.call(this, args, callback);
-    });
+    };
 };
 
 /**
@@ -6575,6 +6507,34 @@ function isObject(value) {
   return value != null && (type == 'object' || type == 'function');
 }
 
+var hasSetImmediate = typeof setImmediate === 'function' && setImmediate;
+var hasNextTick = typeof process === 'object' && typeof process.nextTick === 'function';
+
+function fallback(fn) {
+    setTimeout(fn, 0);
+}
+
+function wrap(defer) {
+    return function (fn/*, ...args*/) {
+        var args = slice(arguments, 1);
+        defer(function () {
+            fn.apply(null, args);
+        });
+    };
+}
+
+var _defer;
+
+if (hasSetImmediate) {
+    _defer = setImmediate;
+} else if (hasNextTick) {
+    _defer = process.nextTick;
+} else {
+    _defer = fallback;
+}
+
+var setImmediate$1 = wrap(_defer);
+
 /**
  * Take a sync function and make it async, passing its return value to a
  * callback. This is useful for plugging sync functions into a waterfall,
@@ -6594,7 +6554,7 @@ function isObject(value) {
  * @method
  * @alias wrapSync
  * @category Util
- * @param {Function} func - The synchronous funuction, or Promise-returning
+ * @param {Function} func - The synchronous function, or Promise-returning
  * function to convert to an {@link AsyncFunction}.
  * @returns {AsyncFunction} An asynchronous wrapper of the `func`. To be
  * invoked with `(args..., callback)`.
@@ -6641,10 +6601,10 @@ function asyncify(func) {
         }
         // if result is Promise object
         if (isObject(result) && typeof result.then === 'function') {
-            result.then(function (value) {
-                callback(null, value);
-            }, function (err) {
-                callback(err.message ? err : new Error(err));
+            result.then(function(value) {
+                invokeCallback(callback, null, value);
+            }, function(err) {
+                invokeCallback(callback, err.message ? err : new Error(err));
             });
         } else {
             callback(null, result);
@@ -6652,18 +6612,19 @@ function asyncify(func) {
     });
 }
 
-var supportsSymbol = typeof Symbol === 'function';
-
-function supportsAsync() {
-    var supported;
+function invokeCallback(callback, error, value) {
     try {
-        /* eslint no-eval: 0 */
-        supported = isAsync(eval('(async function () {})'));
+        callback(error, value);
     } catch (e) {
-        supported = false;
+        setImmediate$1(rethrow, e);
     }
-    return supported;
 }
+
+function rethrow(error) {
+    throw error;
+}
+
+var supportsSymbol = typeof Symbol === 'function';
 
 function isAsync(fn) {
     return supportsSymbol && fn[Symbol.toStringTag] === 'AsyncFunction';
@@ -6673,22 +6634,22 @@ function wrapAsync(asyncFn) {
     return isAsync(asyncFn) ? asyncify(asyncFn) : asyncFn;
 }
 
-var wrapAsync$1 = supportsAsync() ? wrapAsync : identity;
-
 function applyEach$1(eachfn) {
-    return rest(function (fns, args) {
-        var go = initialParams(function (args, callback) {
+    return function(fns/*, ...args*/) {
+        var args = slice(arguments, 1);
+        var go = initialParams(function(args, callback) {
             var that = this;
             return eachfn(fns, function (fn, cb) {
-                wrapAsync$1(fn).apply(that, args.concat(cb));
+                wrapAsync(fn).apply(that, args.concat(cb));
             }, callback);
         });
         if (args.length) {
             return go.apply(this, args);
-        } else {
+        }
+        else {
             return go;
         }
-    });
+    };
 }
 
 /** Detect free variable `global` from Node.js. */
@@ -7358,18 +7319,19 @@ function createArrayIterator(coll) {
     var i = -1;
     var len = coll.length;
     return function next() {
-        return ++i < len ? { value: coll[i], key: i } : null;
-    };
+        return ++i < len ? {value: coll[i], key: i} : null;
+    }
 }
 
 function createES2015Iterator(iterator) {
     var i = -1;
     return function next() {
         var item = iterator.next();
-        if (item.done) return null;
+        if (item.done)
+            return null;
         i++;
-        return { value: item.value, key: i };
-    };
+        return {value: item.value, key: i};
+    }
 }
 
 function createObjectIterator(obj) {
@@ -7378,7 +7340,7 @@ function createObjectIterator(obj) {
     var len = okeys.length;
     return function next() {
         var key = okeys[++i];
-        return i < len ? { value: obj[key], key: key } : null;
+        return i < len ? {value: obj[key], key: key} : null;
     };
 }
 
@@ -7392,7 +7354,7 @@ function iterator(coll) {
 }
 
 function onlyOnce(fn) {
-    return function () {
+    return function() {
         if (fn === null) throw new Error("Callback was already called.");
         var callFn = fn;
         fn = null;
@@ -7415,15 +7377,17 @@ function _eachOfLimit(limit) {
             if (err) {
                 done = true;
                 callback(err);
-            } else if (value === breakLoop || done && running <= 0) {
+            }
+            else if (value === breakLoop || (done && running <= 0)) {
                 done = true;
                 return callback(null);
-            } else {
+            }
+            else {
                 replenish();
             }
         }
 
-        function replenish() {
+        function replenish () {
             while (running < limit && !done) {
                 var elem = nextElem();
                 if (elem === null) {
@@ -7463,7 +7427,7 @@ function _eachOfLimit(limit) {
  * `iteratee` functions have finished, or an error occurs. Invoked with (err).
  */
 function eachOfLimit(coll, limit, iteratee, callback) {
-  _eachOfLimit(limit)(coll, wrapAsync$1(iteratee), callback);
+    _eachOfLimit(limit)(coll, wrapAsync(iteratee), callback);
 }
 
 function doLimit(fn, limit) {
@@ -7485,7 +7449,7 @@ function eachOfArrayLike(coll, iteratee, callback) {
     function iteratorCallback(err, value) {
         if (err) {
             callback(err);
-        } else if (++completed === length || value === breakLoop) {
+        } else if ((++completed === length) || value === breakLoop) {
             callback(null);
         }
     }
@@ -7537,14 +7501,14 @@ var eachOfGeneric = doLimit(eachOfLimit, Infinity);
  *     doSomethingWith(configs);
  * });
  */
-var eachOf = function (coll, iteratee, callback) {
+var eachOf = function(coll, iteratee, callback) {
     var eachOfImplementation = isArrayLike(coll) ? eachOfArrayLike : eachOfGeneric;
-    eachOfImplementation(coll, wrapAsync$1(iteratee), callback);
+    eachOfImplementation(coll, wrapAsync(iteratee), callback);
 };
 
 function doParallel(fn) {
     return function (obj, iteratee, callback) {
-        return fn(eachOf, obj, wrapAsync$1(iteratee), callback);
+        return fn(eachOf, obj, wrapAsync(iteratee), callback);
     };
 }
 
@@ -7553,7 +7517,7 @@ function _asyncMap(eachfn, arr, iteratee, callback) {
     arr = arr || [];
     var results = [];
     var counter = 0;
-    var _iteratee = wrapAsync$1(iteratee);
+    var _iteratee = wrapAsync(iteratee);
 
     eachfn(arr, function (value, _, callback) {
         var index = counter++;
@@ -7641,7 +7605,7 @@ var applyEach = applyEach$1(map);
 
 function doParallelLimit(fn) {
     return function (obj, limit, iteratee, callback) {
-        return fn(_eachOfLimit(limit), obj, wrapAsync$1(iteratee), callback);
+        return fn(_eachOfLimit(limit), obj, wrapAsync(iteratee), callback);
     };
 }
 
@@ -7719,10 +7683,11 @@ var applyEachSeries = applyEach$1(mapSeries);
  * @memberOf module:Utils
  * @method
  * @category Util
- * @param {Function} function - The function you want to eventually apply all
+ * @param {Function} fn - The function you want to eventually apply all
  * arguments to. Invokes with (arguments...).
  * @param {...*} arguments... - Any number of arguments to automatically apply
  * when the continuation is called.
+ * @returns {Function} the partially-applied function
  * @example
  *
  * // using apply
@@ -7751,11 +7716,13 @@ var applyEachSeries = applyEach$1(mapSeries);
  * two
  * three
  */
-var apply$2 = rest(function (fn, args) {
-    return rest(function (callArgs) {
+var apply = function(fn/*, ...args*/) {
+    var args = slice(arguments, 1);
+    return function(/*callArgs*/) {
+        var callArgs = slice(arguments);
         return fn.apply(null, args.concat(callArgs));
-    });
-});
+    };
+};
 
 /**
  * A specialized version of `_.forEach` for arrays without support for
@@ -8025,7 +7992,10 @@ var auto = function (tasks, concurrency, callback) {
 
         arrayEach(dependencies, function (dependencyName) {
             if (!tasks[dependencyName]) {
-                throw new Error('async.auto task `' + key + '` has a non-existent dependency `' + dependencyName + '` in ' + dependencies.join(', '));
+                throw new Error('async.auto task `' + key +
+                    '` has a non-existent dependency `' +
+                    dependencyName + '` in ' +
+                    dependencies.join(', '));
             }
             addListener(dependencyName, function () {
                 remainingDependencies--;
@@ -8049,10 +8019,11 @@ var auto = function (tasks, concurrency, callback) {
         if (readyTasks.length === 0 && runningTasks === 0) {
             return callback(null, results);
         }
-        while (readyTasks.length && runningTasks < concurrency) {
+        while(readyTasks.length && runningTasks < concurrency) {
             var run = readyTasks.shift();
             run();
         }
+
     }
 
     function addListener(taskName, fn) {
@@ -8072,32 +8043,33 @@ var auto = function (tasks, concurrency, callback) {
         processQueue();
     }
 
+
     function runTask(key, task) {
         if (hasError) return;
 
-        var taskCallback = onlyOnce(rest(function (err, args) {
+        var taskCallback = onlyOnce(function(err, result) {
             runningTasks--;
-            if (args.length <= 1) {
-                args = args[0];
+            if (arguments.length > 2) {
+                result = slice(arguments, 1);
             }
             if (err) {
                 var safeResults = {};
-                baseForOwn(results, function (val, rkey) {
+                baseForOwn(results, function(val, rkey) {
                     safeResults[rkey] = val;
                 });
-                safeResults[key] = args;
+                safeResults[key] = result;
                 hasError = true;
                 listeners = Object.create(null);
 
                 callback(err, safeResults);
             } else {
-                results[key] = args;
+                results[key] = result;
                 taskComplete(key);
             }
-        }));
+        });
 
         runningTasks++;
-        var taskFn = wrapAsync$1(task[task.length - 1]);
+        var taskFn = wrapAsync(task[task.length - 1]);
         if (task.length > 1) {
             taskFn(results, taskCallback);
         } else {
@@ -8122,7 +8094,9 @@ var auto = function (tasks, concurrency, callback) {
         }
 
         if (counter !== numTasks) {
-            throw new Error('async.auto cannot execute tasks due to a recursive dependency');
+            throw new Error(
+                'async.auto cannot execute tasks due to a recursive dependency'
+            );
         }
     }
 
@@ -8450,7 +8424,7 @@ function parseParams(func) {
     func = func.toString().replace(STRIP_COMMENTS, '');
     func = func.match(FN_ARGS)[2].replace(' ', '');
     func = func ? func.split(FN_ARG_SPLIT) : [];
-    func = func.map(function (arg) {
+    func = func.map(function (arg){
         return trim(arg.replace(FN_ARG, ''));
     });
     return func;
@@ -8544,7 +8518,9 @@ function autoInject(tasks, callback) {
     baseForOwn(tasks, function (taskFn, key) {
         var params;
         var fnIsAsync = isAsync(taskFn);
-        var hasNoDeps = !fnIsAsync && taskFn.length === 1 || fnIsAsync && taskFn.length === 0;
+        var hasNoDeps =
+            (!fnIsAsync && taskFn.length === 1) ||
+            (fnIsAsync && taskFn.length === 0);
 
         if (isArray(taskFn)) {
             params = taskFn.slice(0, -1);
@@ -8571,39 +8547,12 @@ function autoInject(tasks, callback) {
                 return results[name];
             });
             newArgs.push(taskCb);
-            wrapAsync$1(taskFn).apply(null, newArgs);
+            wrapAsync(taskFn).apply(null, newArgs);
         }
     });
 
     auto(newTasks, callback);
 }
-
-var hasSetImmediate = typeof setImmediate === 'function' && setImmediate;
-var hasNextTick = typeof process === 'object' && typeof process.nextTick === 'function';
-
-function fallback(fn) {
-    setTimeout(fn, 0);
-}
-
-function wrap(defer) {
-    return rest(function (fn, args) {
-        defer(function () {
-            fn.apply(null, args);
-        });
-    });
-}
-
-var _defer;
-
-if (hasSetImmediate) {
-    _defer = setImmediate;
-} else if (hasNextTick) {
-    _defer = process.nextTick;
-} else {
-    _defer = fallback;
-}
-
-var setImmediate$1 = wrap(_defer);
 
 // Simple doubly linked list (https://en.wikipedia.org/wiki/Doubly_linked_list) implementation
 // used for queues. This implementation assumes that the node provided by the user can be modified
@@ -8619,57 +8568,89 @@ function setInitial(dll, node) {
     dll.head = dll.tail = node;
 }
 
-DLL.prototype.removeLink = function (node) {
-    if (node.prev) node.prev.next = node.next;else this.head = node.next;
-    if (node.next) node.next.prev = node.prev;else this.tail = node.prev;
+DLL.prototype.removeLink = function(node) {
+    if (node.prev) node.prev.next = node.next;
+    else this.head = node.next;
+    if (node.next) node.next.prev = node.prev;
+    else this.tail = node.prev;
 
     node.prev = node.next = null;
     this.length -= 1;
     return node;
 };
 
-DLL.prototype.empty = DLL;
+DLL.prototype.empty = function () {
+    while(this.head) this.shift();
+    return this;
+};
 
-DLL.prototype.insertAfter = function (node, newNode) {
+DLL.prototype.insertAfter = function(node, newNode) {
     newNode.prev = node;
     newNode.next = node.next;
-    if (node.next) node.next.prev = newNode;else this.tail = newNode;
+    if (node.next) node.next.prev = newNode;
+    else this.tail = newNode;
     node.next = newNode;
     this.length += 1;
 };
 
-DLL.prototype.insertBefore = function (node, newNode) {
+DLL.prototype.insertBefore = function(node, newNode) {
     newNode.prev = node.prev;
     newNode.next = node;
-    if (node.prev) node.prev.next = newNode;else this.head = newNode;
+    if (node.prev) node.prev.next = newNode;
+    else this.head = newNode;
     node.prev = newNode;
     this.length += 1;
 };
 
-DLL.prototype.unshift = function (node) {
-    if (this.head) this.insertBefore(this.head, node);else setInitial(this, node);
+DLL.prototype.unshift = function(node) {
+    if (this.head) this.insertBefore(this.head, node);
+    else setInitial(this, node);
 };
 
-DLL.prototype.push = function (node) {
-    if (this.tail) this.insertAfter(this.tail, node);else setInitial(this, node);
+DLL.prototype.push = function(node) {
+    if (this.tail) this.insertAfter(this.tail, node);
+    else setInitial(this, node);
 };
 
-DLL.prototype.shift = function () {
+DLL.prototype.shift = function() {
     return this.head && this.removeLink(this.head);
 };
 
-DLL.prototype.pop = function () {
+DLL.prototype.pop = function() {
     return this.tail && this.removeLink(this.tail);
+};
+
+DLL.prototype.toArray = function () {
+    var arr = Array(this.length);
+    var curr = this.head;
+    for(var idx = 0; idx < this.length; idx++) {
+        arr[idx] = curr.data;
+        curr = curr.next;
+    }
+    return arr;
+};
+
+DLL.prototype.remove = function (testFn) {
+    var curr = this.head;
+    while(!!curr) {
+        var next = curr.next;
+        if (testFn(curr)) {
+            this.removeLink(curr);
+        }
+        curr = next;
+    }
+    return this;
 };
 
 function queue(worker, concurrency, payload) {
     if (concurrency == null) {
         concurrency = 1;
-    } else if (concurrency === 0) {
+    }
+    else if(concurrency === 0) {
         throw new Error('Concurrency must not be zero');
     }
 
-    var _worker = wrapAsync$1(worker);
+    var _worker = wrapAsync(worker);
     var numRunning = 0;
     var workersList = [];
 
@@ -8683,7 +8664,7 @@ function queue(worker, concurrency, payload) {
         }
         if (data.length === 0 && q.idle()) {
             // call drain immediately if there are no tasks
-            return setImmediate$1(function () {
+            return setImmediate$1(function() {
                 q.drain();
             });
         }
@@ -8704,7 +8685,7 @@ function queue(worker, concurrency, payload) {
     }
 
     function _next(tasks) {
-        return rest(function (args) {
+        return function(err){
             numRunning -= 1;
 
             for (var i = 0, l = tasks.length; i < l; i++) {
@@ -8714,14 +8695,14 @@ function queue(worker, concurrency, payload) {
                     workersList.splice(index);
                 }
 
-                task.callback.apply(task, args);
+                task.callback.apply(task, arguments);
 
-                if (args[0] != null) {
-                    q.error(args[0], task.data);
+                if (err != null) {
+                    q.error(err, task.data);
                 }
             }
 
-            if (numRunning <= q.concurrency - q.buffer) {
+            if (numRunning <= (q.concurrency - q.buffer) ) {
                 q.unsaturated();
             }
 
@@ -8729,7 +8710,7 @@ function queue(worker, concurrency, payload) {
                 q.drain();
             }
             q.process();
-        });
+        };
     }
 
     var isProcessing = false;
@@ -8738,7 +8719,7 @@ function queue(worker, concurrency, payload) {
         concurrency: concurrency,
         payload: payload,
         saturated: noop,
-        unsaturated: noop,
+        unsaturated:noop,
         buffer: concurrency / 4,
         empty: noop,
         drain: noop,
@@ -8755,6 +8736,9 @@ function queue(worker, concurrency, payload) {
         unshift: function (data, callback) {
             _insert(data, true, callback);
         },
+        remove: function (testFn) {
+            q._tasks.remove(testFn);
+        },
         process: function () {
             // Avoid trying to start too many processing operations. This can occur
             // when callbacks resolve synchronously (#1267).
@@ -8762,9 +8746,8 @@ function queue(worker, concurrency, payload) {
                 return;
             }
             isProcessing = true;
-            while (!q.paused && numRunning < q.concurrency && q._tasks.length) {
-                var tasks = [],
-                    data = [];
+            while(!q.paused && numRunning < q.concurrency && q._tasks.length){
+                var tasks = [], data = [];
                 var l = q._tasks.length;
                 if (q.payload) l = Math.min(l, q.payload);
                 for (var i = 0; i < l; i++) {
@@ -8773,11 +8756,12 @@ function queue(worker, concurrency, payload) {
                     data.push(node.data);
                 }
 
+                numRunning += 1;
+                workersList.push(tasks[0]);
+
                 if (q._tasks.length === 0) {
                     q.empty();
                 }
-                numRunning += 1;
-                workersList.push(tasks[0]);
 
                 if (numRunning === q.concurrency) {
                     q.saturated();
@@ -8797,16 +8781,14 @@ function queue(worker, concurrency, payload) {
         workersList: function () {
             return workersList;
         },
-        idle: function () {
+        idle: function() {
             return q._tasks.length + numRunning === 0;
         },
         pause: function () {
             q.paused = true;
         },
         resume: function () {
-            if (q.paused === false) {
-                return;
-            }
+            if (q.paused === false) { return; }
             q.paused = false;
             setImmediate$1(q.process);
         }
@@ -8892,7 +8874,7 @@ function queue(worker, concurrency, payload) {
  * });
  */
 function cargo(worker, payload) {
-  return queue(worker, 1, payload);
+    return queue(worker, 1, payload);
 }
 
 /**
@@ -8956,13 +8938,13 @@ var eachOfSeries = doLimit(eachOfLimit, 1);
  */
 function reduce(coll, memo, iteratee, callback) {
     callback = once(callback || noop);
-    var _iteratee = wrapAsync$1(iteratee);
-    eachOfSeries(coll, function (x, i, callback) {
-        _iteratee(memo, x, function (err, v) {
+    var _iteratee = wrapAsync(iteratee);
+    eachOfSeries(coll, function(x, i, callback) {
+        _iteratee(memo, x, function(err, v) {
             memo = v;
             callback(err);
         });
-    }, function (err) {
+    }, function(err) {
         callback(err, memo);
     });
 }
@@ -9005,9 +8987,10 @@ function reduce(coll, memo, iteratee, callback) {
  *     });
  * });
  */
-var seq$1 = rest(function seq(functions) {
-    var _functions = arrayMap(functions, wrapAsync$1);
-    return rest(function (args) {
+function seq(/*...functions*/) {
+    var _functions = arrayMap(arguments, wrapAsync);
+    return function(/*...args*/) {
+        var args = slice(arguments);
         var that = this;
 
         var cb = args[args.length - 1];
@@ -9017,15 +9000,17 @@ var seq$1 = rest(function seq(functions) {
             cb = noop;
         }
 
-        reduce(_functions, args, function (newargs, fn, cb) {
-            fn.apply(that, newargs.concat(rest(function (err, nextargs) {
+        reduce(_functions, args, function(newargs, fn, cb) {
+            fn.apply(that, newargs.concat(function(err/*, ...nextargs*/) {
+                var nextargs = slice(arguments, 1);
                 cb(err, nextargs);
-            })));
-        }, function (err, results) {
+            }));
+        },
+        function(err, results) {
             cb.apply(that, [err].concat(results));
         });
-    });
-});
+    };
+}
 
 /**
  * Creates a function which is a composition of the passed asynchronous
@@ -9062,9 +9047,9 @@ var seq$1 = rest(function seq(functions) {
  *     // result now equals 15
  * });
  */
-var compose = rest(function (args) {
-  return seq$1.apply(null, args.reverse());
-});
+var compose = function(/*...args*/) {
+    return seq.apply(null, slice(arguments).reverse());
+};
 
 function concat$1(eachfn, arr, fn, callback) {
     var result = [];
@@ -9107,7 +9092,7 @@ var concat = doParallel(concat$1);
 
 function doSeries(fn) {
     return function (obj, iteratee, callback) {
-        return fn(eachOfSeries, obj, wrapAsync$1(iteratee), callback);
+        return fn(eachOfSeries, obj, wrapAsync(iteratee), callback);
     };
 }
 
@@ -9173,20 +9158,42 @@ var concatSeries = doSeries(concat$1);
  *     //...
  * }, callback);
  */
-var constant = rest(function (values) {
+var constant = function(/*...values*/) {
+    var values = slice(arguments);
     var args = [null].concat(values);
-    return initialParams(function (ignoredArgs, callback) {
+    return function (/*...ignoredArgs, callback*/) {
+        var callback = arguments[arguments.length - 1];
         return callback.apply(this, args);
-    });
-});
+    };
+};
+
+/**
+ * This method returns the first argument it receives.
+ *
+ * @static
+ * @since 0.1.0
+ * @memberOf _
+ * @category Util
+ * @param {*} value Any value.
+ * @returns {*} Returns `value`.
+ * @example
+ *
+ * var object = { 'a': 1 };
+ *
+ * console.log(_.identity(object) === object);
+ * // => true
+ */
+function identity(value) {
+  return value;
+}
 
 function _createTester(check, getResult) {
-    return function (eachfn, arr, iteratee, cb) {
+    return function(eachfn, arr, iteratee, cb) {
         cb = cb || noop;
         var testPassed = false;
         var testResult;
-        eachfn(arr, function (value, _, callback) {
-            iteratee(value, function (err, result) {
+        eachfn(arr, function(value, _, callback) {
+            iteratee(value, function(err, result) {
                 if (err) {
                     callback(err);
                 } else if (check(result) && !testResult) {
@@ -9197,7 +9204,7 @@ function _createTester(check, getResult) {
                     callback();
                 }
             });
-        }, function (err) {
+        }, function(err) {
             if (err) {
                 cb(err);
             } else {
@@ -9295,8 +9302,10 @@ var detectLimit = doParallelLimit(_createTester(identity, _findGetResult));
 var detectSeries = doLimit(detectLimit, 1);
 
 function consoleFunc(name) {
-    return rest(function (fn, args) {
-        wrapAsync$1(fn).apply(null, args.concat(rest(function (err, args) {
+    return function (fn/*, ...args*/) {
+        var args = slice(arguments, 1);
+        args.push(function (err/*, ...args*/) {
+            var args = slice(arguments, 1);
             if (typeof console === 'object') {
                 if (err) {
                     if (console.error) {
@@ -9308,8 +9317,9 @@ function consoleFunc(name) {
                     });
                 }
             }
-        })));
-    });
+        });
+        wrapAsync(fn).apply(null, args);
+    };
 }
 
 /**
@@ -9365,14 +9375,15 @@ var dir = consoleFunc('dir');
  */
 function doDuring(fn, test, callback) {
     callback = onlyOnce(callback || noop);
-    var _fn = wrapAsync$1(fn);
-    var _test = wrapAsync$1(test);
+    var _fn = wrapAsync(fn);
+    var _test = wrapAsync(test);
 
-    var next = rest(function (err, args) {
+    function next(err/*, ...args*/) {
         if (err) return callback(err);
+        var args = slice(arguments, 1);
         args.push(check);
         _test.apply(this, args);
-    });
+    }
 
     function check(err, truth) {
         if (err) return callback(err);
@@ -9381,6 +9392,7 @@ function doDuring(fn, test, callback) {
     }
 
     check(null, true);
+
 }
 
 /**
@@ -9407,12 +9419,13 @@ function doDuring(fn, test, callback) {
  */
 function doWhilst(iteratee, test, callback) {
     callback = onlyOnce(callback || noop);
-    var _iteratee = wrapAsync$1(iteratee);
-    var next = rest(function (err, args) {
+    var _iteratee = wrapAsync(iteratee);
+    var next = function(err/*, ...args*/) {
         if (err) return callback(err);
+        var args = slice(arguments, 1);
         if (test.apply(this, args)) return _iteratee(next);
         callback.apply(null, [null].concat(args));
-    });
+    };
     _iteratee(next);
 }
 
@@ -9437,7 +9450,7 @@ function doWhilst(iteratee, test, callback) {
  * callback. Invoked with (err, [results]);
  */
 function doUntil(iteratee, test, callback) {
-    doWhilst(iteratee, function () {
+    doWhilst(iteratee, function() {
         return !test.apply(this, arguments);
     }, callback);
 }
@@ -9480,8 +9493,8 @@ function doUntil(iteratee, test, callback) {
  */
 function during(test, fn, callback) {
     callback = onlyOnce(callback || noop);
-    var _fn = wrapAsync$1(fn);
-    var _test = wrapAsync$1(test);
+    var _fn = wrapAsync(fn);
+    var _test = wrapAsync(test);
 
     function next(err) {
         if (err) return callback(err);
@@ -9561,7 +9574,7 @@ function _withoutIndex(iteratee) {
  * });
  */
 function eachLimit(coll, iteratee, callback) {
-  eachOf(coll, _withoutIndex(wrapAsync$1(iteratee)), callback);
+    eachOf(coll, _withoutIndex(wrapAsync(iteratee)), callback);
 }
 
 /**
@@ -9585,7 +9598,7 @@ function eachLimit(coll, iteratee, callback) {
  * `iteratee` functions have finished, or an error occurs. Invoked with (err).
  */
 function eachLimit$1(coll, limit, iteratee, callback) {
-  _eachOfLimit(limit)(coll, _withoutIndex(wrapAsync$1(iteratee)), callback);
+    _eachOfLimit(limit)(coll, _withoutIndex(wrapAsync(iteratee)), callback);
 }
 
 /**
@@ -9778,7 +9791,7 @@ function filterGeneric(eachfn, coll, iteratee, callback) {
                 callback(err);
             } else {
                 if (v) {
-                    results.push({ index: index, value: x });
+                    results.push({index: index, value: x});
                 }
                 callback();
             }
@@ -9796,7 +9809,7 @@ function filterGeneric(eachfn, coll, iteratee, callback) {
 
 function _filter(eachfn, coll, iteratee, callback) {
     var filter = isArrayLike(coll) ? filterArray : filterGeneric;
-    filter(eachfn, coll, wrapAsync$1(iteratee), callback || noop);
+    filter(eachfn, coll, wrapAsync(iteratee), callback || noop);
 }
 
 /**
@@ -9899,7 +9912,7 @@ var filterSeries = doLimit(filterLimit, 1);
  */
 function forever(fn, errback) {
     var done = onlyOnce(errback || noop);
-    var task = wrapAsync$1(ensureAsync(fn));
+    var task = wrapAsync(ensureAsync(fn));
 
     function next(err) {
         if (err) return done(err);
@@ -9927,15 +9940,15 @@ function forever(fn, errback) {
  * functions have finished, or an error occurs. Result is an `Object` whoses
  * properties are arrays of values which returned the corresponding key.
  */
-var groupByLimit = function (coll, limit, iteratee, callback) {
+var groupByLimit = function(coll, limit, iteratee, callback) {
     callback = callback || noop;
-    var _iteratee = wrapAsync$1(iteratee);
-    mapLimit(coll, limit, function (val, callback) {
-        _iteratee(val, function (err, key) {
+    var _iteratee = wrapAsync(iteratee);
+    mapLimit(coll, limit, function(val, callback) {
+        _iteratee(val, function(err, key) {
             if (err) return callback(err);
-            return callback(null, { key: key, val: val });
+            return callback(null, {key: key, val: val});
         });
-    }, function (err, mapResults) {
+    }, function(err, mapResults) {
         var result = {};
         // from MDN, handle object having an `hasOwnProperty` prop
         var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -10069,8 +10082,8 @@ var log = consoleFunc('log');
 function mapValuesLimit(obj, limit, iteratee, callback) {
     callback = once(callback || noop);
     var newObj = {};
-    var _iteratee = wrapAsync$1(iteratee);
-    eachOfLimit(obj, limit, function (val, key, next) {
+    var _iteratee = wrapAsync(iteratee);
+    eachOfLimit(obj, limit, function(val, key, next) {
         _iteratee(val, key, function (err, result) {
             if (err) return next(err);
             newObj[key] = result;
@@ -10194,25 +10207,26 @@ function memoize(fn, hasher) {
     var memo = Object.create(null);
     var queues = Object.create(null);
     hasher = hasher || identity;
-    var _fn = wrapAsync$1(fn);
+    var _fn = wrapAsync(fn);
     var memoized = initialParams(function memoized(args, callback) {
         var key = hasher.apply(null, args);
         if (has(memo, key)) {
-            setImmediate$1(function () {
+            setImmediate$1(function() {
                 callback.apply(null, memo[key]);
             });
         } else if (has(queues, key)) {
             queues[key].push(callback);
         } else {
             queues[key] = [callback];
-            _fn.apply(null, args.concat(rest(function (args) {
+            _fn.apply(null, args.concat(function(/*args*/) {
+                var args = slice(arguments);
                 memo[key] = args;
                 var q = queues[key];
                 delete queues[key];
                 for (var i = 0, l = q.length; i < l; i++) {
                     q[i].apply(null, args);
                 }
-            })));
+            }));
         }
     });
     memoized.memo = memo;
@@ -10268,13 +10282,13 @@ function _parallel(eachfn, tasks, callback) {
     var results = isArrayLike(tasks) ? [] : {};
 
     eachfn(tasks, function (task, key, callback) {
-        wrapAsync$1(task)(rest(function (err, args) {
-            if (args.length <= 1) {
-                args = args[0];
+        wrapAsync(task)(function (err, result) {
+            if (arguments.length > 2) {
+                result = slice(arguments, 1);
             }
-            results[key] = args;
+            results[key] = result;
             callback(err);
-        }));
+        });
     }, function (err) {
         callback(err, results);
     });
@@ -10350,7 +10364,7 @@ function _parallel(eachfn, tasks, callback) {
  * });
  */
 function parallelLimit(tasks, callback) {
-  _parallel(eachOf, tasks, callback);
+    _parallel(eachOf, tasks, callback);
 }
 
 /**
@@ -10373,7 +10387,7 @@ function parallelLimit(tasks, callback) {
  * Invoked with (err, results).
  */
 function parallelLimit$1(tasks, limit, callback) {
-  _parallel(_eachOfLimit(limit), tasks, callback);
+    _parallel(_eachOfLimit(limit), tasks, callback);
 }
 
 /**
@@ -10399,6 +10413,12 @@ function parallelLimit$1(tasks, limit, callback) {
  * task in the list. Invoke with `queue.push(task, [callback])`,
  * @property {Function} unshift - add a new task to the front of the `queue`.
  * Invoke with `queue.unshift(task, [callback])`.
+ * @property {Function} remove - remove items from the queue that match a test
+ * function.  The test function will be passed an object with a `data` property,
+ * and a `priority` property, if this is a
+ * [priorityQueue]{@link module:ControlFlow.priorityQueue} object.
+ * Invoked with `queue.remove(testFn)`, where `testFn` is of the form
+ * `function ({data, priority}) {}` and returns a Boolean.
  * @property {Function} saturated - a callback that is called when the number of
  * running workers hits the `concurrency` limit, and further tasks will be
  * queued.
@@ -10475,10 +10495,10 @@ function parallelLimit$1(tasks, limit, callback) {
  * });
  */
 var queue$1 = function (worker, concurrency) {
-  var _worker = wrapAsync$1(worker);
-  return queue(function (items, cb) {
-    _worker(items[0], cb);
-  }, concurrency, 1);
+    var _worker = wrapAsync(worker);
+    return queue(function (items, cb) {
+        _worker(items[0], cb);
+    }, concurrency, 1);
 };
 
 /**
@@ -10504,12 +10524,12 @@ var queue$1 = function (worker, concurrency) {
  *   array of `tasks` is given, all tasks will be assigned the same priority.
  * * The `unshift` method was removed.
  */
-var priorityQueue = function (worker, concurrency) {
+var priorityQueue = function(worker, concurrency) {
     // Start with a normal queue
     var q = queue$1(worker, concurrency);
 
     // Override push to accept second parameter representing priority
-    q.push = function (data, priority, callback) {
+    q.push = function(data, priority, callback) {
         if (callback == null) callback = noop;
         if (typeof callback !== 'function') {
             throw new Error('task callback must be a function');
@@ -10520,7 +10540,7 @@ var priorityQueue = function (worker, concurrency) {
         }
         if (data.length === 0) {
             // call drain immediately if there are no tasks
-            return setImmediate$1(function () {
+            return setImmediate$1(function() {
                 q.drain();
             });
         }
@@ -10594,11 +10614,9 @@ function race(tasks, callback) {
     if (!isArray(tasks)) return callback(new TypeError('First argument to race must be an array of functions'));
     if (!tasks.length) return callback();
     for (var i = 0, l = tasks.length; i < l; i++) {
-        wrapAsync$1(tasks[i])(callback);
+        wrapAsync(tasks[i])(callback);
     }
 }
-
-var slice = Array.prototype.slice;
 
 /**
  * Same as [`reduce`]{@link module:Collections.reduce}, only operates on `array` in reverse order.
@@ -10622,9 +10640,9 @@ var slice = Array.prototype.slice;
  * `iteratee` functions have finished. Result is the reduced value. Invoked with
  * (err, result).
  */
-function reduceRight(array, memo, iteratee, callback) {
-  var reversed = slice.call(array).reverse();
-  reduce(reversed, memo, iteratee, callback);
+function reduceRight (array, memo, iteratee, callback) {
+    var reversed = slice(array).reverse();
+    reduce(reversed, memo, iteratee, callback);
 }
 
 /**
@@ -10667,33 +10685,29 @@ function reduceRight(array, memo, iteratee, callback) {
  * });
  */
 function reflect(fn) {
-    var _fn = wrapAsync$1(fn);
+    var _fn = wrapAsync(fn);
     return initialParams(function reflectOn(args, reflectCallback) {
-        args.push(rest(function callback(err, cbArgs) {
-            if (err) {
-                reflectCallback(null, {
-                    error: err
-                });
+        args.push(function callback(error, cbArg) {
+            if (error) {
+                reflectCallback(null, { error: error });
             } else {
-                var value = null;
-                if (cbArgs.length === 1) {
-                    value = cbArgs[0];
-                } else if (cbArgs.length > 1) {
-                    value = cbArgs;
+                var value;
+                if (arguments.length <= 2) {
+                    value = cbArg;
+                } else {
+                    value = slice(arguments, 1);
                 }
-                reflectCallback(null, {
-                    value: value
-                });
+                reflectCallback(null, { value: value });
             }
-        }));
+        });
 
         return _fn.apply(this, args);
     });
 }
 
 function reject$1(eachfn, arr, iteratee, callback) {
-    _filter(eachfn, arr, function (value, cb) {
-        iteratee(value, function (err, v) {
+    _filter(eachfn, arr, function(value, cb) {
+        iteratee(value, function(err, v) {
             cb(err, !v);
         });
     }, callback);
@@ -10801,7 +10815,7 @@ function reflectAll(tasks) {
         results = arrayMap(tasks, reflect);
     } else {
         results = {};
-        baseForOwn(tasks, function (task, key) {
+        baseForOwn(tasks, function(task, key) {
             results[key] = reflect.call(this, task);
         });
     }
@@ -10970,7 +10984,9 @@ function retry(opts, task, callback) {
         if (typeof t === 'object') {
             acc.times = +t.times || DEFAULT_TIMES;
 
-            acc.intervalFunc = typeof t.interval === 'function' ? t.interval : constant$1(+t.interval || DEFAULT_INTERVAL);
+            acc.intervalFunc = typeof t.interval === 'function' ?
+                t.interval :
+                constant$1(+t.interval || DEFAULT_INTERVAL);
 
             acc.errorFilter = t.errorFilter;
         } else if (typeof t === 'number' || typeof t === 'string') {
@@ -10992,12 +11008,14 @@ function retry(opts, task, callback) {
         throw new Error("Invalid arguments for async.retry");
     }
 
-    var _task = wrapAsync$1(task);
+    var _task = wrapAsync(task);
 
     var attempt = 1;
     function retryAttempt() {
-        _task(function (err) {
-            if (err && attempt++ < options.times && (typeof options.errorFilter != 'function' || options.errorFilter(err))) {
+        _task(function(err) {
+            if (err && attempt++ < options.times &&
+                (typeof options.errorFilter != 'function' ||
+                    options.errorFilter(err))) {
                 setTimeout(retryAttempt, options.intervalFunc(attempt));
             } else {
                 callback.apply(null, arguments);
@@ -11041,13 +11059,15 @@ var retryable = function (opts, task) {
         task = opts;
         opts = null;
     }
-    var _task = wrapAsync$1(task);
+    var _task = wrapAsync(task);
     return initialParams(function (args, callback) {
         function taskFn(cb) {
             _task.apply(null, args.concat(cb));
         }
 
-        if (opts) retry(opts, taskFn, callback);else retry(taskFn, callback);
+        if (opts) retry(opts, taskFn, callback);
+        else retry(taskFn, callback);
+
     });
 };
 
@@ -11116,7 +11136,7 @@ var retryable = function (opts, task) {
  * });
  */
 function series(tasks, callback) {
-  _parallel(eachOfSeries, tasks, callback);
+    _parallel(eachOfSeries, tasks, callback);
 }
 
 /**
@@ -11243,12 +11263,12 @@ var someSeries = doLimit(someLimit, 1);
  *     // result callback
  * });
  */
-function sortBy(coll, iteratee, callback) {
-    var _iteratee = wrapAsync$1(iteratee);
+function sortBy (coll, iteratee, callback) {
+    var _iteratee = wrapAsync(iteratee);
     map(coll, function (x, callback) {
         _iteratee(x, function (err, criteria) {
             if (err) return callback(err);
-            callback(null, { value: x, criteria: criteria });
+            callback(null, {value: x, criteria: criteria});
         });
     }, function (err, results) {
         if (err) return callback(err);
@@ -11256,8 +11276,7 @@ function sortBy(coll, iteratee, callback) {
     });
 
     function comparator(left, right) {
-        var a = left.criteria,
-            b = right.criteria;
+        var a = left.criteria, b = right.criteria;
         return a < b ? -1 : a > b ? 1 : 0;
     }
 }
@@ -11316,7 +11335,7 @@ function timeout(asyncFn, milliseconds, info) {
 
     function timeoutCallback() {
         var name = asyncFn.name || 'anonymous';
-        var error = new Error('Callback function "' + name + '" timed out.');
+        var error  = new Error('Callback function "' + name + '" timed out.');
         error.code = 'ETIMEDOUT';
         if (info) {
             error.info = info;
@@ -11325,7 +11344,7 @@ function timeout(asyncFn, milliseconds, info) {
         originalCallback(error);
     }
 
-    var fn = wrapAsync$1(asyncFn);
+    var fn = wrapAsync(asyncFn);
 
     return initialParams(function (args, origCallback) {
         originalCallback = origCallback;
@@ -11337,7 +11356,7 @@ function timeout(asyncFn, milliseconds, info) {
 
 /* Built-in method references for those with the same name as other `lodash` methods. */
 var nativeCeil = Math.ceil;
-var nativeMax$1 = Math.max;
+var nativeMax = Math.max;
 
 /**
  * The base implementation of `_.range` and `_.rangeRight` which doesn't
@@ -11352,7 +11371,7 @@ var nativeMax$1 = Math.max;
  */
 function baseRange(start, end, step, fromRight) {
   var index = -1,
-      length = nativeMax$1(nativeCeil((end - start) / (step || 1)), 0),
+      length = nativeMax(nativeCeil((end - start) / (step || 1)), 0),
       result = Array(length);
 
   while (length--) {
@@ -11379,8 +11398,8 @@ function baseRange(start, end, step, fromRight) {
  * @param {Function} callback - see [async.map]{@link module:Collections.map}.
  */
 function timeLimit(count, limit, iteratee, callback) {
-  var _iteratee = wrapAsync$1(iteratee);
-  mapLimit(baseRange(0, count, 1), limit, _iteratee, callback);
+    var _iteratee = wrapAsync(iteratee);
+    mapLimit(baseRange(0, count, 1), limit, _iteratee, callback);
 }
 
 /**
@@ -11475,19 +11494,75 @@ var timesSeries = doLimit(timeLimit, 1);
  *     // result is equal to {a: 2, b: 4, c: 6}
  * })
  */
-function transform(coll, accumulator, iteratee, callback) {
+function transform (coll, accumulator, iteratee, callback) {
     if (arguments.length <= 3) {
         callback = iteratee;
         iteratee = accumulator;
         accumulator = isArray(coll) ? [] : {};
     }
     callback = once(callback || noop);
-    var _iteratee = wrapAsync$1(iteratee);
+    var _iteratee = wrapAsync(iteratee);
 
-    eachOf(coll, function (v, k, cb) {
+    eachOf(coll, function(v, k, cb) {
         _iteratee(accumulator, v, k, cb);
-    }, function (err) {
+    }, function(err) {
         callback(err, accumulator);
+    });
+}
+
+/**
+ * It runs each task in series but stops whenever any of the functions were
+ * successful. If one of the tasks were successful, the `callback` will be
+ * passed the result of the successful task. If all tasks fail, the callback
+ * will be passed the error and result (if any) of the final attempt.
+ *
+ * @name tryEach
+ * @static
+ * @memberOf module:ControlFlow
+ * @method
+ * @category Control Flow
+ * @param {Array|Iterable|Object} tasks - A collection containing functions to
+ * run, each function is passed a `callback(err, result)` it must call on
+ * completion with an error `err` (which can be `null`) and an optional `result`
+ * value.
+ * @param {Function} [callback] - An optional callback which is called when one
+ * of the tasks has succeeded, or all have failed. It receives the `err` and
+ * `result` arguments of the last attempt at completing the `task`. Invoked with
+ * (err, results).
+ * @example
+ * async.try([
+ *     function getDataFromFirstWebsite(callback) {
+ *         // Try getting the data from the first website
+ *         callback(err, data);
+ *     },
+ *     function getDataFromSecondWebsite(callback) {
+ *         // First website failed,
+ *         // Try getting the data from the backup website
+ *         callback(err, data);
+ *     }
+ * ],
+ * // optional callback
+ * function(err, results) {
+ *     Now do something with the data.
+ * });
+ *
+ */
+function tryEach(tasks, callback) {
+    var error = null;
+    var result;
+    callback = callback || noop;
+    eachSeries(tasks, function(task, callback) {
+        wrapAsync(task)(function (err, res/*, ...args*/) {
+            if (arguments.length > 2) {
+                result = slice(arguments, 1);
+            } else {
+                result = res;
+            }
+            error = err;
+            callback(!err);
+        });
+    }, function () {
+        callback(error, result);
     });
 }
 
@@ -11546,13 +11621,14 @@ function unmemoize(fn) {
  */
 function whilst(test, iteratee, callback) {
     callback = onlyOnce(callback || noop);
-    var _iteratee = wrapAsync$1(iteratee);
+    var _iteratee = wrapAsync(iteratee);
     if (!test()) return callback(null);
-    var next = rest(function (err, args) {
+    var next = function(err/*, ...args*/) {
         if (err) return callback(err);
         if (test()) return _iteratee(next);
+        var args = slice(arguments, 1);
         callback.apply(null, [null].concat(args));
-    });
+    };
     _iteratee(next);
 }
 
@@ -11579,7 +11655,7 @@ function whilst(test, iteratee, callback) {
  * callback. Invoked with (err, [results]);
  */
 function until(test, iteratee, callback) {
-    whilst(function () {
+    whilst(function() {
         return !test.apply(this, arguments);
     }, iteratee, callback);
 }
@@ -11641,28 +11717,23 @@ function until(test, iteratee, callback) {
  *     callback(null, 'done');
  * }
  */
-var waterfall = function (tasks, callback) {
+var waterfall = function(tasks, callback) {
     callback = once(callback || noop);
     if (!isArray(tasks)) return callback(new Error('First argument to waterfall must be an array of functions'));
     if (!tasks.length) return callback();
     var taskIndex = 0;
 
     function nextTask(args) {
-        if (taskIndex === tasks.length) {
-            return callback.apply(null, [null].concat(args));
-        }
-
-        var taskCallback = onlyOnce(rest(function (err, args) {
-            if (err) {
-                return callback.apply(null, [err].concat(args));
-            }
-            nextTask(args);
-        }));
-
-        args.push(taskCallback);
-
-        var task = wrapAsync$1(tasks[taskIndex++]);
+        var task = wrapAsync(tasks[taskIndex++]);
+        args.push(onlyOnce(next));
         task.apply(null, args);
+    }
+
+    function next(err/*, ...args*/) {
+        if (err || taskIndex === tasks.length) {
+            return callback.apply(null, arguments);
+        }
+        nextTask(slice(arguments, 1));
     }
 
     nextTask([]);
@@ -11716,6 +11787,7 @@ var waterfall = function (tasks, callback) {
  * @see AsyncFunction
  */
 
+
 /**
  * A collection of `async` functions for manipulating collections, such as
  * arrays and objects.
@@ -11733,104 +11805,105 @@ var waterfall = function (tasks, callback) {
  */
 
 var index = {
-  applyEach: applyEach,
-  applyEachSeries: applyEachSeries,
-  apply: apply$2,
-  asyncify: asyncify,
-  auto: auto,
-  autoInject: autoInject,
-  cargo: cargo,
-  compose: compose,
-  concat: concat,
-  concatSeries: concatSeries,
-  constant: constant,
-  detect: detect,
-  detectLimit: detectLimit,
-  detectSeries: detectSeries,
-  dir: dir,
-  doDuring: doDuring,
-  doUntil: doUntil,
-  doWhilst: doWhilst,
-  during: during,
-  each: eachLimit,
-  eachLimit: eachLimit$1,
-  eachOf: eachOf,
-  eachOfLimit: eachOfLimit,
-  eachOfSeries: eachOfSeries,
-  eachSeries: eachSeries,
-  ensureAsync: ensureAsync,
-  every: every,
-  everyLimit: everyLimit,
-  everySeries: everySeries,
-  filter: filter,
-  filterLimit: filterLimit,
-  filterSeries: filterSeries,
-  forever: forever,
-  groupBy: groupBy,
-  groupByLimit: groupByLimit,
-  groupBySeries: groupBySeries,
-  log: log,
-  map: map,
-  mapLimit: mapLimit,
-  mapSeries: mapSeries,
-  mapValues: mapValues,
-  mapValuesLimit: mapValuesLimit,
-  mapValuesSeries: mapValuesSeries,
-  memoize: memoize,
-  nextTick: nextTick,
-  parallel: parallelLimit,
-  parallelLimit: parallelLimit$1,
-  priorityQueue: priorityQueue,
-  queue: queue$1,
-  race: race,
-  reduce: reduce,
-  reduceRight: reduceRight,
-  reflect: reflect,
-  reflectAll: reflectAll,
-  reject: reject,
-  rejectLimit: rejectLimit,
-  rejectSeries: rejectSeries,
-  retry: retry,
-  retryable: retryable,
-  seq: seq$1,
-  series: series,
-  setImmediate: setImmediate$1,
-  some: some,
-  someLimit: someLimit,
-  someSeries: someSeries,
-  sortBy: sortBy,
-  timeout: timeout,
-  times: times,
-  timesLimit: timeLimit,
-  timesSeries: timesSeries,
-  transform: transform,
-  unmemoize: unmemoize,
-  until: until,
-  waterfall: waterfall,
-  whilst: whilst,
+    applyEach: applyEach,
+    applyEachSeries: applyEachSeries,
+    apply: apply,
+    asyncify: asyncify,
+    auto: auto,
+    autoInject: autoInject,
+    cargo: cargo,
+    compose: compose,
+    concat: concat,
+    concatSeries: concatSeries,
+    constant: constant,
+    detect: detect,
+    detectLimit: detectLimit,
+    detectSeries: detectSeries,
+    dir: dir,
+    doDuring: doDuring,
+    doUntil: doUntil,
+    doWhilst: doWhilst,
+    during: during,
+    each: eachLimit,
+    eachLimit: eachLimit$1,
+    eachOf: eachOf,
+    eachOfLimit: eachOfLimit,
+    eachOfSeries: eachOfSeries,
+    eachSeries: eachSeries,
+    ensureAsync: ensureAsync,
+    every: every,
+    everyLimit: everyLimit,
+    everySeries: everySeries,
+    filter: filter,
+    filterLimit: filterLimit,
+    filterSeries: filterSeries,
+    forever: forever,
+    groupBy: groupBy,
+    groupByLimit: groupByLimit,
+    groupBySeries: groupBySeries,
+    log: log,
+    map: map,
+    mapLimit: mapLimit,
+    mapSeries: mapSeries,
+    mapValues: mapValues,
+    mapValuesLimit: mapValuesLimit,
+    mapValuesSeries: mapValuesSeries,
+    memoize: memoize,
+    nextTick: nextTick,
+    parallel: parallelLimit,
+    parallelLimit: parallelLimit$1,
+    priorityQueue: priorityQueue,
+    queue: queue$1,
+    race: race,
+    reduce: reduce,
+    reduceRight: reduceRight,
+    reflect: reflect,
+    reflectAll: reflectAll,
+    reject: reject,
+    rejectLimit: rejectLimit,
+    rejectSeries: rejectSeries,
+    retry: retry,
+    retryable: retryable,
+    seq: seq,
+    series: series,
+    setImmediate: setImmediate$1,
+    some: some,
+    someLimit: someLimit,
+    someSeries: someSeries,
+    sortBy: sortBy,
+    timeout: timeout,
+    times: times,
+    timesLimit: timeLimit,
+    timesSeries: timesSeries,
+    transform: transform,
+    tryEach: tryEach,
+    unmemoize: unmemoize,
+    until: until,
+    waterfall: waterfall,
+    whilst: whilst,
 
-  // aliases
-  all: every,
-  any: some,
-  forEach: eachLimit,
-  forEachSeries: eachSeries,
-  forEachLimit: eachLimit$1,
-  forEachOf: eachOf,
-  forEachOfSeries: eachOfSeries,
-  forEachOfLimit: eachOfLimit,
-  inject: reduce,
-  foldl: reduce,
-  foldr: reduceRight,
-  select: filter,
-  selectLimit: filterLimit,
-  selectSeries: filterSeries,
-  wrapSync: asyncify
+    // aliases
+    all: every,
+    any: some,
+    forEach: eachLimit,
+    forEachSeries: eachSeries,
+    forEachLimit: eachLimit$1,
+    forEachOf: eachOf,
+    forEachOfSeries: eachOfSeries,
+    forEachOfLimit: eachOfLimit,
+    inject: reduce,
+    foldl: reduce,
+    foldr: reduceRight,
+    select: filter,
+    selectLimit: filterLimit,
+    selectSeries: filterSeries,
+    wrapSync: asyncify
 };
 
 exports['default'] = index;
 exports.applyEach = applyEach;
 exports.applyEachSeries = applyEachSeries;
-exports.apply = apply$2;
+exports.apply = apply;
 exports.asyncify = asyncify;
 exports.auto = auto;
 exports.autoInject = autoInject;
@@ -11887,7 +11960,7 @@ exports.rejectLimit = rejectLimit;
 exports.rejectSeries = rejectSeries;
 exports.retry = retry;
 exports.retryable = retryable;
-exports.seq = seq$1;
+exports.seq = seq;
 exports.series = series;
 exports.setImmediate = setImmediate$1;
 exports.some = some;
@@ -11899,6 +11972,7 @@ exports.times = times;
 exports.timesLimit = timeLimit;
 exports.timesSeries = timesSeries;
 exports.transform = transform;
+exports.tryEach = tryEach;
 exports.unmemoize = unmemoize;
 exports.until = until;
 exports.waterfall = waterfall;
@@ -11930,7 +12004,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7), __webpack_require__(160)(module), __webpack_require__(102).setImmediate, __webpack_require__(5)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(102).setImmediate, __webpack_require__(5), __webpack_require__(7), __webpack_require__(160)(module)))
 
 /***/ }),
 /* 35 */
@@ -13213,6 +13287,24 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -13223,7 +13315,8 @@ var querystring = __webpack_require__(6);
 			arena: {},
 			photos: {},
 			arenaId: '',
-			value5: 0
+			value5: 0,
+			display_photo: 0
 		};
 	},
 	created: function created() {
@@ -13233,7 +13326,7 @@ var querystring = __webpack_require__(6);
 			_this.arena = arena;
 			_this.photos = arena.photos;
 			_this.arenaId = arena._id;
-			_this.value5 = arena.avg_rating;
+			_this.value5 = arena.avg_rating.toFixed(2);
 		});
 	},
 
@@ -13250,6 +13343,12 @@ var querystring = __webpack_require__(6);
 		dispalyImage: function dispalyImage(element) {
 			document.getElementById("img01").src = element;
 			document.getElementById("modal01").style.display = "block";
+		},
+		addOne: function addOne() {
+			this.display_photo = this.display_photo + 1;
+		},
+		minusOne: function minusOne() {
+			this.display_photo = this.display_photo - 1;
 		}
 	},
 
@@ -13260,6 +13359,7 @@ var querystring = __webpack_require__(6);
 		type: function type() {
 			return window.type;
 		},
+
 		getUrl: function getUrl() {
 			return "/schedule/" + this.arena.name;
 		}
@@ -13542,6 +13642,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
 	data: function data() {
@@ -13586,9 +13688,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(Buffer) {Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
 //
 //
 //
@@ -13827,8 +13926,19 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			var _this2 = this;
 
 			this.form.submit('post', '/editarenainfo/' + this.form._id).then(function (arena) {
-				_this2.$router.push('/myArenas');
-			}).catch(function (err) {});
+				_this2.$notify({
+					title: 'Success',
+					message: 'The arena info is updated successfully',
+					type: 'success'
+				});
+				_this2.$router.push('/profile');
+			}).catch(function (err) {
+				_this2.$notify({
+					title: 'Error',
+					message: error,
+					type: 'error'
+				});
+			});
 		},
 		addImage: function addImage() {
 			var _this3 = this;
@@ -13836,8 +13946,19 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			var dataForm = new FormData();
 			dataForm.append('new_image', this.files[0]);
 			axios.post('/addarenaimage/' + this.form._id, dataForm).then(function (arena) {
-				_this3.$router.push('/myArenas');
-			}).catch(function (err) {});
+				_this3.$notify({
+					title: 'Success',
+					message: 'The new image is successfully added',
+					type: 'success'
+				});
+				_this3.$router.push('/profile');
+			}).catch(function (err) {
+				_this3.$notify({
+					title: 'Error',
+					message: error,
+					type: 'error'
+				});
+			});
 		},
 		onFile: function onFile(event) {
 			this.files = event.target.files;
@@ -13874,8 +13995,19 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 					if (this.schedule[i][j] == -1) x.push(i + "," + j);
 				}
 			}axios.post('/editdefaultschedule/' + this.form._id, querystring.stringify({ schedule: x }), { headers: { "Content-Type": "application/x-www-form-urlencoded" } }).then(function (arena) {
-				_this4.$router.push('/myArenas');
-			}).catch(function (err) {});
+				_this4.$notify({
+					title: 'Success',
+					message: 'The arena schedule is updated successfully',
+					type: 'success'
+				});
+				_this4.$router.push('/profile');
+			}).catch(function (error) {
+				_this4.$notify({
+					title: 'Error',
+					message: error,
+					type: 'error'
+				});
+			});
 		}
 	}
 
@@ -14029,7 +14161,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         _this.type_provider = true;
       }
     }).catch(function (error) {
-      return alert(error.response.data.error);
+      _this.$notify({
+        title: 'Error',
+        message: error.response.data.error,
+        type: 'error'
+      });
     });
   },
 
@@ -14159,50 +14295,102 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-	data: function data() {
-		return {
-			form: new Form({
-				comment: ""
-			}),
-			games: [],
-			showmodal: false,
-			selected: ''
-		};
-	},
-	created: function created() {
-		var _this = this;
+    data: function data() {
+        return {
+            form: new Form({
+                phone: "",
+                comment: ""
+            }),
+            games: [],
+            showmodal: false,
+            selected: ''
+        };
+    },
+    created: function created() {
+        var _this = this;
 
-		axios.get("/viewgames").then(function (res) {
-			_this.games = res.data;
-		});
-	},
+        axios.get("/viewgames").then(function (res) {
+            _this.games = res.data;
+        });
+    },
 
+    methods: {
+        date: function date(inp) {
 
-	methods: {
-		onsubmit: function onsubmit(game) {
-			this.form.submit('post', '/RequestGame/' + this.games[game]._id).then(function (response) {
-				return alert(response);
-			}).catch(function (errors) {
-				return alert(errors);
-			});
-		},
-		selectReq: function selectReq(e) {
-			this.showmodal = true;
-			this.selected = e.target.value;
-		}
-	},
-
-	computed: {
-		user: function user() {
-			return window.user;
-		},
-		type: function type() {
-			return window.type;
-		}
-	}
+            return inp.substring(8, 10) + " / " + inp.substring(5, 7) + " / " + inp.substring(0, 4);
+        },
+        onsubmit: function onsubmit(game) {
+            this.form.submit('post', '/RequestGame/' + this.games[game]._id).then(function (response) {
+                return alert(response);
+            }).catch(function (errors) {
+                return alert(errors);
+            });
+        },
+        selectReq: function selectReq(e) {
+            console.log(e.target);
+            this.showmodal = true;
+            var x = e.target.value;
+            this.selected = x;
+            this.$forceUpdate();
+        }
+    },
+    computed: {
+        user: function user() {
+            return window.user;
+        },
+        type: function type() {
+            return window.type;
+        }
+    }
 });
 
 /***/ }),
@@ -14211,6 +14399,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(Buffer) {Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
 //
 //
 //
@@ -14320,7 +14509,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		axios.get('/topArenas').then(function (response) {
 			_this.top_arenas = response.data;
 		}).catch(function (error) {
-			return alert(error);
+			_this.$notify({
+				title: 'Error',
+				message: error,
+				type: 'error'
+			});
 		});
 	},
 
@@ -14663,7 +14856,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       value: [],
       bookings: [],
       playerNames: [],
-      dates: []
+      dates: [],
+      type: this.$session.get('type')
     };
   },
   created: function created() {
@@ -14678,12 +14872,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
   },
 
 
-  computed: {
-    type: function type() {
-      return window.type;
-    }
-  },
-
   methods: {
     render: function render() {
       var _this2 = this;
@@ -14691,9 +14879,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       this.playerNames = [];
       this.dates = [];
       this.value = [];
+
       for (var i = 0; i < this.bookings.length; i++) {
         var date = new Date(this.bookings[i].date);
-        this.dates.push(date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate() + "(" + date.getHours() + ":" + date.getMinutes() + ')');
+        var minDigit = "";
+
+        if (date.getMinutes() < 10) minDigit = "0";
+
+        this.dates.push(date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate() + "(" + date.getHours() + ":" + minDigit + date.getMinutes() + ')');
         this.value.push(1);
         var playerID = this.bookings[i].playerID;
         axios.get('/getNameOfPlayer/' + playerID).then(function (res) {
@@ -15288,6 +15481,20 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		signup: function signup() {
 			var _this = this;
 
+			var errors = [];
+			if (!/^[a-zA-Z ]*$/.test(this.form.name)) {
+				this.form.errors.record({ name: 'Name cannot contain special characters' });
+				return;
+			}
+			if (!/^[a-zA-Z0-9_.-]*$/.test(this.form.username)) {
+				this.form.errors.record({ username: 'Username can only contain 0-9/a-z/A-Z/_/./-' });
+				return;
+			}
+			if (!/^[a-zA-Z0-9_.-]*$/.test(this.form.location)) {
+				this.form.errors.record({ location: 'Location can only contain 0-9/a-z/A-Z/_/./-' });
+				return;
+			}
+
 			this.loading = 'button is-primary w3-xlarge is-loading';
 			this.loginData = { username: this.form.username, password: this.form.password };
 			this.form.submit('post', '/signup').then(function (res) {
@@ -15784,7 +15991,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     return {
       comment: '',
       comments: this.initialcomments,
-      type: window.type
+      type: this.$session.get('type')
+
     };
   },
   mounted: function mounted() {
@@ -15802,7 +16010,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     calcDate: function calcDate(date) {
       var comp = new Date(date);
       var minDigit = "";
-      if (comp.getMinutes().length < 1) minDigit = "0";
+      if (comp.getMinutes() < 10) minDigit = "0";
 
       return comp.getFullYear() + "/" + (comp.getMonth() + 1) + "/" + comp.getDate() + "(" + comp.getHours() + ":" + minDigit + comp.getMinutes() + ')';
     },
@@ -16274,6 +16482,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
     methods: {
         handleClick: function handleClick(index) {
+            if (index <= new Date().getHours() * 2) {
+                return console.log("You can not book in the past");
+            }
             if (this.schedule[index] != 0 && this.schedule[index] != 3) {
                 console.log("You can not use this as start/end index because it is already used");
             } else if (this.startTime == null) {
@@ -16284,6 +16495,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             } else {
                 //user is selecting 
                 if (this.findIndex(this.startTime) <= index && this.checkAvailable(parseInt(this.findIndex(this.startTime)), parseInt(index))) {
+
                     if (this.findIndex(this.startTime) == index && this.findIndex(this.endTime) == index + 1) {
                         this.schedule[index] = 0;
                         this.startTime = null;
@@ -16657,7 +16869,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 _this.hideMe();
             }).catch(function (error) {
                 _this.error = true;
-                alert(error);
+                _this.$notify({ title: "Error!", message: error.response.data.error, type: "error" });
             });
         },
         setUnavailable2: function setUnavailable2() {
@@ -16679,8 +16891,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 _this2.hideMe();
             }).catch(function (error) {
                 _this2.error = true;
-                console.log(error);
-                alert(error);
+                _this2.$notify({ title: "Error!", message: error.response.data.error, type: "error" });
             });
         },
         assignValues: function assignValues(data) {
@@ -17532,14 +17743,14 @@ exports.push([module.i, "\n* {box-sizing:border-box;\n}\nul {list-style-type: no
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(3)();
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 /***/ }),
 /* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(3)();
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 /***/ }),
 /* 95 */
@@ -19420,28 +19631,32 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     on: {
       "change": _vm.onFile
     }
-  }), _c('br'), _vm._v(" "), _c('br'), _vm._v(" "), _vm._m(2)]), _vm._v(" "), _c('br'), _vm._v(" "), _c('br')]) : _vm._e(), _vm._v(" "), (_vm.selectedTab == 'schedule') ? _c('div', [_c('div', {
-    staticClass: "w3-center"
-  }, [_c('div', {
-    staticClass: "w3-half"
-  }, [_c('div', {
-    staticClass: "w3-dropdown-hover"
+  }), _c('br'), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
+    staticClass: "control"
   }, [_c('button', {
-    staticClass: "w3-button w3-black w3-hover-red"
-  }, [_vm._v("Choose Day")]), _vm._v(" "), _c('div', {
-    staticClass: "w3-dropdown-content w3-bar-block w3-border"
-  }, _vm._l((7), function(i) {
-    return _c('a', {
-      staticClass: "w3-bar-item w3-button",
+    staticClass: "button is-primary",
+    attrs: {
+      "disabled": _vm.files == ''
+    }
+  }, [_vm._v("Add")])])]), _vm._v(" "), _c('br'), _vm._v(" "), _c('br')]) : _vm._e(), _vm._v(" "), (_vm.selectedTab == 'schedule') ? _c('div', [_c('div', {
+    staticClass: "tabs "
+  }, [_c('ul', _vm._l((7), function(i) {
+    return _c('li', {
+      class: {
+        'black-tab': _vm.currentDay == i - 1
+      }
+    }, [_c('a', {
       on: {
         "click": function($event) {
           _vm.selectDay(i - 1)
         }
       }
-    }, [_vm._v(_vm._s(_vm.days[i - 1]))])
-  }))])]), _vm._v(" "), _c('h3', {
-    staticClass: "w3-half w3-text-red"
-  }, [_vm._v(_vm._s(_vm.days[_vm.currentDay]))])]), _vm._v(" "), _vm._l((7), function(j) {
+    }, [_c('h6', {
+      class: {
+        'white-text': _vm.currentDay == i - 1
+      }
+    }, [_vm._v(_vm._s(_vm.days[i - 1]))])])])
+  }))]), _vm._v(" "), _vm._l((7), function(j) {
     return (j - 1 == _vm.currentDay) ? _c('table', {
       staticClass: "table is-bordered"
     }, [_c('tr', _vm._l((12), function(i) {
@@ -19543,12 +19758,6 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "id": "img01"
     }
   })])])
-},function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', {
-    staticClass: "control"
-  }, [_c('button', {
-    staticClass: "button is-primary"
-  }, [_vm._v("Add")])])
 }]}
 module.exports.render._withStripped = true
 if (false) {
@@ -20372,7 +20581,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
           _vm.editClicked(booking, index)
         }
       }
-    }, [_vm._v("\n              Rate\n            ")])])])])
+    }, [_vm._v("\n            Rate\n          ")])])])])
   })], 2)])
 },staticRenderFns: []}
 module.exports.render._withStripped = true
@@ -20561,26 +20770,52 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "message"
   }, [_vm._m(0), _vm._v(" "), _c('div', {
     staticClass: "message-body"
-  }, [_vm._v("\n    " + _vm._s(_vm.arena.rules_and_regulations) + "\n  ")])])]), _vm._v(" "), _c('div', {
-    staticClass: "w3-row-padding"
-  }, _vm._l((_vm.photos), function(photo) {
-    return _c('div', {
-      staticClass: "w3-third"
-    }, [_c('img', {
-      staticStyle: {
-        "width": "100%"
-      },
-      attrs: {
-        "src": _vm.getPath(photo),
-        "alt": "arena image"
-      },
-      on: {
-        "click": function($event) {
-          _vm.dispalyImage(_vm.getPath(photo))
-        }
+  }, [_vm._v("\n    " + _vm._s(_vm.arena.rules_and_regulations) + "\n  ")])])]), _vm._v(" "), _c('br'), _c('br'), _vm._v(" "), _c('div', {
+    staticClass: "w3-quarter ",
+    staticStyle: {
+      "padding": "180px 0",
+      "text-align": "center"
+    }
+  }, [(_vm.display_photo > 0) ? _c('a', [_c('img', {
+    attrs: {
+      "src": "Back-48.png",
+      "alt": ""
+    },
+    on: {
+      "click": _vm.minusOne
+    }
+  })]) : _vm._e()]), _vm._v(" "), _c('div', {
+    staticClass: "w3-half"
+  }, [_c('figure', {
+    staticClass: "image is-3by2"
+  }, [_c('img', {
+    staticStyle: {
+      "width": "100%"
+    },
+    attrs: {
+      "src": _vm.getPath(_vm.photos[_vm.display_photo]),
+      "alt": "arena image"
+    },
+    on: {
+      "click": function($event) {
+        _vm.dispalyImage(_vm.getPath(_vm.photos[_vm.display_photo]))
       }
-    })])
-  })), _vm._v(" "), _vm._m(1), _vm._v(" "), _c('comments', {
+    }
+  })])]), _vm._v(" "), _c('div', {
+    staticClass: "w3-quarter",
+    staticStyle: {
+      "padding": "180px 0",
+      "text-align": "center"
+    }
+  }, [(_vm.display_photo < _vm.photos.length - 1) ? _c('a', [_c('img', {
+    attrs: {
+      "src": "Forward-48.png",
+      "alt": ""
+    },
+    on: {
+      "click": _vm.addOne
+    }
+  })]) : _vm._e()]), _vm._v(" "), _vm._m(1), _vm._v(" "), _c('br'), _c('br'), _vm._v(" "), _c('comments', {
     attrs: {
       "initialMina": this.arenaId,
       "initialcomments": this.arena.comments
@@ -21701,30 +21936,70 @@ if (false) {
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', {
     staticClass: "w3-container"
+  }, [_c('div', {
+    staticClass: "w3-quarter"
+  }, [_vm._v(" ")]), _vm._v(" "), _c('div', {
+    staticClass: " w3-center w3-half"
   }, [_c('br'), _vm._v(" "), (_vm.type == 'Player') ? _c('router-link', {
     staticClass: "button w3-blue",
     attrs: {
       "tag": "button",
       "to": "/createGame"
     }
-  }, [_vm._v(" Create New Game")]) : _vm._e(), _vm._v(" "), _c('br'), _vm._v(" "), _vm._l((_vm.games), function(game) {
-    return _c('div', [_c('article', {
-      staticClass: "message"
-    }, [_vm._m(0, true), _vm._v(" "), _c('h3', [_vm._v("Creator : " + _vm._s(game.creator))]), _vm._v(" "), _c('h3', [_vm._v("Size : " + _vm._s(game.size))]), _vm._v(" "), _c('h3', [_vm._v("Location : " + _vm._s(game.location))]), _vm._v(" "), _c('h3', [_vm._v("Start date  : " + _vm._s(game.start_date))]), _vm._v(" "), _c('h3', [_vm._v("End date : " + _vm._s(game.end_date))]), _vm._v(" "), _c('button', {
-      staticClass: "button is-info",
+  }, [_vm._v("\n               Create New Game\n           ")]) : _vm._e(), _vm._v(" "), _c('br'), _vm._v(" "), _vm._l((_vm.games), function(game) {
+    return _c('div', [_c('el-card', {
+      staticStyle: {
+        "width": "650px"
+      }
+    }, [_c('div', {
+      staticClass: "clearfix",
+      slot: "header"
+    }, [_c('span', {
+      staticStyle: {
+        "float": "left line-height: 36px",
+        "font-size": "18px",
+        "font-weight": "bold"
+      }
+    }, [_vm._v("\n                   Game Request by " + _vm._s(game.creator) + "\n                       ")]), _vm._v(" "), _c('button', {
+      staticClass: "w3-green",
+      staticStyle: {
+        "float": "right"
+      },
       attrs: {
-        "type": "button",
+        "type": "success",
         "value": _vm.games.indexOf(game)
       },
       on: {
         "click": _vm.selectReq
       }
-    }, [_vm._v("Send a request")])]), _vm._v(" "), (_vm.showmodal) ? _c('div', [_c('div', {
+    }, [_vm._v("\n                           Request Game\n                       ")])]), _vm._v(" "), _c('div', [_c('table', [_c('tr', {
+      staticStyle: {
+        "font-size": "12px"
+      }
+    }, [_c('td', [_c('span', {
+      staticStyle: {
+        "font-weight": "bold"
+      }
+    }, [_vm._v("\n                               Size\n                               ")]), _vm._v(" : " + _vm._s(game.size) + "\n                               ")]), _vm._v(" "), _c('td', [_c('span', {
+      staticStyle: {
+        "font-weight": "bold"
+      }
+    }, [_vm._v("\n                               Location \n                               ")]), _vm._v(" : " + _vm._s(game.location) + "\n                               ")]), _vm._v(" "), _c('td', [_c('span', {
+      staticStyle: {
+        "font-weight": "bold"
+      }
+    }, [_vm._v("\n                               Start date\n                               ")]), _vm._v(" : " + _vm._s(_vm.date(game.start_date)) + "\n                               ")]), _vm._v(" "), _c('td', [_c('span', {
+      staticStyle: {
+        "font-weight": "bold"
+      }
+    }, [_vm._v("\n                               End date\n                               ")]), _vm._v(" : " + _vm._s(_vm.date(game.end_date)) + "\n                               ")])])])])]), _vm._v(" "), _c('br'), _vm._v(" "), _c('br'), _vm._v(" "), (_vm.showmodal) ? _c('div', [_c('div', {
       staticClass: "modal is-active"
     }, [_c('div', {
       staticClass: "modal-background"
     }), _vm._v(" "), _c('div', {
       staticClass: "modal-content"
+    }, [_c('div', {
+      staticClass: "box"
     }, [_c('form', {
       attrs: {
         "action": "/RequestGame",
@@ -21736,6 +22011,33 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
           _vm.onsubmit(_vm.selected)
         }
       }
+    }, [_c('div', {
+      staticClass: "field"
+    }, [_c('input', {
+      directives: [{
+        name: "model",
+        rawName: "v-model",
+        value: (_vm.form.phone),
+        expression: "form.phone"
+      }],
+      staticClass: "input",
+      attrs: {
+        "required": "",
+        "pattern": "^01[0-2]{1}[0-9]{8}",
+        "placeholder": "Your Phone Number...",
+        "title": "please enter a valid phone number"
+      },
+      domProps: {
+        "value": (_vm.form.phone)
+      },
+      on: {
+        "input": function($event) {
+          if ($event.target.composing) { return; }
+          _vm.form.phone = $event.target.value
+        }
+      }
+    })]), _vm._v(" "), _c('div', {
+      staticClass: "field"
     }, [_c('input', {
       directives: [{
         name: "model",
@@ -21745,6 +22047,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       }],
       staticClass: "textarea",
       attrs: {
+        "required": "",
         "placeholder": "Add a comment..."
       },
       domProps: {
@@ -21756,25 +22059,21 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
           _vm.form.comment = $event.target.value
         }
       }
-    }), _vm._v(" "), _c('button', {
+    })]), _vm._v(" "), _c('button', {
       staticClass: "button is-info",
       attrs: {
         "type": "submit"
       }
-    }, [_vm._v("Send The Request")])])]), _vm._v(" "), _c('button', {
+    }, [_vm._v("\n                           Send The Request\n                           ")])])])]), _vm._v(" "), _c('button', {
       staticClass: "modal-close",
       on: {
         "click": function($event) {
           _vm.showmodal = false
         }
       }
-    })])]) : _vm._e()])
-  })], 2)
-},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', {
-    staticClass: "message-header"
-  }, [_c('p', [_vm._v("Game details")])])
-}]}
+    })])]) : _vm._e()], 1)
+  })], 2)])
+},staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
   module.hot.accept()
@@ -22111,14 +22410,24 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "to": "/viewArenas"
     }
   }, [_c('a', [_vm._v("Show Arenas")])])], 1)])])]), _vm._v(" "), _c('hr'), _vm._v(" "), _c('div', {
-    staticClass: "w3-container w3-card-2 w3-white w3-margin-bottom"
-  }, [_c('div', {
-    staticClass: "heading w3-center w3-container w3-card-2 w3-white w3-margin-bottom"
+    staticClass: "w3-container w3-white w3-margin-bottom "
+  }, [_c('br'), _vm._v(" "), _c('div', {
+    staticClass: "has-text-centered"
   }, [_c('h1', {
-    staticClass: "title w3-text-red"
-  }, [_vm._v("TOP ARENAS")]), _vm._v(" "), (_vm.top_arenas.length == 0) ? _c('h2', {
+    staticStyle: {
+      "font-family": "Chalkboard SE"
+    }
+  }, [_c('font', {
+    attrs: {
+      "size": "8"
+    }
+  }, [_c('b', [_c('font', {
+    attrs: {
+      "color": "red"
+    }
+  }, [_vm._v("TOP")]), _vm._v(" ARENAS")], 1)])], 1), _vm._v(" "), (_vm.top_arenas.length == 0) ? _c('h2', {
     staticClass: "title w3-text-blue"
-  }, [_vm._v("NO arenas created yet")]) : _vm._e()]), _vm._v(" "), _c('div', {
+  }, [_vm._v("NO arenas created yet")]) : _vm._e(), _vm._v(" "), _c('br')]), _vm._v(" "), _c('div', {
     staticClass: "w3-row"
   }, _vm._l((_vm.top_arenas), function(arena) {
     return _c('div', {
@@ -22481,7 +22790,17 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         "src": "bluetick.png"
       }
     }) : _vm._e()])])])
-  }))])]), _vm._v(" "), (this.startTime != null && this.endTime != null) ? _c('div', {
+  })), _vm._v(" "), _c('button', {
+    staticClass: "button is-black is-inverted is-large",
+    attrs: {
+      "disabled": _vm.startTime == null || _vm.endTime == null
+    },
+    on: {
+      "click": function($event) {
+        _vm.bookHours()
+      }
+    }
+  }, [_vm._v("Play !")])])]), _vm._v(" "), (this.startTime != null && this.endTime != null) ? _c('div', {
     attrs: {
       "id": "StripeForm"
     }

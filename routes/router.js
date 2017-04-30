@@ -42,7 +42,7 @@ router.get('/', function (req, res) {
 router.get('/topArenas',function(req,res){
     Arena.find({}).sort({avg_rating : -1}).limit(8).exec(function(err,top_arenas){
         if(err){
-            return res.status(400).json(err);
+            return res.status(400).json({ error: err.message });
         }else{
             return res.json(top_arenas);
         }
