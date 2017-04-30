@@ -62,6 +62,7 @@
 
 		methods : {
 			createGame(){
+				
 				this.form.submit('post','/createGame')
 				.then(res => {
 					this.$notify({
