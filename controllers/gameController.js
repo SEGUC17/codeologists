@@ -14,7 +14,7 @@ var createGame = function (req, res) {
     req.checkBody('start_date', 'Start Date is required.').notEmpty();
     req.checkBody('end_date', 'End Date is required.').notEmpty();
     req.checkBody('location', 'Location is required.').notEmpty();
-    req.checkBody('size', 'Arena size is required.').notEmpty();
+    req.checkBody('size', 'The team size of you game is required.').notEmpty();
     var errors = req.validationErrors();
     if (errors) {
         return res.status(400).json(errors);
@@ -25,7 +25,7 @@ var createGame = function (req, res) {
     var location2 = req.body.location;
     var start_date2 = req.body.start_date;
     var end_date2 = req.body.end_date;
-    if (start_date2 > end_date2 || end_date2 < new Date()) {
+    if (new Date(start_date2) > new Date(end_date2) || new Date(end_date2) < new Date() || new Date(start_date2) < new Date()) {
         res.status(400).json({ error: "Enter a valid date" });
     }
     else {
