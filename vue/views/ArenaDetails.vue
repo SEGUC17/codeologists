@@ -189,7 +189,7 @@
 			getPath(photo) {
 				if(photo && photo.data)
                   return 'data:image/*;base64,' + (new Buffer(photo.data.data).toString('base64'));
-                return '';
+                return 'no_image.jpg';
 			},
 			dispalyImage(element) {
 				document.getElementById("img01").src = element;

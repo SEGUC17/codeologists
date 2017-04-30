@@ -22,14 +22,14 @@
         <label class="label">Arena Name:</label>
         <span class="help is-info">Arena Name can not contain spaces</span
         <p class="control">
-          <input class="input "type="text" placeholder="Arena name" onkeypress='return event.charCode !=32' v-model = "form.name" required="true"> <br>
+          <input class="input "type="text" placeholder="Arena name" onkeypress='return event.charCode >= 48 && event.charCode <= 57 || event.charCode < 10 || event.charCode >= 65 && event.charCode <= 90 || event.charCode >= 97 && event.charCode <= 122 || event.charCode == 45 || event.charCode == 95' onpaste="return false;"  v-model = "form.name" required="true"> <br>
         </p>
         </div>
 
         <div class="field">
         <label class="label">Arena address:</label>
         <p class="control">
-          <input class="input"  type="text" placeholder="Arena address" v-model = "form.address" required="true"> <br>
+          <input class="input"  type="text" placeholder="Arena address" v-model = "form.address" onkeypress='return event.charCode >= 48 && event.charCode <= 57 || event.charCode < 10 || event.charCode >= 65 && event.charCode <= 90 || event.charCode >= 97 && event.charCode <= 122 || event.charCode == 45 || event.charCode == 95 || event.charCode == 32' onpaste="return false;" required="true"> <br>
         </p>
         </div>
 
@@ -43,22 +43,22 @@
         <div class="field">
         <label class="label">Arena location:</label>
               <select  v-model="form.location" id="location" required >
-                <option value="" selected disabled>Arena location</option>                               
+                <option value="" selected disabled>Arena location</option>
                 <option v-for="loc in locations" v-bind:value="loc">
                  {{ loc }}
-                </option> 
+                </option>
                 </select>
         </div>
 
         <div >
         <label class="label">Arena type:</label>
               <select v-model="form.type"  required >
-                 <option value="" disabled selected>Arena surface type</option>              
+                 <option value="" disabled selected>Arena surface type</option>
                 <option v-for="type in types" v-bind:value="type">
                  {{ type }}
-                </option> 
+                </option>
                 </select>
-    
+
         </div>
 
         <div class="field">
@@ -282,19 +282,19 @@
                 this.form.submit('post', '/createArena')
                     .then(res => {
                         if (res.error)
-                            alert(res.error);
+                            this.$notify({title:"", message: res.error ,type:"error"});
                         else{
-                            alert('arena added');
+                            this.$notify({title:"", message: "Arena added successfully!" ,type:"success"});
                             this.$router.push('/myArenas');
                             }
                     })
                     .catch(err => {
                         if (err.error)
-                            alert(err.error);
+                            this.$notify({title:"", message: err.error ,type:"error"});
                         if (err.response.data.error)
-                            alert(err.response.data.error);
+                            this.$notify({title:"", message: err.response.data.error ,type:"error"});
                         else
-                            alert(err.message);
+                            this.$notify({title:"", message: err.message ,type:"error"});
                     });
             },
             selectDay(day) {
