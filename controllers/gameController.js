@@ -60,7 +60,9 @@ functionality: this function fetches the games
 */
 function viewgames(req, res) {
 
-    Game.find(function (err, games) {
+    Game.find({})
+    .$where('this.end_date>new Date()')
+    .exec(function (err, games) {
         if (err)
             res.json({ error: err.message });
         else
@@ -79,8 +81,8 @@ a function attaches the request to the game .
 */
 
 function requestgame(req, res, nxt) {
-
-    var NewReq = { playerUsername: req.user.username, comment: req.body.comment, accepted: false };
+    var message = req.body.comment+"...... His phone number is "+req.body.phone; 
+    var NewReq = { playerUsername: req.user.username, comment: message, accepted: false };
     var id = req.params.id;
     if (id == null) {
         res.status(500).json({ error: 'can not send a game request of undefined game' });
@@ -110,7 +112,6 @@ function requestgame(req, res, nxt) {
             }
             game.requests.push(NewReq);
             game.save(nxt);
-            console.log(game);
             res.send("Request sent Successfully !");
 
         }
