@@ -189,7 +189,7 @@
                         this.hideMe();
                         }
                  ).catch(error => {this.error=true
-                                    alert(error)    });
+                                    this.$notify({title:"Error!" , message: error.response.data.error, type: "error"})   });
              },
               setUnavailable2(){
                 axios.post('/sp/arena/'+this.arenaName,querystring.stringify(
@@ -211,8 +211,7 @@
                                              this.hideMe();
                  }
                  ).catch(error => {this.error=true
-                                    console.log(error)
-                                    alert(error)    });
+                                    this.$notify({title:"Error!" , message: error.response.data.error, type: "error"})    });
              },
             assignValues(data) {
                 this.shown = true;
