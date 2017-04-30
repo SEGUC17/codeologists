@@ -4,16 +4,16 @@
 			  <img src="image/1.jpg" alt="Lights" style="width: 100%" >
 			  <div class="w3-display-middle w3-large">
 
-			  		<h1 class="w3-text-white">Choose location</h1>
-			  		<div class="box" style="opacity: 0.65;">
+			  		<h3><font size="6"><font color="white">Choose Location</font></font></h3>
+			  		<div class="box">
 			  			<div class="w3-dropdown-hover">
-							<button class="w3-button w3-black" >{{this.location}}</button>
+							<button class="w3-button w3-black" style="width: 300px">{{this.location}}</button>
 							<div class="w3-dropdown-content w3-bar-block w3-border" >
 								<a v-for="loc in locations" class="w3-bar-item w3-button" @click="setLocation(loc)">{{loc}}</a>
 							</div>
 						</div>
 
-						<button class="w3-button w3-red" @click="view_by_location" :disabled="this.check " >
+						<button class="w3-button w3-red w3-text-black" @click="view_by_location" :disabled="this.check " >
 							<router-link to="/viewArenas">
 	    						<a>Show Arenas</a>
 	    					</router-link>

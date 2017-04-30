@@ -62,12 +62,12 @@
     </div>
     
       <div class="w3-container w3-card-2 w3-white w3-margin-bottom" v-if="selectedTab=='arenas'">
-        <p  class="w3-padding-16" ></p>
-        <router-link tag="el-button" to="/createArena"><a>Create New Arena</a></router-link>
+        <div class="w3-center">
+          <p  class="w3-padding-16" ></p>
+          <router-link tag="el-button" to="/createArena"><a>Create New Arena</a></router-link>
+        </div>
         <br>
         <br>
-
-        <h2 class="w3-text-grey">My Arenas: </h2>
         <arenas></arenas>
 
       </div>
