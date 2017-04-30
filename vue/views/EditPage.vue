@@ -141,7 +141,13 @@
                       this.type_provider = true;
                     }
               })
-              .catch(error => alert(error.response.data.error));
+              .catch(error => {
+        				this.$notify({
+        							title: 'Error',
+        							message: error.response.data.error,
+        							type: 'error'
+        						});
+        			});
             },
             methods:{
                        onSubmit_player(){

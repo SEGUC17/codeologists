@@ -109,7 +109,13 @@
 		created() {
 			axios.get('/topArenas')
 			.then(response => {this.top_arenas = response.data})
-			.catch(error => alert(error));
+			.catch(error => {
+				this.$notify({
+							title: 'Error',
+							message: error,
+							type: 'error'
+						});
+			});
 		},
 
 		methods : {
