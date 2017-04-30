@@ -4,7 +4,7 @@
 
         <br>
         <br>
-
+        
         <table class="table is-striped">
           <thead>
             <th>Arena</th>
@@ -85,15 +85,25 @@
                     axios.post('/acceptBooking/' + booking._id, querystring.stringify({ arena: booking.arena }), { headers: { "Content-Type": "application/x-www-form-urlencoded" } })
                         .then(response => {
                             if (response.error) {
-                                alert(response.error);
+                                this.$notify.error({
+                                  title: 'Error',
+                                  message: response.error
+                                });
                             }
                             else {
-                                alert('Successfully accepted');
+                                this.$notify({
+                                  title: 'Done',
+                                  message: 'You have successfully accepted the booking',
+                                  type: 'success'
+                                });
                                 this.selectArena(this.curArena);
                             }
                         })
                         .catch(err => {
-                            alert(err);
+                            this.$notify.error({
+                                  title: 'Error',
+                                  message: err,
+                                });
                         });
                 }
             },
@@ -103,15 +113,25 @@
                     axios.post('/rejectBooking/' + booking._id, querystring.stringify({ arena: booking.arena }), { headers: { "Content-Type": "application/x-www-form-urlencoded" } })
                         .then(response => {
                             if (response.error) {
-                                alert(response.error);
+                                this.$notify.error({
+                                  title: 'Error',
+                                  message: response.error
+                                });
                             }
                             else {
-                                alert('Successfully rejected');
+                                this.$notify({
+                                  title: 'Done',
+                                  message: 'You have successfully rejected the booking',
+                                  type: 'success'
+                                });
                                 this.selectArena(this.curArena);
                             }
                         })
                         .catch(err => {
-                            alert(err);
+                            this.$notify.error({
+                                  title: 'Error',
+                                  message: err
+                                });
                         });
                 }
             }
@@ -119,8 +139,8 @@
         },
 
         computed: {
-            user: function () { return window.user; },
-            type: function () { return window.type; }
+            user: function () { return this.$session.get('user'); },
+            type: function () { return this.$session.get('type'); }
         }
     })
 

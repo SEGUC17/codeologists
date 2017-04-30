@@ -246,6 +246,7 @@ gameControler.myrequests:
 function myrequests(req, res) {
     var currentuser = req.user.username;
     Game.findOne({ creator: currentuser }, function (err, game) {
+        console.log(game);
         if (err) {
             res.status(400).json({ error: err });
             return;

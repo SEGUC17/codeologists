@@ -1,19 +1,30 @@
 <template>
 <div>
    <div v-for="Notification in Notifications">
-<article class="message" >
-    <div class="message-header">
-        <p>Notification details:</p>
-      </div>
-    <h3>Details :{{Notification}}</h3>
-  <!--  <form action="/delete" method="POST" @submit.prevent="rej(request)">
-   <button type="submit" class="button is-info" >Reject</button>
-   </form> -->
-     </article>
+<div class="notify notify-yellow"><span class="symbol icon-tick"></span>{{Notification}}</div> 
 </div>
 </div>
 </template>
+<style >
+  .notify {
+  background-color:#e3f7fc; 
+  color:#555; 
+    border:.1em solid;
+  border-color: #8ed9f6;
+    border-radius:10px;
+    font-family:Tahoma,Geneva,Arial,sans-serif;
+    font-size:1.1em;
+    padding:10px 10px 10px 10px;
+    margin:10px;
+    cursor: default;
+}
 
+.notify-yellow { background: #fff8c4; border-color: #f7deae; }
+.notify-red { background: #ffecec; border-color: #fad9d7; }
+.notify-green { background: #e9ffd9; border-color: #D1FAB6; }
+
+
+</style>
 
 <script>
 

@@ -132,8 +132,8 @@
 
         },
         computed: {
-            user: function () { return this.$session.user; },
-            type: function () { return this.$session.type; }
+            user: function () { return this.$session.get('user'); },
+            type: function () { return this.$session.get('type'); }
         }
     }
 
