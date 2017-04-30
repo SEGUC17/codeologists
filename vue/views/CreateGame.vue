@@ -72,8 +72,8 @@
 		},
 
         computed: {
-            user: function () { return window.user; },
-            type: function () { return window.type; }
+            user: function () { return this.$session.user; },
+            type: function () { return this.$session.type; }
         }
 	}
 </script>
