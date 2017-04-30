@@ -1,10 +1,10 @@
 <template>
 
 
-<div id="list" class="columns is-mobile">
+<div id="list" class="w3-container">
     <div class="column is-half is-offset-one-quarter">
-
-      <input v-model="PlayerInfo" v-on:keyup.enter="onSubmit" placeholder="add a player" style='width:100%'>
+      <label class=" w3-card-2 w3-white w3-margin-bottom"><font face="Ubuntu">Black list</font></label><br></br>
+      <input class="input" v-model="PlayerInfo" v-on:keyup.enter="onSubmit" placeholder="add a player" style='width:70%'>
         
         <div v-for="(player, index) in players" v-bind:key="player" >
         <br>
@@ -57,7 +57,7 @@
                     this.showPlayers(res.data.players)
                 })
                 .catch(err => {
-                    alert("please login")
+                    //alert("please login")
                 })
         },
         methods: {
@@ -84,11 +84,11 @@
                     .then(res => {
                         this.players.splice(index, 1);
                         setTimeout(function() {
-                            alert(res.data.message);
+                            this.$notify({title:"", message: res.data.message ,type:"success"});
                         }, 1);
                     })
                     .catch(err => {
-                        alert(err.response.data.error)
+                        this.$notify({title:"", message: err.response.data.error ,type:"warn"});
                     });
             },
             addNewPlayer(listedPlayer) {
@@ -114,11 +114,11 @@
                         .then(res => {
                             this.addNewPlayer(res.data.listedPlayer)
                             setTimeout(function() {
-                                alert(res.data.message);
-                            }, 1);
+                            this.$notify({title:"", message: res.data.message ,type:"success"});
+                        }, 1);
                         })
                         .catch(err => {
-                            alert(err.response.data.error)
+                            this.$notify({title:"", message: err.response.data.error ,type:"warn"});
                         });
                 } else {
                     axios.post('/profile/blacklist/phone',
@@ -132,11 +132,11 @@
                         .then(res => {
                             this.addNewPlayer(res.data.listedPlayer)
                             setTimeout(function() {
-                                alert(res.data.message);
-                            }, 1);
+                            this.$notify({title:"", message: res.data.message ,type:"success"});
+                        }, 1);
                         })
                         .catch(err => {
-                            alert(err.response.data.error)
+                            this.$notify({title:"", message: err.response.data.error ,type:"warn"});
                         });
                 }
             }
