@@ -81,7 +81,7 @@ a function attaches the request to the game .
 */
 
 function requestgame(req, res, nxt) {
-    var message = req.body.comment+"...... His phone number is "+req.body.phone; 
+    var message = req.body.comment+"  ...... My phone number is "+req.body.phone; 
     var NewReq = { playerUsername: req.user.username, comment: message, accepted: false };
     var id = req.params.id;
     if (id == null) {

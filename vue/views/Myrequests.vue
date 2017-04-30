@@ -1,20 +1,42 @@
 <template>
 <div>
    <div v-for="request in requests">
-<article class="message" >
-    <div class="message-header">
-        <p>Requet details: {{this.requests}}</p>
-      </div>
 
-    <h3>Player Username :{{request.playerUsername}}</h3>
-    <h3>Comment :{{request.comment}} </h3>
-<form action="/AcceptRequest" method="POST" @submit.prevent="acc(request)">
-   <button type="submit" class="button is-info" >Accept</button>
-   </form>
-   <form action="/RejectRequest" method="POST" @submit.prevent="rej(request)">
-   <button type="submit" class="button is-info" >Reject</button>
-   </form>
-     </article>
+
+
+    <el-card style="width: 650px">
+      <div slot="header" class="clearfix">
+          <span style="float:left line-height: 36px; font-size: 18px; font-weight: bold;">
+            You have a game request by {{ request.playerUsername}}
+          </span>
+          <br>
+          <span style="font-weight: bold;">He left you a comment :</span>
+          <br>
+          <span>{{request.comment}}</span>
+          <form action="/RejectRequest" method="POST" @submit.prevent="rej(request)">
+             <button class="w3-red" style="float: right;" type="submit">Reject</button>
+          </form>     
+          <form action="/AcceptRequest" method="POST" @submit.prevent="acc(request)">
+            <button class="w3-green" style="float: right;" type="submit">Accept</button>
+          </form>
+        </div>
+    </el-card>
+
+
+   <!--  <article class="message" >
+        <div class="message-header">
+            <p>Requet details: {{this.requests}}</p>
+        </div>
+
+        <h3>Player Username :{{request.playerUsername}}</h3>
+        <h3>Comment :{{request.comment}} </h3>
+        <form action="/AcceptRequest" method="POST" @submit.prevent="acc(request)">
+           <button type="submit" class="button is-info" >Accept</button>
+        </form>
+        <form action="/RejectRequest" method="POST" @submit.prevent="rej(request)">
+           <button type="submit" class="button is-info" >Reject</button>
+        </form>
+    </article> -->
 </div>
 </div>
 </template>
